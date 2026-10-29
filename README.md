@@ -79,9 +79,19 @@ FlexAgX is designed to deliver the following. Results depend on the game, the sc
 
 **Overall.** The image looks composed rather than processed. It is brighter where it was too dark, calmer where it was too hot, and it keeps a sense of depth that a harsher tone curve would flatten.
 
-When you compare before and after, the largest changes are usually in the shadows and highlights. Midtones should look closest to the original.
+<table>
+  <tr>
+    <td align="center">
+      <b>Before</b><br />
+      <img src="https://github.com/user-attachments/assets/f73eac74-a38f-4ded-a856-6f798035b6ef" width="100%" alt="Before" />
+    </td>
+    <td align="center">
+      <b>After</b><br />
+      <img src="https://github.com/user-attachments/assets/c24c0a3d-fccb-4dd7-aacb-51b8aa54b273" width="100%" alt="After" />
+    </td>
+  </tr>
+</table>
 
-FlexAgX works on the finished frame, so it cannot restore detail the game has already clipped to pure white. Use Clipping Warning to see where that happens.
 
 ---
 
