@@ -65,6 +65,8 @@ Clipping Warning paints anything the game has already blown out in magenta, so y
 
 ---
 
+<a id="what-youll-see"></a>
+
 ## 👀 What You'll See
 
 FlexAgX is designed to deliver the following. Results depend on the game, the scene, your display, and your settings.*
@@ -107,6 +109,8 @@ Older ReShade versions, Direct3D 9 and 10, and OpenGL below 4.3 are rejected at 
 
 ---
 
+<a id="installation"></a>
+
 ## 📥 Installation
 
 1. Install ReShade 5.9.0 or newer for your game's graphics API.
@@ -116,6 +120,8 @@ Older ReShade versions, Direct3D 9 and 10, and OpenGL below 4.3 are rejected at 
 5. Open the FlexAgX settings and adjust to taste. The defaults are the recommended starting point.
 
 ---
+
+<a id="controls"></a>
 
 ## 🎛️ Controls
 
@@ -145,6 +151,8 @@ Set `Overall Strength` to 0% and FlexAgX becomes a bit-exact pass-through: your 
 | Input and Output | Dithering | On | On / Off | Adds invisible noise so gradients do not show color bands. |
 
 ---
+
+<a id="how-it-works"></a>
 
 ## ⚙️ How It Works
 
