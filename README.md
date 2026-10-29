@@ -59,10 +59,6 @@ Local Detail restores fine contrast in foliage, fabric, stone, and faces, the ki
 
 Dithering adds imperceptible noise to smooth gradients, so skies and fog do not break into visible rings. The curve itself is checked for monotonicity across every 8-bit code before it is used, so the image never reverses direction or steps unnaturally.
 
-### Diagnostics, built in.
-
-Clipping Warning paints anything the game has already blown out in magenta, so you can see exactly what FlexAgX cannot recover. Exposure Gain shows how much brightness it is adding, in real time.
-
 ---
 
 <a id="what-youll-see"></a>
