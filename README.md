@@ -15,7 +15,7 @@ Shadows that keep their shape. Highlights that hold their color. Detail that sta
 
 ---
 
-## Introducing FlexAgX.
+## ✨ Introducing FlexAgX.
 
 FlexAgX is a tone-mapping shader for ReShade. It takes the final image of your game and reshapes its brightness and color so it reads the way a well-exposed photograph would: balanced, luminous, and natural. No crushed blacks. No blown-out skies. No muddy midtones.
 
@@ -23,7 +23,7 @@ It is a single file. It looks good out of the box, and every decision it makes c
 
 ---
 
-## Why it's different.
+## 🤔 Why it's different.
 
 Most tone mappers ask you to choose a trade-off. Lift the shadows and the highlights go flat. Protect the highlights and the darks turn to mud. Push the brightness and the colors drift.
 
@@ -33,7 +33,7 @@ Every stage is designed to work with the others. Nothing is bolted on.
 
 ---
 
-## Features
+## 🧩 Features
 
 ### Brightness, understood.
 
@@ -65,7 +65,7 @@ Clipping Warning paints anything the game has already blown out in magenta, so y
 
 ---
 
-## What You'll See
+## 👀 What You'll See
 
 FlexAgX is designed to deliver the following. Results depend on the game, the scene, your display, and your settings.*
 
@@ -95,7 +95,7 @@ FlexAgX is designed to deliver the following. Results depend on the game, the sc
 
 ---
 
-## Requirements
+## 📋 Requirements
 
 | Requirement | Details |
 |---|---|
@@ -107,7 +107,7 @@ Older ReShade versions, Direct3D 9 and 10, and OpenGL below 4.3 are rejected at 
 
 ---
 
-## Installation
+## 📥 Installation
 
 1. Install ReShade 5.9.0 or newer for your game's graphics API.
 2. Download `FlexAgX.fx` and place it in your ReShade shaders folder, usually `reshade-shaders/Shaders/`.
@@ -117,7 +117,7 @@ Older ReShade versions, Direct3D 9 and 10, and OpenGL below 4.3 are rejected at 
 
 ---
 
-## Controls
+## 🎛️ Controls
 
 Set `Overall Strength` to 0% and FlexAgX becomes a bit-exact pass-through: your image is returned exactly as the game rendered it. The debug views remain available at 0% for diagnostics.
 
@@ -146,7 +146,7 @@ Set `Overall Strength` to 0% and FlexAgX becomes a bit-exact pass-through: your 
 
 ---
 
-## How It Works
+## ⚙️ How It Works
 
 Every frame, FlexAgX runs a short pipeline entirely on the GPU. It first samples a log-luminance histogram of the frame and compares it with the previous frame to measure how much the scene has changed. An adaptation stage updates the scene's exposure with critically damped smoothing and a rate limit, then builds a 1,024-entry tone curve from that state. The curve is checked for monotonicity across every 8-bit code. If the check fails, the curve is adjusted and rebuilt, with a strictly monotone fallback as a last resort.
 
@@ -156,7 +156,7 @@ FlexAgX runs as a compute pass and several full-screen passes at your render res
 
 ---
 
-## Troubleshooting
+## 🛠️ Troubleshooting
 
 | Symptom | What to try |
 |---|---|
@@ -171,13 +171,13 @@ FlexAgX runs as a compute pass and several full-screen passes at your render res
 
 ---
 
-## Credits
+## 🙏 Credits
 
 FlexAgX stands on the work of others. The AgX display transform was developed by Troy Sobotka and popularized by Blender. The Oklab color space was designed by Björn Ottosson. The guided filtering approach follows the work of Kaiming He, Jian Sun, and Xiaoou Tang. ReShade is the work of crosire and its contributors.
 
 ---
 
-## License
+## 📜 License
 
 FlexAgX is released under the [MIT License](LICENSE).
 
