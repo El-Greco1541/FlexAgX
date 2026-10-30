@@ -53,6 +53,16 @@ FlexAgX fundamentally changes how light and color interact on screen:
     <td><img src="https://github.com/user-attachments/assets/34c4d945-956e-48e0-8a7c-5d04700df5cd" alt="After" /></td>
   </tr>
 </table>
+<table>
+  <tr>
+    <td align="center"><b>Before</b></td>
+    <td align="center"><b>After</b></td>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/b1e77469-d456-4a42-9d43-bf3319835db6" alt="Before" /></td>
+    <td><img src="https://github.com/user-attachments/assets/8dc278e6-e7a3-446a-8211-3c8e57ee1f00" alt="After" /></td>
+  </tr>
+</table>
 
 ---
 
