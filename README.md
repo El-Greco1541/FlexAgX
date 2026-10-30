@@ -1,6 +1,6 @@
 <div align="center">
   
-# FlexAgX 🎨
+# FlexAgX
 
 **Advanced Image Reconstruction & Tone Mapping for ReShade.**  
 *Pro-grade dynamic range. Zero color clipping. Uncompromising fidelity.*
