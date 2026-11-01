@@ -1,7 +1,7 @@
 {
-  "version": "0.3.0",
+  "version": "0.5.0",
   "original_sha256": "e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d",
-  "corrected_sha256": "9116e0c2f4d13214b678f387bf05723348d0910117755e9a4c3de6addb894c68",
+  "corrected_sha256": "311941a715b8396e01c3f57df850c6a28207cf82c2a6f074be0a4cf95e3bfef5",
   "edits": [
     {
       "id": "F38-HUE-GUARD",
@@ -27,6 +27,14 @@
     {
       "id": "F18-F32-COLD-STATE-SEED",
       "source_occurrences": 1,
+      "runtime_verified": false
+    },
+    {
+      "id": "CT-004-F23-F24-DEADBAND_SETTLE",
+      "runtime_verified": false
+    },
+    {
+      "id": "CT-005-F29-TWO_OBSERVATION_CUT",
       "runtime_verified": false
     }
   ],

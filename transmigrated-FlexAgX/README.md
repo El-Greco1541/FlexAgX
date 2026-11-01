@@ -92,3 +92,9 @@ CT-003 adds a validated `FA_TemporalBoot` record to the shader state pass. A mis
 The corrected S5 step now stops residual scene-key velocity when the exposure-key error is within the configured inclusive deadband. Outside the deadband, the original source equations remain unchanged. This is a **proposed correctness contract**, not a GPU-certified fix or an Operator-approved policy change. See [CT-004 contract](docs/CT004_DEADBAND_SETTLING.md) and [source diff](docs/CT004_SOURCE_DIFF.patch).
 
 **New validation:** 79/79 pytest; 55,570/55,570 cumulative checks across two fully completed CPU/static harness campaigns (1,000 and 2,000 simulated frames). There has been **no** native ReShade compilation or GPU execution. F29/F36 diagnostic holdouts and F39/F40 color policy remain open. Production gate LOCKED.
+
+## v0.5.0 — F29 two-observation scene-cut confirmation (staged)
+
+CT-005 requires a prior discrepant frame before confirming a scene cut. A single slow/stalled frame cannot trigger an exposure scene-cut correction merely because clamped `dt` exceeds 100 ms. The existing histogram distance calculation, persistence threshold and rate-limited applied exposure are unchanged. This is a narrowly staged correctness candidate, not a certified GPU fix; [CT-005 contract](docs/CT005_SCENE_CUT_CONFIRMATION.md) and [source diff](docs/CT005_SOURCE_DIFF.patch) document it.
+
+**Verification:** 100/100 pytest, 16/16 harness self-tests, and two completed campaigns totaling 107,000/107,000 CPU/static checks (seeds 20261101 and 731234, 3,000 synthetic frames). F36 internal tracking at 0% automatic exposure is deliberately preserved. Original shader remains immutable (SHA-256 `e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d`). Real ReShade compilation, GPU rendering and Operator behavioral acceptance remain outstanding. Production gate LOCKED.

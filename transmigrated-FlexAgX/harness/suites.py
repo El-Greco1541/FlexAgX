@@ -11,7 +11,7 @@ from .source_audit import check_corrections
 
 ROOT=Path(__file__).resolve().parents[1]
 REFERENCE_SHA='e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d'
-CANDIDATE_SHA='abbb4cf5e5ca97cdcfc694567e8e4b462bf19634a2b4d3d60d83d73cac184dde'
+CANDIDATE_SHA='311941a715b8396e01c3f57df850c6a28207cf82c2a6f074be0a4cf95e3bfef5'
 
 def checked(data, phase, detail, cases):
     assert data, f'{phase}: {detail}'
@@ -257,7 +257,51 @@ def adaptation_suite(seed,frames):
         checked(fired == (min(.25,max(.001,dt))>=threshold) and (advanced==fired),'adaptation',f'existing scene-cut clock {i}',cases)
     return cases
 
-SUITES={'adaptation':adaptation_suite,'temporal':temporal_suite,'source':source_suite,'hue':hue_suite,'histogram':histogram_suite,'interface':interface_suite,'metamorphic':metamorphic_suite,'torture':torture_suite}
+
+def scene_cut_suite(seed,frames):
+    """CT-005: two-observation confirmation, baseline hold, F36 unchanged."""
+    from .scene_cut_oracle import cut_step, old_cut_step, auto_strength_zero_contract
+    cases=[]; rng=random.Random(seed ^ 0xF2905)
+    # A single 100..250ms frame would have confirmed in v0.4.
+    for ms in (100,101,150,200,250,500,1000):
+        before=old_cut_step(.8,.35,0.,ms,key=-5.,target=-1.,velocity=.4)
+        after=cut_step(.8,.35,0.,ms,key=-5.,target=-1.,velocity=.4)
+        checked(before.fired and not after.fired and not after.update_reference and after.seconds>0,'scene_cut',f'single slow frame suppressed {ms}',cases)
+        follow=cut_step(.8,.35,after.seconds,16.667,key=-5.,target=-1.,velocity=.4)
+        checked(follow.fired and follow.update_reference and follow.seconds==0 and follow.velocity==0,'scene_cut',f'confirmed second observation {ms}',cases)
+    checked(not cut_step(.8,.35,0,99.).fired,'scene_cut','subthreshold first frame',cases)
+    for i in range(1800):
+        ms=rng.uniform(1,1000);sensitivity=rng.uniform(.1,.6)
+        first=cut_step(sensitivity+.01,sensitivity,0.,ms)
+        checked(not first.fired and not first.update_reference and first.seconds==min(.25,max(.001,ms/1000)),'scene_cut',f'new candidate never fires {i}',cases)
+        second=cut_step(sensitivity+.01,sensitivity,first.seconds,ms)
+        checked(second.fired == (first.seconds+min(.25,max(.001,ms/1000))>=.1) and not (second.fired and second.seconds!=0), 'scene_cut',f'consecutive persistent {i}',cases)
+        stop=cut_step(sensitivity,sensitivity,first.seconds,ms)
+        checked(not stop.fired and stop.seconds==0 and stop.update_reference,'scene_cut',f'stable interruption resets {i}',cases)
+    for i in range(2400):
+        distance=rng.uniform(0,1);sensitivity=rng.uniform(.1,.6)
+        elapsed=rng.uniform(.001,.5);ms=rng.uniform(1,250)
+        key=rng.uniform(-14,6);target=rng.uniform(-14,6);v=rng.uniform(-3,3);rate=rng.uniform(.5,6)
+        before=old_cut_step(distance,sensitivity,elapsed,ms,key=key,target=target,velocity=v,max_rate=rate)
+        after=cut_step(distance,sensitivity,elapsed,ms,key=key,target=target,velocity=v,max_rate=rate)
+        checked(before==after,'scene_cut',f'unchanged prior-candidate/stable {i}',cases)
+        checked(abs(after.key_delta)<=.5*rate+1e-12 and (not after.fired or after.update_reference),'scene_cut',f'bounded correction {i}',cases)
+    for i in range(1200):
+        # Frame sequences including one-frame spikes, stalled frames and reverts.
+        sensitivity=rng.uniform(.1,.6);sequence=[rng.choice([0.,sensitivity+.05]) for _ in range(12)]
+        elapsed=0.
+        for j,D in enumerate(sequence):
+            prior=elapsed
+            out=cut_step(D,sensitivity,elapsed,rng.uniform(5,400))
+            checked(not out.fired or (prior>0 and D>sensitivity),'scene_cut',f'prior discrepant witness {i}.{j}',cases)
+            elapsed=out.seconds
+    for i in range(1100):
+        manual=rng.uniform(-2,2);old_ev=rng.uniform(-3,3)
+        result=auto_strength_zero_contract(manual,old_ev,tracker_advanced=bool(i%2))
+        checked(result['applied_auto_ev']==0 and result['total_gain_ev']==manual and result['tracker_advanced']==bool(i%2),'scene_cut',f'F36 unchanged contribution {i}',cases)
+    return cases
+
+SUITES={'scene_cut':scene_cut_suite,'adaptation':adaptation_suite,'temporal':temporal_suite,'source':source_suite,'hue':hue_suite,'histogram':histogram_suite,'interface':interface_suite,'metamorphic':metamorphic_suite,'torture':torture_suite}
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('phase',choices=SUITES);p.add_argument('--seed',type=int,required=True);p.add_argument('--frames',type=int,default=1000);p.add_argument('--output',type=Path,required=True)

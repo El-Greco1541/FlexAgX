@@ -1,15 +1,17 @@
-# FlexAgX staged correction v0.4.0 — Verification
+# FlexAgX v0.5.0 — correction-first verification
 
-**Date:** 2026-11-01. **Subject:** CT-004/F23-F24 proposed deadband velocity settling. **Production gate:** LOCKED.
+**2026-11-01 · STAGED · Production gate LOCKED**
 
-| Campaign | Synthetic frames | Counted CPU/static checks | Failed |
-| --- | ---: | ---: | ---: |
-| Seed 20261101 | 1,000 | 27,271 | 0 |
-| Seed 731234 | 2,000 | 28,299 | 0 |
-| **Total** | **3,000** | **55,570** | **0** |
+**CT-005 / F29:** Prevent one-frame false scene-cut confirmation when `dt >= 100 ms`; require a previously observed candidate and accumulated time. **F36 remains unchanged.**
 
-Additional: **79/79 pytest passed; 16/16 bounded-runner self-tests passed**. The check counts are executions, not unique test definitions; they include existing inherited suites and 7,602 adaptation-check executions per campaign. See machine-readable report for precise per-phase counts; do not treat these as distinct bugs fixed.
+| Seed | Simulated frames | Counted checks | Result |
+| --- | ---: | ---: | --- |
+| 20261101 | 1,000 | 52,986 | PASS |
+| 731234 | 2,000 | 54,014 | PASS |
+| **Total** | **3,000** | **107,000** | **PASS** |
 
-**Source:** Original FlexAgX 1.2 upstream FX unchanged and SHA-256 pinned. Candidate retains nine FX passes; the S5 deadband fragment is the only shader edit relative to v0.3.0.
+Additional **100/100 pytest**, **16/16 isolated harness self-tests**. Counts are check executions, not unique assertions or GPU frames. Source-mutation guards and 4,000 prior-candidate equivalence fixtures were run.
 
-**Acceptance boundary:** CPU and static assertions are evidence of the proposed source-level contract only. FX compiler, ReShade GPU backend, storage ordering, color/pixel fidelity, startup/reload, scene-cut and gamut/encoding behavior remain unverified or undecided. See `docs/CT004_DEADBAND_SETTLING.md`.
+**Original FX:** byte-identical to El-Greco1541 1.2. **FX passes:** nine (one preclear plus eight original). Only the F29 source section was changed relative to v0.4.0.
+
+**Unverified:** ReShade FX compilation, GPU execution, true effect reload, GPU storage ordering, visual parity, Operator acceptance of scene-cut semantics and the F36/F39/F40 policy decisions. Full per-case evidence is in the separately packaged evidence ZIP.

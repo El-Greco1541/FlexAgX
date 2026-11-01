@@ -17,3 +17,5 @@
 - **CT-003 residual**: No GPU compiler or ReShade runtime available; texture marker first-use, resource reload and synchronization remain unverified. Sentinel collision is theoretically possible; marker is not an attestation primitive.
 
 v0.4 CT-004: F23 residual motion inside the deadband reproduced then removed under proposed settle-to-rest policy; F24 neutral speed selection is inert after settle. No new unresolved CPU/static test failures. Native GPU certification pending.
+
+v0.5 CT-005: Reproduced one-frame false scene-cut confirmation at 100..250ms in pre-change source oracle; candidate rejects first observation. No test failures recorded in two completed bounded campaigns. Native timing and GPU acceptance remain open.

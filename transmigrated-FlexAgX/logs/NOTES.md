@@ -11,3 +11,5 @@ Source references and shader remain byte-identical. Seven isolated phases and li
 - v0.3.0 F18/F32: dual sentinel + split 32-bit frame marker, validation before retained-state use; CPU model and source tests PASS; native FX acceptance pending.
 
 v0.4 CT-004: Deliberately minimal FX S5 edit, keeping rate limit and phase structure. A CPU oracle is not an FX runtime. Original source remains immutable.
+
+v0.5 CT-005 is a deliberate one-line conditional change in S6, with a captured previous-candidate flag. No pass additions and no changes to F36 or gamut/encoding. Synthetic probes are not native GPU evidence.

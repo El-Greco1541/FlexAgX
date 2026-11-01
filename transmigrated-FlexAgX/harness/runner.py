@@ -5,8 +5,8 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 MAX_OUTPUT=524288
 MAX_RETAIN=8192
-PHASES=('adaptation','temporal','source','hue','histogram','interface','metamorphic','torture','live_http')
-LIMITS={'adaptation':35,'temporal':35,'source':25,'hue':50,'histogram':55,'interface':75,'metamorphic':40,'torture':80,'live_http':90}
+PHASES=('scene_cut','adaptation','temporal','source','hue','histogram','interface','metamorphic','torture','live_http')
+LIMITS={'scene_cut':40,'adaptation':35,'temporal':35,'source':25,'hue':50,'histogram':55,'interface':75,'metamorphic':40,'torture':80,'live_http':90}
 
 class HarnessFailure(Exception):pass
 
@@ -89,7 +89,7 @@ def run(seed=20261101,frames=1000,output_root=None,phases=PHASES):
             results.append({'phase':phase,'status':'FAIL','checks':0,'passed':0,'failed':1,'elapsed_seconds':0,'evidence_sha256':'NOT_AVAILABLE'})
     checks=sum(x['checks'] for x in results);passed=sum(x['passed'] for x in results)
     status='PASS' if not issues and checks==passed else 'FAIL'
-    report={'version':'0.4.0','subject':'Transmigrated FlexAgX effect — static and CPU correction probes','execution_scope':'NOT_GPU_OR_FX_COMPILER','seed':seed,'frames':frames,'run_id':run_id,'status':status,'checks':checks,'passed':passed,'failed':len(issues),'phases':results,'errors':issues,'elapsed_seconds':round(time.monotonic()-begin,3),'runtime_limits':{'child_output_bytes':MAX_OUTPUT,'retained_output_bytes':MAX_RETAIN,'per_suite_seconds':LIMITS},'toolchain':toolchain(),'unverified':['ReShade FX compiler acceptance','D3D11/D3D12/Vulkan/OpenGL GPU execution','original and corrected shader pixel identity','FA_State/FA_HistPrev boot-marker implementation requires native ReShade reload/cold-start acceptance','backend storage barrier semantics','F39/F40 gamut and encoding policy']}
+    report={'version':'0.5.0','subject':'Transmigrated FlexAgX effect — static and CPU correction probes','execution_scope':'NOT_GPU_OR_FX_COMPILER','seed':seed,'frames':frames,'run_id':run_id,'status':status,'checks':checks,'passed':passed,'failed':len(issues),'phases':results,'errors':issues,'elapsed_seconds':round(time.monotonic()-begin,3),'runtime_limits':{'child_output_bytes':MAX_OUTPUT,'retained_output_bytes':MAX_RETAIN,'per_suite_seconds':LIMITS},'toolchain':toolchain(),'unverified':['ReShade FX compiler acceptance','D3D11/D3D12/Vulkan/OpenGL GPU execution','original and corrected shader pixel identity','FA_State/FA_HistPrev boot-marker implementation requires native ReShade reload/cold-start acceptance','backend storage barrier semantics','F36 internal tracking policy unchanged and awaiting acceptance','F39/F40 gamut and encoding policy']}
     (location/'RUN_REPORT.json').write_text(json.dumps(report,indent=2,allow_nan=False)+'\n')
     (parent/'LATEST_REPORT.json').write_text(json.dumps(report,indent=2,allow_nan=False)+'\n')
     return report

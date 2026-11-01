@@ -1,11 +1,11 @@
 {
   "project": "transmigrated-FlexAgX",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "status": "STAGED_CORRECTION_NOT_GPU_CERTIFIED",
-  "manifest_scope": "curated GitHub staging files and reproducible ZIP; full case-level v0.4 evidence available in companion evidence ZIP",
-  "file_count": 65,
+  "manifest_scope": "curated GitHub staging files; full per-case evidence distributed separately",
+  "file_count": 71,
   "original_sha256": "e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d",
-  "corrected_sha256": "abbb4cf5e5ca97cdcfc694567e8e4b462bf19634a2b4d3d60d83d73cac184dde",
+  "corrected_sha256": "311941a715b8396e01c3f57df850c6a28207cf82c2a6f074be0a4cf95e3bfef5",
   "files": [
     {
       "path": ".gitignore",
@@ -19,18 +19,18 @@
     },
     {
       "path": "README.md",
-      "sha256": "b2a6e348f516b091f53d7602205fd381e579e0c9afecbff5d3af1a46848edcb0",
-      "bytes": 7166
+      "sha256": "3e29d6607cc4abd89e6b1a33abf812c399670de9c17065e90dcc393280cb2e35",
+      "bytes": 8223
     },
     {
       "path": "VERIFICATION_REPORT.json",
-      "sha256": "d89aa105643263403cc794c252b1beb508aaa43d9067a128d2c36b6a67472ab9",
-      "bytes": 6946
+      "sha256": "707dd0e7cbcb74b61ed196310ae23773b0de369fa4acf24290a95a869ee073fb",
+      "bytes": 10365
     },
     {
       "path": "VERIFICATION_REPORT.md",
-      "sha256": "44a29ce03eb579b9ca705b6069f7f946a3f119981926eefdfe180412fe3eee17",
-      "bytes": 1210
+      "sha256": "0343eccea2b037a16e67652952528b3add63d829bb7be9d8809b715680814fbc",
+      "bytes": 1133
     },
     {
       "path": "correction_api/__init__.py",
@@ -64,8 +64,8 @@
     },
     {
       "path": "docs/CORRECTION_LEDGER.md",
-      "sha256": "c5bb19c112dbb7e3fd0ff74f2c0e18aa93f20adf44fd9eefb414a08887bb42a3",
-      "bytes": 4291
+      "sha256": "e540b0803815235f3bea051dc1b23e0eb3bf27b4ead51fb1c73a8bc8341e39a6",
+      "bytes": 5132
     },
     {
       "path": "docs/CT004_DEADBAND_SETTLING.md",
@@ -78,9 +78,19 @@
       "bytes": 1544
     },
     {
+      "path": "docs/CT005_SCENE_CUT_CONFIRMATION.md",
+      "sha256": "6682db1182be826ad8c22304fd184dc7fa6d0d19ac3e885d9b78c5ee1b16b80b",
+      "bytes": 2906
+    },
+    {
+      "path": "docs/CT005_SOURCE_DIFF.patch",
+      "sha256": "08a370342ff46daa8e9aa4de4bd5f1fc43f091194bc08a6b37fef1dfd097c9d5",
+      "bytes": 1522
+    },
+    {
       "path": "docs/DIFF_SCOPE.json",
-      "sha256": "eaf8030055c98a02e116143574b0336478b973a535be3c6c1e7131f5a03456b0",
-      "bytes": 844
+      "sha256": "dde5724cf4186ae58cab78adfe743d350d22fa33828710da5e90733ec0ee51d0",
+      "bytes": 1026
     },
     {
       "path": "docs/EFFECT_HARNESS.md",
@@ -89,8 +99,8 @@
     },
     {
       "path": "docs/PENDING_DECISIONS.md",
-      "sha256": "f75e26a87639cfade0ca1a58623c4fae450ffefef8c67a29b9a546a346a02789",
-      "bytes": 1688
+      "sha256": "42c84eb0c1dec14b785f74ef81524d245c8b91c0c2b418c1195cf0dcf11101e0",
+      "bytes": 1820
     },
     {
       "path": "docs/SOURCE_DIFF.patch",
@@ -131,6 +141,16 @@
       "path": "harness/evidence/V04_SEED_731234_2000.json",
       "sha256": "66d1098518d99ea61ebf47731662447df36ce754ee2047d56089e0ca546eddc6",
       "bytes": 3898
+    },
+    {
+      "path": "harness/evidence/V05_SEED_20261101_1000.json",
+      "sha256": "f441c39d4b9844b8d84f9cbacb446084b78741f8ace7157c95b65bcb5c73d33c",
+      "bytes": 4245
+    },
+    {
+      "path": "harness/evidence/V05_SEED_731234_2000.json",
+      "sha256": "2bee2efddd0cf180342e4325d113ca50dacc97e7cfbd53fde9ea292ecb849e92",
+      "bytes": 4244
     },
     {
       "path": "harness/evidence/full/20261101_1000/RUN_REPORT.json",
@@ -224,8 +244,13 @@
     },
     {
       "path": "harness/runner.py",
-      "sha256": "251f7e5d6bd5eb31dd179b430cc3d2ce95926439f6421d742b5a35683c9f4d45",
-      "bytes": 6955
+      "sha256": "f4474495f896a7055f5b2f61259493c58adb65376b90bab7a41d74f20bd364f3",
+      "bytes": 7047
+    },
+    {
+      "path": "harness/scene_cut_oracle.py",
+      "sha256": "edca43b2cb7844507276c3cad6eb9c1df9eaba33228f2c57f92a51f329c46544",
+      "bytes": 2244
     },
     {
       "path": "harness/selftest.py",
@@ -234,13 +259,13 @@
     },
     {
       "path": "harness/source_audit.py",
-      "sha256": "63898796ecfd0f610d7c8285a9e5726d58ba45ece74dedc8f363ae0b20e68834",
-      "bytes": 4178
+      "sha256": "9f9e55eeea44bb4782a01a2599ae1a9c191be5a98e1ddf1b744df3bcab52e75a",
+      "bytes": 4909
     },
     {
       "path": "harness/suites.py",
-      "sha256": "82a72264ffde8ecbd3e3eef9be0894a53b5a379336647365e531a8664ea0f036",
-      "bytes": 17359
+      "sha256": "a0d7b4d49f8513f4cb4e06274187d73974186563694b6b706d19bf2b59c7e061",
+      "bytes": 20689
     },
     {
       "path": "harness/temporal_oracle.py",
@@ -254,28 +279,28 @@
     },
     {
       "path": "logs/AGENDA.md",
-      "sha256": "bf35b47bf87f49ff752754edad2aec80a91efb62321bd53e2cf0deb39612b1ef",
-      "bytes": 749
+      "sha256": "c553b709eda3279308d1242f2386c937420f18f5dc771ff3ccde3b0cb13b3405",
+      "bytes": 922
     },
     {
       "path": "logs/ERROR_LOG.md",
-      "sha256": "42298bb17bf2854f04c563d9aa4bc18c685e400047f8fa94ebc8db49e0959387",
-      "bytes": 1667
+      "sha256": "cd8b7044e5331b2021bdee8d792171ebc29ac302eb58eb82760d304a1b6802a6",
+      "bytes": 1919
     },
     {
       "path": "logs/NOTES.md",
-      "sha256": "56c3109b5abcdad34494bdd4c176f0ecb60d0d4fd044cfbcb27d815894c7f3ec",
-      "bytes": 1017
+      "sha256": "665deeef5de058494aee8c3fb2ff1ed37ec8d634927b4f48949301aa99a142f1",
+      "bytes": 1227
     },
     {
       "path": "logs/ROADMAP.md",
-      "sha256": "fe9766c228b6723207004a5334de0e57c964b641f12d768d66871c1c11e0f3f6",
-      "bytes": 1150
+      "sha256": "c41dc18862650b263bd83d5030749ce6e9b276461662dd0faedacc2dc65883ea",
+      "bytes": 1351
     },
     {
       "path": "logs/TODO.md",
-      "sha256": "8550d5bd42e852d94aedb7967be2910211a8109c0993a214b8272bc1b9dcc3f7",
-      "bytes": 2361
+      "sha256": "7f1b0fd8711ce36980704a86307a8f926c9088df4713c9d8f98f713935c56b46",
+      "bytes": 2990
     },
     {
       "path": "reference/FlexAgX_1.2.fx",
@@ -294,8 +319,8 @@
     },
     {
       "path": "shader/FlexAgX_transmigrated.fx",
-      "sha256": "abbb4cf5e5ca97cdcfc694567e8e4b462bf19634a2b4d3d60d83d73cac184dde",
-      "bytes": 54276
+      "sha256": "311941a715b8396e01c3f57df850c6a28207cf82c2a6f074be0a4cf95e3bfef5",
+      "bytes": 54601
     },
     {
       "path": "tests/conftest.py",
@@ -326,6 +351,11 @@
       "path": "tests/test_harness.py",
       "sha256": "1b089c427410fe2192f0be4ee8f8eb70a6e79a2d47975d8f78178392f383a7ad",
       "bytes": 942
+    },
+    {
+      "path": "tests/test_scene_cut.py",
+      "sha256": "aa8fa19fceae3ed50278b84ac4d17e6045444f2403358310ad2304f7e488ff1f",
+      "bytes": 2685
     },
     {
       "path": "tests/test_temporal_init.py",

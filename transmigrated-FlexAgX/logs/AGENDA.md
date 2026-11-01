@@ -13,3 +13,5 @@
 - F18/F32: obtain native ReShade first-use/reload tests before declaring runtime correction complete.
 
 v0.4: Review CT-004 semantics and evidence; obtain Operator decision on settle versus decay; plan actual ReShade/GPU verification.
+
+v0.5 Review two-observation cut confirmation semantics and F36 zero-strength tracking; run real FX compiler and frame time tests; retain independent F39/F40 decision gate.

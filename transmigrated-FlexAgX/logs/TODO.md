@@ -35,3 +35,13 @@
 - [ ] Obtain Operator acceptance of settle-to-rest versus gradual decay semantics
 - [ ] Native ReShade compilation and first-frame/reload GPU tests
 - [ ] F29/F36 scene-cut and zero-strength policy decision; F39/F40 gamut/transfer policy decision
+
+## v0.5.0 CT-005 F29/F36
+- [x] Reproduce one-frame slow-timestep premature scene cut in legacy S6.
+- [x] Require prior discrepant observation as well as time threshold.
+- [x] Test single-frame spikes, interrupts, persistent cuts, max dt and strict threshold.
+- [x] Preserve F36 zero-auto-strength tracking and manual EV policy without changing it.
+- [x] Run bounded CPU/static harness at 1,000 and 2,000 frames.
+- [ ] Operator acceptance of two-observation scene-cut policy.
+- [ ] Native ReShade GPU/FX compilation, visual and frame-timing tests; test freeze/re-enable/reload.
+- [ ] F39/F40 gamut and output encoding decisions.

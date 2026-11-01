@@ -27,3 +27,12 @@ A disabled frame does not refresh the marker, so the next active frame is treate
 - Evidence: 79 pytest tests and 55,570 cumulative deterministic CPU/static check executions; source mutation rejected; GPU unverified.
 - **Operator decision:** settle-to-rest is a candidate policy justified by the UI deadband tooltip. Do not promote or conflate with external approval. See `docs/CT004_DEADBAND_SETTLING.md`.
 - Candidate SHA-256: `abbb4cf5e5ca97cdcfc694567e8e4b462bf19634a2b4d3d60d83d73cac184dde`. Upstream remains `e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d`.
+
+## CT-005 / F29 — v0.5.0 candidate
+
+- A single slow frame no longer causes scene-cut confirmation; a pre-existing discrepant observation is required.
+- Existing persistence threshold, histogram baseline handling and applied exposure rate limits are retained.
+- F36 (zero automatic exposure contribution while internal state may track) is unchanged and remains a policy holdout.
+- CPU/static tests: 100 pytest; 107,000 counted deterministic checks across two runs; 16 harness self-tests; native GPU not executed.
+- Corrected candidate SHA-256: `311941a715b8396e01c3f57df850c6a28207cf82c2a6f074be0a4cf95e3bfef5`; upstream FX SHA-256 remains `e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d`.
+- Operator choice of scene-cut temporal semantics and GPU acceptance remains required. See `docs/CT005_SCENE_CUT_CONFIRMATION.md`.

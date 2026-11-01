@@ -859,7 +859,7 @@ void FlexAgX_State(uint3 id : SV_DispatchThreadID, uint3 tid : SV_GroupThreadID)
             // S6: compare against a retained scene baseline. If a substantial
             // difference persists for 0.10 s, accept the new histogram as the
             // baseline. This detects a hard cut even after the next frame is
-            // visually stable; one-frame differences do not trigger a reset.
+            // visually stable; one-frame differences must not trigger a reset, even at low FPS.
             float D = 0.0;
             for (int i = 0; i < 64; ++i)
             {
@@ -867,6 +867,10 @@ void FlexAgX_State(uint3 id : SV_DispatchThreadID, uint3 tid : SV_GroupThreadID)
                 D += abs(p - FA_PrevSh[i]);
             }
             D *= 0.5;
+            // CT-005 / F29: require a previously observed discrepant frame.
+            // One stalled/slow frame can have dt >= _FA_SCENE_CUT_SECONDS;
+            // elapsed time alone is not evidence that the difference persisted.
+            bool hadCutCandidate = (cutCount > 0.0);
             if (D > SceneChangeSensitivity)
             {
                 cutCount += dt;
@@ -877,7 +881,7 @@ void FlexAgX_State(uint3 id : SV_DispatchThreadID, uint3 tid : SV_GroupThreadID)
                 cutCount = 0.0;
                 FA_UpdateHistRef = 1; // stable scene: keep tracking its histogram
             }
-            if (cutCount >= _FA_SCENE_CUT_SECONDS)
+            if (hadCutCandidate && cutCount >= _FA_SCENE_CUT_SECONDS)
             {
                 // Keep the scene-key correction bounded; the applied exposure
                 // itself is separately rate-limited below.

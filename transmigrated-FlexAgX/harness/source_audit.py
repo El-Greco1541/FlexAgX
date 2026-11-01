@@ -61,4 +61,15 @@ def check_corrections(source,reference):
             errors.append('DEADBAND_VELOCITY_SETTLE_MISSING')
     except ValueError:
         errors.append('DEADBAND_SECTION_MISSING')
+    # CT-005 F29: elapsed-only cut confirmation can be triggered by a single
+    # slow frame. The new branch requires a prior, distinct discrepant frame.
+    try:
+        cut=source[source.index('// S6: compare against'):source.index('// S7: smoothed highlight knee')]
+        if not ('bool hadCutCandidate = (cutCount > 0.0);' in cut and
+                'if (hadCutCandidate && cutCount >= _FA_SCENE_CUT_SECONDS)' in cut and
+                cut.index('bool hadCutCandidate')<cut.index('cutCount += dt;') and
+                cut.index('cutCount += dt;')<cut.index('if (hadCutCandidate &&')):
+            errors.append('SCENE_CUT_TWO_OBSERVATIONS_MISSING')
+    except ValueError:
+        errors.append('SCENE_CUT_SECTION_MISSING')
     return errors

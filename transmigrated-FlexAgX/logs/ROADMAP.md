@@ -12,3 +12,5 @@ Static and CPU harness complete. Next stage is a separate ReShade compiler/GPU r
 - v0.3.0: F18/F32 source mitigation and temporal harness completed; pending native acceptance. Expansion remains gated.
 
 v0.4 candidate: F23/F24 source mitigation and tests; next F29/F36 semantic contract decision; F39/F40 gamut/encoding contract; native graphics certification.
+
+v0.5 candidate: F29 two-observation scene-cut guard staged and CPU-tested; next Operator acceptance of F29/F36 semantics, native FX/GPU verification, then independent gamut/encoding research F39/F40.
