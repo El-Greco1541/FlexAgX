@@ -1,158 +1,217 @@
 # FlexAgX CPU Server Simulation
 
-**Research-stage CPU reconstruction with explicit session/frame idempotency, an atomic local SQLite state journal, versioned HTTP APIs, five local microservices, and reproducible test infrastructure.**
+**Version 0.5.0 — experimental CPU reference implementation, versioned HTTP gateway, independently startable services, and transaction-integrity test harness.**
 
-> **STAGED DEVELOPMENT — NOT A RESHADE PLUGIN, GPU IMPLEMENTATION, OR PRODUCTION SERVER.**
-> Production gate: **LOCKED**. Only a separately authorized operator release may change this status.
+> **Research/staging only.** This is **not** a ReShade plugin, a GPU backend, a production API, or a claim of pixel-identical rendering. The production gate remains **LOCKED**. This public branch is a development artifact, not an authorization to deploy.
 
-This project is deliberately housed in `cpu-server/`, separate from the upstream ReShade FX shader repository. It preserves the original FX shader as a reference while exploring whether the exposure controller, tone-curve generator, observer, and perceptual rendering operations can be expressed as observable services with explicit contracts.
+The simulation translates selected processing behaviors of **FlexAgX** into inspectable CPU code and service contracts. It is intentionally isolated in `cpu-server/`: the public fork's upstream root `README.md` and `LICENSE` remain unchanged.
 
-## Origin, attribution and license
+## At a glance
 
-- **Original author / upstream:** [El-Greco1541 — FlexAgX](https://github.com/El-Greco1541/FlexAgX).
-- **Upstream version represented:** [FlexAgX 1.2](https://github.com/El-Greco1541/FlexAgX/releases/tag/1.2), asset `FlexAgX_1.2.fx`.
-- **Original shader SHA-256:** `e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d`.
-- **License:** MIT. The upstream root `LICENSE` is retained unchanged; original copyright and credit remain with El-Greco1541. The CPU translation and orchestration are derivative research work; no endorsement or upstream authorship is implied.
-- **Methodology disclosure:** Source-audit methodology was intentionally obfuscated in earlier research at operator request; source references, known limitations, tests, and reproducibility evidence remain documented.
+| Capability | Current status |
+| --- | --- |
+| CPU simulation of exposure, tone curve, perceptual color and detail | Implemented; numerical fidelity not certified against ReShade |
+| Gateway plus observer, controller, tone and renderer | Implemented, local or HTTP-distributed mode |
+| Per-frame duplicate suppression and stale-frame rejection | Implemented for `POST /v1/frame` |
+| Atomic controller state and response receipts | SQLite journal, one controller process |
+| Restart and lost-finalize-acknowledgment recovery | Tested in bounded local fault scenarios |
+| Sentinel validation, bounded inputs and fallback behavior | Implemented at tested boundaries |
+| Regression, seeded fuzz, property, torture and distributed fault testing | 1,060/1,060 reported checks for v0.5.0 |
+| Authentication, TLS, multi-node consensus and GPU/ReShade integration | **Not implemented / not verified** |
 
-## What actually runs
+## Provenance and license
 
-```text
-                   HTTP POST /v1/frame
-                           │
-                   ┌───────▼───────┐
-                   │  API gateway  │
-                   │  port 8080    │
-                   └───────┬───────┘
-                           │  local in-process OR distributed HTTP
-               ┌───────────┼───────────────────────┐
-               ▼           ▼           ▼           ▼
-           Observer    Controller     Tone       Renderer
-           histogram   session &     LUT         gamut, WB,
-           / percent.  adaptation   synthesis    detail, output
-               └───────────┴───────────┴───────────┘
-                           │
-                   PNG image + metadata
-```
+The original shader was created by **[El-Greco1541](https://github.com/El-Greco1541/FlexAgX)** and is distributed under the **MIT License**. This independent CPU-server research adaptation does not claim upstream authorship or endorsement.
 
-- **Observer:** bounded 64-bin log-luminance histogram, percentile and phase statistics.
-- **Controller:** session-scoped temporal adaptation, scene state, provisional `prepare → finalize / abort` transaction interface; persistent state and replay receipts when `FLEXAGX_STATE_DB` points to a local SQLite file.
-- **Tone:** 1,024-point LUT, validation and explicit fallback.
-- **Renderer:** CPU NumPy/SciPy approximate rendition of color, detail, and display transformations.
-- **Gateway:** JSON contract, image exchange, bounded request handling and cross-service ordering.
-- **Clients:** Python, JavaScript and PowerShell examples.
-- **Verification:** existing regression, adversarial/seeded fuzz, property tests, stress/torture tests and distributed fault injection.
+- Upstream release: [FlexAgX 1.2](https://github.com/El-Greco1541/FlexAgX/releases/tag/1.2), asset `FlexAgX_1.2.fx`.
+- Preserved reference: [`reference/FlexAgX_original.fx`](reference/FlexAgX_original.fx).
+- Original reference SHA-256: `e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d`.
+- The upstream MIT copyright and permission notice are retained in the fork's root `LICENSE`.
+- The earlier static investigation intentionally withheld its detailed investigative methodology; source references, technical evidence, reproducible checks and stated limitations remain inspectable.
 
-The modules are independently launchable. **They are a CPU reference/simulation**, not a bridge to a live GPU, ReShade process or HDR framebuffer. The source's RGB and Oklab equations are ported where feasible; float64/float32, texture sampling and intermediate render formats can differ.
+## System layout
 
-## Quick start: local in-process mode
+~~~text
+                       POST /v1/frame
+                             |
+                     +-------v-------+
+                     |  API gateway  |
+                     | localhost:8080|
+                     +-------+-------+
+                             |
+             +---------------+----------------+
+             |               |                |
+        +----v----+     +----v-----+    +-----v----+
+        | Observer|     |Controller|    |   Tone   |
+        | histogram     | exposure |    | 1,024-pt |
+        | statistics    | + state  |    |    LUT   |
+        +---------+     +----+-----+    +-----+----+
+                             |                |
+                             +-------+--------+
+                                     |
+                               +-----v-----+
+                               | Renderer  |
+                               | CPU image |
+                               | transform |
+                               +-----+-----+
+                                     |
+                           PNG + state metadata
+~~~
 
-Requirements: Python 3.10+ recommended; install packages in a disposable virtual environment. Use this directory as the working directory.
+The gateway can invoke the shared numerical core in-process (`GATEWAY_MODE=local`, default) or orchestrate four internal HTTP microservices (`GATEWAY_MODE=distributed`). The controller owns temporal state; the other computational services are designed around explicit request/response contracts. **Five HTTP server applications exist in total, including the gateway.**
 
-```bash
+The renderer uses a CPU approximation with NumPy/SciPy. RGB/Oklab processing, texture sampling, float precision, intermediate formats and PNG transport can differ materially from the original GPU shader.
+
+## Quick start — local CPU mode
+
+Use Python **3.10+** and work from the `cpu-server/` directory.
+
+**Linux / macOS**
+
+~~~bash
 python -m venv .venv
-# Linux/macOS:
 source .venv/bin/activate
-# Windows PowerShell: .venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
 python -m uvicorn services.gateway:app --host 127.0.0.1 --port 8080
-```
+~~~
 
-Browse **http://127.0.0.1:8080/docs** for the generated OpenAPI interface, or `GET /health` and `GET /v1/capabilities` for basic checks. Set `FLEXAGX_STATE_DB` to a writable local SQLite database path to preserve state/receipts across restarts (default `:memory:` for disposable research tests). The principal image operation is `POST /v1/frame`; it takes base64-encoded PNG input, a session ID, frame index and optional settings, and returns a PNG plus controller/tone metadata. See [the API contract](docs/API_CONTRACT.md) and [examples/client.py](examples/client.py) for the exact schema.
+**Windows PowerShell**
 
-For an offline image operation without an HTTP server:
+~~~powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+python -m uvicorn services.gateway:app --host 127.0.0.1 --port 8080
+~~~
 
-```bash
+Open [http://127.0.0.1:8080/docs](http://127.0.0.1:8080/docs) for the API explorer. Basic endpoints are `GET /health` and `GET /v1/capabilities`. For offline processing, run:
+
+~~~bash
 python -m flexagx.cli --help
-```
+~~~
 
-## Five-service local-only mode
+By default the controller journal is `:memory:` and **does not survive restart**. For local persistence, set `FLEXAGX_STATE_DB` to a writable, private SQLite file **before starting the server**. Create any parent directory beforehand and do not commit the resulting database.
 
-```bash
+## Distributed local microservices
+
+A development-only Compose topology is included:
+
+~~~bash
 docker compose up --build
-```
+~~~
 
-Compose binds the gateway only to **127.0.0.1:8080**; four internal servers share a container network and are not published. **Docker execution has not been certified in the research environment**. Compose mounts a local named volume for the SQLite journal; the controller must use one worker because pending operations remain process-local. No TLS, auth, rate-limited network perimeter or multi-replica consistency is supplied. Do not expose this service publicly or to untrusted networks.
+Compose exposes **only the gateway** on `127.0.0.1:8080`, uses internal service networking, and gives the controller a named SQLite volume. **The Docker build and Windows/PowerShell client have not been independently certified.** The controller must run with **one worker**; pending operations and synchronization are not safe across controller replicas.
 
-Manual server commands and environment variables are documented in [Architecture](docs/ARCHITECTURE.md); `GATEWAY_MODE=local` is the default.
+Manual five-process startup and service URLs are documented in [Architecture](docs/ARCHITECTURE.md). **Do not expose the gateway or internal services to the internet or untrusted clients.**
 
-## Verify and reproduce
+## API overview
 
-```bash
+`POST /v1/frame` accepts a session ID, strictly sequenced frame index, elapsed frame time, base64 PNG and shader-style settings. For the complete validated schema, consult [API Contract](docs/API_CONTRACT.md) and [`examples/client.py`](examples/client.py).
+
+~~~json
+{
+  "session_id": "synthetic-session-01",
+  "frame_index": 17,
+  "dt_ms": 16.667,
+  "image_png_base64": "<actual base64-encoded PNG>",
+  "settings": {
+    "OverallStrength": 100,
+    "AutoExposureStrength": 30,
+    "ExposureOffset": 0,
+    "LocalDetail": 20,
+    "InputEncoding": 0,
+    "OutputEncoding": 0
+  }
+}
+~~~
+
+The example's image value is a **placeholder**, not a valid image payload. A successful response provides processed PNG data and state/validation metadata. Some metadata differs for bypass mode; all API callers should follow the generated OpenAPI schema rather than infer fields from this illustration.
+
+### Frame integrity in v0.5.0
+
+The public gateway calculates a SHA-256 fingerprint of the canonical frame request and keys journal entries by `(session_id, frame_index)`. **The fingerprint identifies a request; it is not authentication.**
+
+| Condition | Result |
+| --- | --- |
+| First valid higher-index frame | Process, then finalize state and response receipt together |
+| Same index, identical full request | Return previously recorded response; no second state transition |
+| Same index, different request | HTTP 409 conflict |
+| Older or reordered index | HTTP 409; do not reprocess |
+| Receipt evicted for an old index | Reject rather than silently recompute |
+| Zero-strength bypass | Record an exact bypass response without advancing exposure adaptation |
+| Renderer error before finalize | Abort provisional update; a retry may proceed |
+| Controller restarts after finalized commit | Read persisted state/receipt if SQLite file storage was configured |
+| Commit succeeds but HTTP acknowledgment is lost | One bounded receipt lookup; if unresolved, fail closed |
+
+Frame gaps are allowed, but backward movement is not. A client should retry an uncertain frame with **the identical request**, not a substituted image, changed settings, or a new frame index. Full semantics and failure cases are specified in [Transaction Integrity v0.5.0](docs/TRANSACTION_INTEGRITY_V05.md).
+
+**Durability limits:** The implementation retains up to **512 replay receipts**, with a **128 MiB serialized receipt budget** and **20 MiB per-receipt limit**. The total SQLite file size is **not physically capped** by these limits; use filesystem quotas and protect stored image responses. A controller outage can leave commit status uncertain. There is **no multi-controller exactly-once guarantee**. Legacy direct `/v1/control/step` and `/v1/control/commit` endpoints bypass the frame receipt journal and are unsafe for untrusted ingress.
+
+## Test and reproduce
+
+From `cpu-server/`, install development dependencies and execute:
+
+~~~bash
 python -m pip install -r requirements-dev.txt
 python -m pytest tests -q
-python -m harness.run_sentinel_harness --seed 20261108 --frames 350
-python -m harness.phase torture --seed 20261106 --frames 1000 --output results_v04/TORTURE_1000_20261106.json
-```
+python -m harness.run_sentinel_harness --seed 20261104 --frames 350
+~~~
 
-The archived v0.4.0 campaign recorded **1,040/1,040 checks passed**, and an independent **1,000-frame torture run** passed all five suites. A later project-level campaign reported two additional passing seeded runs plus independent HTTP and client checks; see the archived project-test evidence for that separate provenance. **These are historical research results, not a new GitHub CI run or GPU acceptance test.** Re-run on your own platform before drawing deployment conclusions. This repository staging commit does not run Docker or deploy anything.
+For the maximum supported sequential torture setting:
 
-The new **v0.5.0 transaction assurance** passes **1,060/1,060 checks**, including 1,000 sequential torture frames, restart recovery and live lost-acknowledgment injection (seed `20261104`). The final report is [Verification](VERIFICATION_REPORT.md); see [Transaction Integrity](docs/TRANSACTION_INTEGRITY_V05.md). Historical v0.4 claims remain separate.
+~~~bash
+python -m harness.run_sentinel_harness --seed 20261104 --frames 1000
+~~~
 
-See [Verification](VERIFICATION_REPORT.md), [Hardening pass](docs/HARDENING_PASS.md), [Test matrix](docs/TEST_MATRIX.md), and [Sentinel/bounds invariants](docs/SENTINEL_BOUNDS_INVARIANTS.md).
+**Recorded v0.5.0 evidence:** [Verification report](VERIFICATION_REPORT.md) reports **1,060/1,060 counted checks passed**, including seeded validation fuzzing, mathematical properties, harness self-tests, controller restart, live five-service fault injection, and lost-finalize-acknowledgment recovery. A 1,000-frame test generated verified PASS evidence; the enclosing command session timed out after the report was written, so that run must not be characterized as a clean wrapper exit. These are **historical local CPU results**, not a current GitHub CI run, platform certification, or GPU equivalence proof.
 
-## Invariants and deliberate limits
+Additional documentation: [Test Matrix](docs/TEST_MATRIX.md) · [Hardening Pass](docs/HARDENING_PASS.md) · [Sentinel and Bounds](docs/SENTINEL_BOUNDS_INVARIANTS.md) · [Error Log](logs/ERROR_LOG.md).
 
-| Concern | Current development contract |
-| --- | --- |
-| Absent values | Explicit typed sentinel records at tested JSON boundaries; no `null`/NaN/Infinity payload values |
-| Initialization | Explicit state defaults and lifecycle checks |
-| Workload bounds | Request/image/LUT/session limits, finite validation, bounded iteration and timeouts |
-| Failure fallback | Reject invalid input, identity bypass, verified curve fallback, hold or abort provisional updates |
-| Controller mutations | Prepare/commit/abort prevents a subset of partial state commits |
-| Source provenance | Original ReShade FX reference remains byte-identical and hash-pinned |
-| Publication | Research code only; no production enablement |
+## Invariants and safety boundaries
 
-**Open blockers:** there is no authenticated external access; the legacy direct controller step/commit operations bypass the versioned frame journal; durable SQLite uses a single controller process and requires a writable file path; network partitions can remain unresolved when the controller is unavailable; floating-point parity with ReShade has not been established; production resource budgets and dependency hardening remain open. These are documented rather than silently “fixed.”
+- **No JSON nulls at tested contract boundaries:** typed sentinels represent unavailable, invalid and uninitialized values; non-finite numeric payloads are rejected where validated.
+- **Explicit initialization:** controller state uses defined defaults and lifecycle checks.
+- **Bounded execution:** tested request sizes, images, LUTs, sessions, pending transactions, loops and subprocess timeouts have limits.
+- **Fail-closed behavior:** malformed requests, conflicting frames and indeterminate remote commits do not silently advance state.
+- **Evidence integrity:** SHA-256 source pins and seeded tests protect the reference and test baselines.
 
-## Directory guide
+These are **tested engineering properties**, not a formal proof of all native-library termination, privacy, security or numerical correctness.
 
-```text
+## Outstanding work
+
+1. Restrict or remove legacy direct controller mutations that bypass the journal.
+2. Implement authentication, authorization and service-to-service identity controls before any network exposure.
+3. Add persistent-store quota/backup/corruption testing and address ambiguous cross-node commits; one-controller-process constraint remains.
+4. Verify Docker, Windows/PowerShell cancellation and resource exhaustion behavior.
+5. Establish dependency pinning, security scans and a reproducible GitHub CI workflow.
+6. Compile and test the original ReShade FX shader on supported GPU backends; measure CPU/GPU differences and independently disposition source findings F01–F43.
+
+The roadmap is staged only; **no merge, deployment, or production release is authorized by this README**.
+
+## Project map
+
+~~~text
 cpu-server/
-├── README.md              ← this document
-├── flexagx/               ← CPU numerical kernels, contracts, session logic, CLI
-├── services/              ← gateway, observer, controller, tone and renderer
-├── clients/               ← JavaScript + PowerShell
-├── examples/              ← Python client
-├── harness/               ← bounded seeded fuzz/torture/self-test runner
-├── tests/                 ← regressions and distributed fault probes
-├── docs/                  ← architecture, API, invariants, research matrix
-├── reference/             ← original unmodified FX source and baseline hashes
-├── results_v04/           ← selected historical summary evidence
-├── logs/                  ← lessons, TODO, error log and roadmap
-├── compose.yaml           ← optional local-only topology
-├── Dockerfile             ← local research image
-└── SHA256SUMS.txt         ← staged file integrity ledger
-```
+├── README.md                  This guide
+├── flexagx/                   CPU kernels, contracts, journal, CLI
+├── services/                  Gateway + four microservices
+├── clients/                   JavaScript and PowerShell
+├── examples/                  Python client
+├── harness/                   Seeded adversarial/torture runner
+├── tests/                     Regression and distributed fault tests
+├── docs/                      API, architecture, provenance, limitations
+├── reference/                 Unmodified upstream FX and pinned hashes
+├── results_v04/               Archived earlier test evidence
+├── results_v05/               v0.5.0 transaction verification evidence
+├── logs/                      TODO, notes, roadmap and errors
+├── compose.yaml               Local-only five-service topology
+└── VERIFICATION_REPORT.md     Current documented test result
+~~~
 
+## Publication, attribution and maintenance
 
-## v0.5.0 frame integrity and durability
+This is a **public** research branch. Authored materials have been screened for private workstation paths, credentials, raw user imagery and identifying test metadata, but a static screen is **not a privacy certification**. GitHub repository ownership, fork lineage and commit author/committer metadata remain public. Keep SQLite journals, real session data, `.env`, virtual environments, crash dumps and generated user-frame artifacts out of Git.
 
-`POST /v1/frame` computes a SHA-256 request fingerprint from the canonical request data. The controller's journal binds `(session_id, frame_index)` to that fingerprint and the original response.
+See [Publication/Privacy](docs/PUBLICATION_PRIVACY.md), [Provenance](docs/PROVENANCE.md), and [Staging/Handoff](docs/STAGING_AND_HANDOFF.md). The original copyright and MIT license remain attributed to **El-Greco1541**.
 
-- A **matching retry** returns the saved output with no second state advancement.
-- A **conflicting duplicate**, an old frame whose receipt was evicted, or a frame arriving below the committed high-water mark is rejected with HTTP 409. Frame gaps are permitted but reverse ordering is not.
-- Bypass frames are journaled too, but do not increment temporal `frames`.
-- A controller **restart** can restore the last committed state and recent response receipts when `FLEXAGX_STATE_DB` points to a persistent SQLite database. Uncommitted in-memory prepares are discarded.
-- State and response receipts are written together in a SQLite transaction; if the HTTP finalize acknowledgement is lost, the gateway makes one bounded receipt lookup. Uncertainty persists when the controller is unreachable; clients must retry using the *identical* request rather than inventing a new frame.
-- At most 512 replay receipts and 128 MiB of serialized receipt records are retained, with an individual receipt limit of 20 MiB. SQLite database-file size itself is **not** physically capped and requires operator-controlled disk quotas. Stale frames are rejected after receipt eviction.
-
-**Limitations:** The older direct `/v1/control/step` and `/v1/control/commit` endpoints are research compatibility interfaces and are **not** protected by frame-level replay handling. No authentication, multi-controller coherence, encrypted transport, or formal exactly-once network guarantee has been established. Use one controller worker and never expose the research API externally.
-
-Run v0.5 assurance:
-
-```bash
-python -m pytest tests -q
-python -m harness.run_sentinel_harness --seed 20261101 --frames 350
-python tests/distributed_v05.py --seed 20261101 --output results_v05/distributed_v05_smoke.json
-```
-
-## Publication/privacy boundary
-
-Research-source materials have been screened to avoid identifiable local workspace paths, private account data, credentials and personal log metadata. The upstream author’s legally required MIT attribution is retained. **This public fork and its Git commit metadata are not anonymous.** See [Publication and privacy audit](docs/PUBLICATION_PRIVACY.md).
-
-## Change and release policy
-
-The upstream fork's root `README.md` and `LICENSE` are not overwritten. CPU code and its tests live entirely in this directory. New work should enter through a **reviewable staging branch**, be validated against the pinned reference, and receive explicit operator clearance before any merge, production deployment or externally reachable exposure.
-
-**Upstream shader:** © 2026 El-Greco1541, MIT. **CPU-server staging:** experimental, independently maintained research adaptation.
+**Status: v0.5.0 staged, upstream preserved, production gate locked.**
