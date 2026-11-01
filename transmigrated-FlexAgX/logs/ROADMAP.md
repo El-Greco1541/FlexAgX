@@ -5,3 +5,6 @@
 4. **v0.4 modular expansion:** independently executable pass equations, correct intermediate formats, API contracts and glue.
 5. **Runtime acceptance:** ReShade FX compiler, GPU runs, cross-API fidelity, security and explicit release decision.
 Production gate remains locked for every new material change until operator clearance.
+
+## v0.2 effect treatment
+Static and CPU harness complete. Next stage is a separate ReShade compiler/GPU runner; then first-use resource initialization and bounded fidelity evaluation. No production authority granted.

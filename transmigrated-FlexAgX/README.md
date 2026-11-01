@@ -1,6 +1,6 @@
 # Transmigrated FlexAgX — correction-first shader development
 
-**Status: STAGED RESEARCH · Phase 1: CORRECT FIRST · Expansion: NOT YET AUTHORIZED**
+**Status: STAGED RESEARCH · Phase 1: CORRECT FIRST · Harness v0.2.0 · Expansion: NOT YET AUTHORIZED**
 
 This independent workspace starts with the original **FlexAgX 1.2** by **El-Greco1541** (MIT licensed), uses the existing 43-finding audit and prior CPU-server architecture as research inputs, and makes narrowly documented shader corrections before expanding behavior. It does **not** replace, edit or claim upstream authorship for the original shader.
 
@@ -53,6 +53,19 @@ Example achromatic hue request:
 ```
 
 Response is a finite sentinel with angle zero and reason `ACHROMATIC_FALLBACK`. Histogram requests require exactly 64 integer bins plus matching valid/white/sample counters. Each call starts from an explicit 67-slot zero state. Any invalid wire input receives a typed rejection sentinel and no mutation. All computation ports are replaceable and no concurrent persistent state is exposed by the probe service.
+
+## Hardened effect harness (v0.2.0)
+
+The new [effect-harness guide](docs/EFFECT_HARNESS.md) covers isolated test processes, fail-closed evidence validation, original-vs-candidate source hashing, deliberate shader-regression mutations, hue/histogram reference oracles, adversarial JSON, 8-thread live HTTP, and **1,000-/2,000-frame synthetic sampling torture**.
+
+**Result:** Two campaigns passed **24,138 counted checks cumulatively**, with **40/40 pytest tests**. This verifies only CPU correction probes and source properties—not actual `.fx` rendering. No ReShade FX compiler or GPU runtime was available, and `FA_State`/`FA_HistPrev` first-use and backend barrier semantics remain unverified. See [Verification](VERIFICATION_REPORT.md).
+
+```bash
+python -m pytest -q tests
+python -m harness.selftest
+python -m harness.runner --seed 20261101 --frames 1000
+python -m harness.runner --seed 731234 --frames 2000
+```
 
 ## Test
 

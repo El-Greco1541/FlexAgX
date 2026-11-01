@@ -1,0 +1,211 @@
+"""Deterministic, seeded effect-oriented suites. Runtime FX execution is NOT supplied."""
+import argparse, ast, hashlib, json, math, random, re, sys
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+from fastapi.testclient import TestClient
+from correction_api.api import app
+from correction_api.models import HueRequest, HistogramRequest
+from correction_api.modules import safe_hue, clear_and_accumulate
+from .fixtures import reference_hue,histogram_source_model,lut_domain_index
+from .source_audit import check_corrections
+
+ROOT=Path(__file__).resolve().parents[1]
+REFERENCE_SHA='e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d'
+CANDIDATE_SHA='ff5f38cfc4f21bee6521b62aeb996eba6ed5bedd95c3745de82ac32d9199f3da'
+
+def checked(data, phase, detail, cases):
+    assert data, f'{phase}: {detail}'
+    cases.append(detail)
+
+def check_no_null(value):
+    if value is None:raise AssertionError('JSON null emitted')
+    if isinstance(value,float) and not math.isfinite(value):raise AssertionError('nonfinite JSON emitted')
+    if isinstance(value,dict):
+        for v in value.values():check_no_null(v)
+    if isinstance(value,list):
+        for v in value:check_no_null(v)
+
+def passes(text):
+    return re.findall(r'\bpass (FlexAgX_\w+)\s*\{',text)
+
+def source_suite(seed, frames):
+    cases=[]
+    reference=(ROOT/'reference/FlexAgX_1.2.fx').read_bytes()
+    candidate=(ROOT/'shader/FlexAgX_transmigrated.fx').read_bytes()
+    checked(hashlib.sha256(reference).hexdigest()==REFERENCE_SHA,'source','original SHA-256 matches upstream',cases)
+    checked(hashlib.sha256(candidate).hexdigest()==CANDIDATE_SHA,'source','candidate SHA-256 unchanged',cases)
+    checked(check_corrections(candidate.decode(),reference.decode())==[],'source','structural pass and guarded-HLSL audit passes',cases)
+    old=passes(reference.decode());new=passes(candidate.decode())
+    checked(len(old)==8 and len(new)==9 and new[1:]==old,'source','exact original eight pass names/order retained',cases)
+    checked(new[0]=='FlexAgX_ClearHistogramPass','source','P0 histogram preclear ordered first',cases)
+    text=candidate.decode()
+    checked(re.search(r'\[numthreads\(128,\s*1,\s*1\)\]\s*void FlexAgX_ClearHistogram\(',text),'source','histogram clear launch spans 128 lanes',cases)
+    checked('if (id.x < 67u)' in text and 'tex2Dstore(FA_HistStorage, int2((int)id.x, 0), 0u)' in text,'source','67 histogram slots covered by preclear',cases)
+    checked(text.count('ComputeShader = FlexAgX_ClearHistogram;')==1,'source','clear pass bound to correct compute function',cases)
+    checked(text.count('h = atan2(lab.z, lab.y)')==1 and text.count('h = atan2(b, a)')==1,'source','guarded hue-angle call sites intact',cases)
+    checked('if (inputChroma >= 1.0e-4)' in text and 'if (curvedChroma > 1.0e-6)' in text and 'if (C > 1.0e-6)' in text,'source','three origin guards match intended boundaries',cases)
+    checked('GroupMemoryBarrierWithGroupSync' not in text and 'barrier();' in text,'source','compute synchronization uses explicit shader barriers',cases)
+    checked('FA_HistPrevStorage' in text and 'FA_StateStorage' in text,'source','state textures present but cold-start safety not asserted',cases)
+    checked('if (OverallStrength <= 0.0 && DebugView == 0)' in text,'source','exact-bypass code path exists',cases)
+    checked(not re.search(r'\bwhile\s*\(',text),'source','no shader while loops',cases)
+    checked('for (int i = 0; i < 10; ++i)' in text,'source','chroma bisection loop explicitly limited',cases)
+    checked('if (C > 1.0e-6)' in text[text.index('float4 FlexAgX_OutputPS'):],'source','gamut chroma bisection guarded at origin',cases)
+    checked(re.search(r'\btex2Dfetch\(FA_StateStorage',text) and re.search(r'\btex2Dfetch\(FA_HistPrevStorage',text),'source','persistent resource reads are tracked as open risk',cases)
+    return cases
+
+def hue_suite(seed,frames):
+    cases=[]; rng=random.Random(seed^0xF38)
+    checked(len(reference_hue('output-gamut',0.,0.))==2,'hue','oracle output initialized',cases)
+    values=[0.,1e-12,1e-7,1e-6,9.999e-5,1e-4,1.001e-4,1.,8.]
+    for stage in ('source-hue','curved-hue','output-gamut'):
+        for a in values:
+            for b in values:
+                for sign in (-1,1):
+                    q=HueRequest(stage=stage,a=float(a),b=float(b)*sign)
+                    result=safe_hue(q); theta,guard=reference_hue(stage,q.a,q.b)
+                    checked(result.guarded==guard and abs(result.angle_rad-theta)<1e-12,'hue',f'{stage} boundary {a}/{b}/{sign}',cases)
+    for i in range(2500):
+        a=rng.uniform(-8,8);b=rng.uniform(-8,8)
+        stage=('source-hue','curved-hue','output-gamut')[i%3]
+        h=safe_hue(HueRequest(stage=stage,a=a,b=b));expected,guard=reference_hue(stage,a,b)
+        checked(h.guarded==guard and math.isfinite(h.angle_rad) and abs(h.angle_rad-expected)<1e-12,'hue',f'angle oracle {i}',cases)
+    for i in range(1000):
+        a,b=rng.uniform(-4,4),rng.uniform(-4,4)
+        h=safe_hue(HueRequest(stage='output-gamut',a=a,b=b))
+        if h.guarded: continue
+        k=rng.uniform(1.1,1.9)
+        if abs(a*k)>8 or abs(b*k)>8:continue
+        h2=safe_hue(HueRequest(stage='output-gamut',a=a*k,b=b*k))
+        checked(not h2.guarded and abs(h.angle_rad-h2.angle_rad)<1e-12,'hue',f'positive scale invariance {i}',cases)
+    return cases
+
+def histogram_suite(seed,frames):
+    cases=[]; rng=random.Random(seed^0xF41)
+    for i in range(1200):
+        bins=[rng.randrange(0,70) for _ in range(64)]; valid=sum(bins)
+        white=rng.randrange(valid+1); samples=valid+rng.randrange(0,100)
+        q=HistogramRequest(bins=bins,valid_count=valid,white_count=white,sample_count=samples)
+        result=clear_and_accumulate(q).counters
+        checked(len(result)==67 and result[:64]==bins and result[64:]==[valid,white,samples],'histogram',f'counts {i}',cases)
+    for i in range(500):
+        w=rng.randrange(1,33);h=rng.randrange(1,33)
+        colors=[(0.,0.,0.),(1.,1.,1.),(.5,.5,.5),(.01,.02,.05),(.98,.99,1.),(.1,.8,.15)]
+        image=[colors[rng.randrange(len(colors))] for _ in range(w*h)]
+        f=rng.randrange(0,2**32)
+        a=histogram_source_model(image,w,h,f)
+        checked(sum(a[:64])==a[64] and 0<=a[65]<=a[64]<=a[66]<=((w+1)//2)*((h+1)//2),'histogram',f'image oracle {i}',cases)
+        b=histogram_source_model(image,w,h,f+(1<<32))
+        checked(b==a,'histogram',f'uint32 phase wrap {i}',cases)
+    for w in (1,2,3,5,16,17,31,64):
+        for h in (1,2,3,7,32):
+            empty=[(0.,0.,0.)]*(w*h);white=[(1.,1.,1.)]*(w*h)
+            for f in range(8):
+                black=histogram_source_model(empty,w,h,f); bright=histogram_source_model(white,w,h,f)
+                checked(black[64]==0 and black[65]==0 and black[66]==bright[66] and bright[64]==bright[65],'histogram',f'black/white {w}x{h} f{f}',cases)
+    return cases
+
+def interface_suite(seed,frames):
+    cases=[];rng=random.Random(seed^0xAA)
+    with TestClient(app) as client:
+        for name in ('/health','/v1/capabilities'):
+            r=client.get(name);check_no_null(r.json());checked(r.status_code==200,'interface',f'{name} probe',cases)
+        valid={'stage':'output-gamut','a':0.0,'b':0.0}
+        for i in range(650):
+            obj=dict(valid)
+            choice=i%13
+            if choice==0:obj['a']=None
+            elif choice==1:obj['a']='invalid'
+            elif choice==2:obj['a']=True
+            elif choice==3:obj['a']=1000.0
+            elif choice==4:obj['a']=-1000.0
+            elif choice==5:obj['stage']='not-a-stage'
+            elif choice==6:obj['extra']=str(i)
+            elif choice==7:obj.pop('b')
+            elif choice==8:obj['b']={}
+            elif choice==9:obj['a']=[1,2]
+            elif choice==10:obj['a']=-1e100
+            elif choice==11:obj['a']=1e-12
+            elif choice==12:obj['b']=rng.uniform(-8,8)
+            r=client.post('/v1/correction/hue',json=obj)
+            check_no_null(r.json())
+            expected=200 if choice in (11,12) else 422
+            checked(r.status_code==expected,'interface',f'hue invalid/valid {i}',cases)
+        for token in ('NaN','Infinity','-Infinity','1e10000'):
+            r=client.post('/v1/correction/hue',content='{"stage":"output-gamut","a":'+token+',"b":0.0}',headers={'content-type':'application/json'})
+            checked(r.status_code==422 and r.json()['sentinel']['fallback']=='NO_MUTATION','interface',f'nonfinite token {token}',cases)
+        req={'bins':[0]*64,'valid_count':0,'white_count':0,'sample_count':0}
+        for i in range(450):
+            q={**req,'bins':req['bins'].copy()}
+            choice=i%9
+            if choice==0:q['bins']=[0]*63
+            elif choice==1:q['bins']=[0]*65
+            elif choice==2:q['bins'][0]=1
+            elif choice==3:q['bins'][0]=-1
+            elif choice==4:q['bins'][0]=True
+            elif choice==5:q['white_count']=1
+            elif choice==6:q['sample_count']=-1
+            elif choice==7:q['bins'][0]=2000001
+            elif choice==8:q['bins'][0]=1;q['valid_count']=1;q['sample_count']=1
+            r=client.post('/v1/correction/histogram',json=q)
+            check_no_null(r.json());expected=200 if choice==8 else 422
+            checked(r.status_code==expected,'interface',f'histogram payload {i}',cases)
+        for i in range(75):
+            r=client.post('/v1/correction/hue',content=b'{bad-json',headers={'content-type':'application/json'})
+            checked(r.status_code==422 and 'null' not in r.text.lower(),'interface',f'invalid JSON {i}',cases)
+    return cases
+
+def metamorphic_suite(seed,frames):
+    cases=[];rng=random.Random(seed^0xABCD)
+    for i in range(1200):
+        u=rng.uniform(-10,10);k0,k1,t=lut_domain_index(u)
+        checked(0<=k0<=k1<1024 and 0<=t<=1,'meta',f'LUT index bounds {i}',cases)
+    for i in range(900):
+        a,b=rng.uniform(-7,7),rng.uniform(-7,7)
+        theta,guard=reference_hue('output-gamut',a,b)
+        reflected,other=reference_hue('output-gamut',a,-b)
+        checked(guard==other and abs(theta+reflected)<1e-12,'meta',f'polar reflect {i}',cases)
+    for i in range(450):
+        a=[rng.randrange(0,50) for _ in range(64)];b=[rng.randrange(0,50) for _ in range(64)]
+        va=sum(a);vb=sum(b)
+        result=clear_and_accumulate(HistogramRequest(bins=[x+y for x,y in zip(a,b)],valid_count=va+vb,white_count=0,sample_count=va+vb)).counters
+        checked(result[:64]==[x+y for x,y in zip(a,b)] and result[64]==va+vb,'meta',f'additive histogram {i}',cases)
+    return cases
+
+def torture_suite(seed,frames):
+    cases=[];rng=random.Random(seed^0xBABE)
+    image=[];w=31;h=27
+    palette=[(0.,0.,0.),(1.,1.,1.),(.25,.25,.25),(.99,.5,.01),(.01,.88,.3),(.01,.01,.02)]
+    for i in range(w*h): image.append(palette[rng.randrange(len(palette))])
+    prev=None
+    for f in range(frames):
+        if f%37==0:
+            v=palette[rng.randrange(len(palette))]
+            image=[v for _ in range(w*h)]
+        if f%19==0:
+            idx=rng.randrange(w*h);image[idx]=palette[rng.randrange(len(palette))]
+        counters=histogram_source_model(image,w,h,f)
+        req=HistogramRequest(bins=counters[:64],valid_count=counters[64],white_count=counters[65],sample_count=counters[66])
+        out=clear_and_accumulate(req).counters
+        checked(out==counters,'torture',f'frame {f}',cases)
+        if prev is not None and f%37==1:
+            checked(all(isinstance(k,int) for k in out),'torture',f'phase restored {f}',cases)
+        prev=out
+    return cases
+
+SUITES={'source':source_suite,'hue':hue_suite,'histogram':histogram_suite,'interface':interface_suite,'metamorphic':metamorphic_suite,'torture':torture_suite}
+
+def main():
+    p=argparse.ArgumentParser();p.add_argument('phase',choices=SUITES);p.add_argument('--seed',type=int,required=True);p.add_argument('--frames',type=int,default=1000);p.add_argument('--output',type=Path,required=True)
+    args=p.parse_args()
+    if not (0<=args.seed<=2**63-1 and 1<=args.frames<=2000):p.error('seed or frames out of bounds')
+    out={'phase':args.phase,'seed':args.seed,'frames':args.frames,'status':'FAIL','checks':0,'passed':0,'failed':1,'errors':['not executed']}
+    try:
+        cases=SUITES[args.phase](args.seed,args.frames)
+        out={'phase':args.phase,'seed':args.seed,'frames':args.frames,'status':'PASS','checks':len(cases),'passed':len(cases),'failed':0,'errors':[],'evidence_sha256':hashlib.sha256(('\n'.join(cases)).encode()).hexdigest(),'case_ids':cases,'first_cases':cases[:5],'last_cases':cases[-5:]}
+    except Exception as e:
+        out['errors']=[type(e).__name__+': '+str(e)[:300]]
+    args.output.parent.mkdir(parents=True,exist_ok=True)
+    args.output.write_text(json.dumps(out,indent=2,allow_nan=False)+'\n')
+    print(json.dumps({'phase':out['phase'],'status':out['status'],'checks':out['checks'],'failed':out['failed']}),flush=True)
+    sys.exit(0 if out['status']=='PASS' else 1)
+if __name__=='__main__':main()

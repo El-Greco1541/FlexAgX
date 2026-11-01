@@ -7,3 +7,9 @@ __pycache__/
 *.db
 *.log
 results_tmp/
+
+# Harness execution evidence is archived separately; do not commit transient data.
+harness/results/
+harness/tmp/
+*.sqlite3
+*.db

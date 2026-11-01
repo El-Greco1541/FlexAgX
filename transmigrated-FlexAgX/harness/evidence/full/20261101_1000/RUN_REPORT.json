@@ -1,0 +1,116 @@
+{
+  "version": "0.2.0",
+  "subject": "Transmigrated FlexAgX effect \u2014 static and CPU correction probes",
+  "execution_scope": "NOT_GPU_OR_FX_COMPILER",
+  "seed": 20261101,
+  "frames": 1000,
+  "run_id": "fx-c199eb525746",
+  "status": "PASS",
+  "checks": 11555,
+  "passed": 11555,
+  "failed": 0,
+  "phases": [
+    {
+      "phase": "source",
+      "status": "PASS",
+      "checks": 17,
+      "passed": 17,
+      "failed": 0,
+      "elapsed_seconds": 1.028,
+      "evidence_sha256": "f8c9e94a79c906c6c061ee66e5001da3801ed10dce4b9e9e1557c3642a866d80"
+    },
+    {
+      "phase": "hue",
+      "status": "PASS",
+      "checks": 3987,
+      "passed": 3987,
+      "failed": 0,
+      "elapsed_seconds": 1.031,
+      "evidence_sha256": "180c7d00104c874671ce97a231693bdd10d0265851ba120e0fa3e6fd6b8e879c"
+    },
+    {
+      "phase": "histogram",
+      "status": "PASS",
+      "checks": 2520,
+      "passed": 2520,
+      "failed": 0,
+      "elapsed_seconds": 1.138,
+      "evidence_sha256": "ec0dec3a2220f9a9713ab165e6186407867e4d4096f47da91b02416fed3c057e"
+    },
+    {
+      "phase": "interface",
+      "status": "PASS",
+      "checks": 1181,
+      "passed": 1181,
+      "failed": 0,
+      "elapsed_seconds": 1.816,
+      "evidence_sha256": "dfe2e664d6a438874911d0812f119ab92cae0a7e00b0a9c881a7022cdb659ef2"
+    },
+    {
+      "phase": "metamorphic",
+      "status": "PASS",
+      "checks": 2550,
+      "passed": 2550,
+      "failed": 0,
+      "elapsed_seconds": 1.093,
+      "evidence_sha256": "848edebb1e49075ee0e76365750e2ae8bc34c9240c68ec545c9bc3d61cfadbfa"
+    },
+    {
+      "phase": "torture",
+      "status": "PASS",
+      "checks": 1027,
+      "passed": 1027,
+      "failed": 0,
+      "elapsed_seconds": 1.204,
+      "evidence_sha256": "a1f6e9b5e2f7f40e1416335c5a90cd3a4506cb2d0b8ad1b18e28938839902ef6"
+    },
+    {
+      "phase": "live_http",
+      "status": "PASS",
+      "checks": 273,
+      "passed": 273,
+      "failed": 0,
+      "elapsed_seconds": 2.522,
+      "evidence_sha256": "03eb232c8bbec10acfebf7bc24fcb24ce471821c1a40a5e2920b6cd1064d4ea2"
+    }
+  ],
+  "errors": [],
+  "elapsed_seconds": 9.84,
+  "runtime_limits": {
+    "child_output_bytes": 524288,
+    "retained_output_bytes": 8192,
+    "per_suite_seconds": {
+      "source": 25,
+      "hue": 50,
+      "histogram": 55,
+      "interface": 75,
+      "metamorphic": 40,
+      "torture": 80,
+      "live_http": 90
+    }
+  },
+  "toolchain": {
+    "status": "NOT_RUN",
+    "reason": "No executable ReShade FX compiler found; neither GL shader validators nor HLSL compiler alone certify ReShade FX semantics",
+    "tools": {
+      "reshadefx": "NOT_FOUND",
+      "glslangValidator": "NOT_FOUND",
+      "dxc": "NOT_FOUND",
+      "fxc": "NOT_FOUND",
+      "nvidia-smi": "NOT_FOUND",
+      "vulkaninfo": "NOT_FOUND"
+    },
+    "gpu_runtime": "NOT_DETECTED",
+    "native_shader_compilation": "NOT_EXECUTED",
+    "native_effect_rendering": "NOT_EXECUTED",
+    "scope": "This probe does not attempt to claim FX compiler or GPU acceptance."
+  },
+  "unverified": [
+    "ReShade FX compiler acceptance",
+    "D3D11/D3D12/Vulkan/OpenGL GPU execution",
+    "original and corrected shader pixel identity",
+    "FA_State/FA_HistPrev cold-start/reload persistence",
+    "backend storage barrier semantics",
+    "F39/F40 gamut and encoding policy"
+  ]
+}

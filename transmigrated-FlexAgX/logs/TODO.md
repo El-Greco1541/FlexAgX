@@ -10,3 +10,11 @@
 - [ ] F23/F24 deadband/velocity behavior contract and tests
 - [ ] Migrate accepted corrections into independent CPU pass implementations
 - [ ] Test actual GPU vs CPU numerical parity before expansion
+
+## Effect harness v0.2.0
+- [x] Isolated seven-phase static/CPU/HTTP harness with per-run evidence and deadlines
+- [x] 40/40 pytest, 24,138 seeded check executions across 1,000 and 2,000 frames
+- [x] FX mutation guards and proof of fail-closed harness selftests
+- [ ] Native ReShade compiler / actual GPU frame capture and independent color comparison
+- [ ] Resolve FA_State and FA_HistPrev first-use/reload initialization
+- [ ] Decide gamut/encoding F39/F40 contracts before source modification

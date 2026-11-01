@@ -1,0 +1,44 @@
+{
+  "phase": "source",
+  "seed": 731234,
+  "frames": 2000,
+  "status": "PASS",
+  "checks": 17,
+  "passed": 17,
+  "failed": 0,
+  "errors": [],
+  "evidence_sha256": "e7447256b26c025a30ef0753ce7c4ac67feabfc04c73d2ecd3e9597302c36fe4",
+  "case_ids": [
+    "original SHA-256 matches upstream",
+    "candidate SHA-256 unchanged",
+    "structural pass and guarded-HLSL audit passes",
+    "exact original eight pass names/order retained",
+    "P0 histogram preclear ordered first",
+    "histogram clear launch spans 128 lanes",
+    "67 histogram slots covered by preclear",
+    "clear pass bound to correct compute function",
+    "guarded hue-angle call sites intact",
+    "three origin guards match intended boundaries",
+    "compute synchronization uses explicit shader barriers",
+    "state textures present but cold-start safety not asserted",
+    "exact-bypass code path exists",
+    "no shader while loops",
+    "chroma bisection loop explicitly limited",
+    "gamut chroma bisection guarded at origin",
+    "persistent resource reads are tracked as open risk"
+  ],
+  "first_cases": [
+    "original SHA-256 matches upstream",
+    "candidate SHA-256 unchanged",
+    "structural pass and guarded-HLSL audit passes",
+    "exact original eight pass names/order retained",
+    "P0 histogram preclear ordered first"
+  ],
+  "last_cases": [
+    "exact-bypass code path exists",
+    "no shader while loops",
+    "chroma bisection loop explicitly limited",
+    "gamut chroma bisection guarded at origin",
+    "persistent resource reads are tracked as open risk"
+  ]
+}
