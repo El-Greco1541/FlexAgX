@@ -11,7 +11,7 @@ from .source_audit import check_corrections
 
 ROOT=Path(__file__).resolve().parents[1]
 REFERENCE_SHA='e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d'
-CANDIDATE_SHA='ff5f38cfc4f21bee6521b62aeb996eba6ed5bedd95c3745de82ac32d9199f3da'
+CANDIDATE_SHA='9116e0c2f4d13214b678f387bf05723348d0910117755e9a4c3de6addb894c68'
 
 def checked(data, phase, detail, cases):
     assert data, f'{phase}: {detail}'
@@ -45,12 +45,46 @@ def source_suite(seed, frames):
     checked(text.count('h = atan2(lab.z, lab.y)')==1 and text.count('h = atan2(b, a)')==1,'source','guarded hue-angle call sites intact',cases)
     checked('if (inputChroma >= 1.0e-4)' in text and 'if (curvedChroma > 1.0e-6)' in text and 'if (C > 1.0e-6)' in text,'source','three origin guards match intended boundaries',cases)
     checked('GroupMemoryBarrierWithGroupSync' not in text and 'barrier();' in text,'source','compute synchronization uses explicit shader barriers',cases)
-    checked('FA_HistPrevStorage' in text and 'FA_StateStorage' in text,'source','state textures present but cold-start safety not asserted',cases)
+    checked('FA_HistPrevStorage' in text and 'FA_StateStorage' in text,'source','state and histogram reads guarded by temporal initialization',cases)
     checked('if (OverallStrength <= 0.0 && DebugView == 0)' in text,'source','exact-bypass code path exists',cases)
     checked(not re.search(r'\bwhile\s*\(',text),'source','no shader while loops',cases)
     checked('for (int i = 0; i < 10; ++i)' in text,'source','chroma bisection loop explicitly limited',cases)
     checked('if (C > 1.0e-6)' in text[text.index('float4 FlexAgX_OutputPS'):],'source','gamut chroma bisection guarded at origin',cases)
     checked(re.search(r'\btex2Dfetch\(FA_StateStorage',text) and re.search(r'\btex2Dfetch\(FA_HistPrevStorage',text),'source','persistent resource reads are tracked as open risk',cases)
+    checked('FA_ColdStart = valid ? 0 : 1;' in text,'source','cold-start marker controls retained-state reads',cases)
+    checked('FA_PrevSh[lane] = currentNorm;' in text,'source','cold-start scene reference uses current histogram',cases)
+    checked('tex2Dstore(FA_TemporalBootStorage' in text,'source','temporal marker written after successful state/histogram stores',cases)
+    return cases
+
+def temporal_suite(seed,frames):
+    """Deterministic marker model and targeted poison/fault cases, NOT GPU execution."""
+    from .temporal_oracle import temporal_marker, temporal_valid, normalized_reference
+    cases=[]; rng=random.Random(seed ^ 0xB007)
+    old0=(-5.0,0.0,0.5,0.0)
+    old1=(0.2,1.0,0.1,0.3)
+    for i in range(2200):
+        now=rng.randrange(0,1<<32)
+        marker=temporal_marker((now-1)&0xffffffff)
+        checked(temporal_valid(marker,now,old0,old1),'temporal',f'valid consecutive {i}',cases)
+        bad=list(marker); bad[i%4]+=1
+        checked(not temporal_valid(bad,now,old0,old1),'temporal',f'invalid marker field {i}',cases)
+        wrong=(now-rng.randrange(2,20000))&0xffffffff
+        checked(not temporal_valid(temporal_marker(wrong),now,old0,old1),'temporal',f'nonconsecutive frame {i}',cases)
+    # Special-case frame wraparound, per-channel NaN, Inf, oversized entries.
+    checked(temporal_valid(temporal_marker(0xffffffff),0,old0,old1),'temporal','u32 wrap accepted',cases)
+    checked(not temporal_valid(temporal_marker(0),0,old0,old1),'temporal','framecount reset rejected',cases)
+    for i,value in enumerate((float('nan'),float('inf'),-float('inf'),1000000.0)):
+        c=list(old0);c[i]=value
+        checked(not temporal_valid(temporal_marker(4),5,c,old1),'temporal',f'corrupt old0 {i}',cases)
+    for i,value in enumerate((float('nan'),float('inf'),-float('inf'),1000000.0)):
+        c=list(old1);c[i]=value
+        checked(not temporal_valid(temporal_marker(4),5,old0,c),'temporal',f'corrupt old1 {i}',cases)
+    for i in range(1500):
+        bins=[rng.randrange(0,20000) for _ in range(64)]
+        ref=normalized_reference(bins)
+        checked(len(ref)==64 and all(math.isfinite(z) and 0<=z<=1 for z in ref)
+                and abs(sum(ref)-1.0)<1e-12,'temporal',f'cold hist normalized {i}',cases)
+    checked(normalized_reference([0]*64)==[0.0]*64,'temporal','zero-count frame baseline',cases)
     return cases
 
 def hue_suite(seed,frames):
@@ -192,7 +226,7 @@ def torture_suite(seed,frames):
         prev=out
     return cases
 
-SUITES={'source':source_suite,'hue':hue_suite,'histogram':histogram_suite,'interface':interface_suite,'metamorphic':metamorphic_suite,'torture':torture_suite}
+SUITES={'temporal':temporal_suite,'source':source_suite,'hue':hue_suite,'histogram':histogram_suite,'interface':interface_suite,'metamorphic':metamorphic_suite,'torture':torture_suite}
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('phase',choices=SUITES);p.add_argument('--seed',type=int,required=True);p.add_argument('--frames',type=int,default=1000);p.add_argument('--output',type=Path,required=True)

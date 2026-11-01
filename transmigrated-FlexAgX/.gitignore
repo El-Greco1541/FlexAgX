@@ -13,3 +13,6 @@ harness/results/
 harness/tmp/
 *.sqlite3
 *.db
+
+# Local v0.3.0 full source/CPU simulation evidence, bundled separately
+harness/correction_results/

@@ -238,6 +238,20 @@ texture2D FA_State
     Width = 2; Height = 1; Format = RGBA32F;
 };
 storage2D FA_StateStorage { Texture = FA_State; };
+
+// Cold-start/reload discriminator for FA_State and FA_HistPrev.
+// This marker is checked BEFORE state is used for exposure calculations.
+// A pair of exactly represented float sentinels plus two uint16 framecount
+// words avoids precision loss from storing a 32-bit frame counter as float.
+// Contents of a newly allocated GPU texture are NOT assumed to be zero.
+// Runtime clearing/reload semantics remain subject to native GPU acceptance.
+#define _FA_BOOT_MAGIC_A (17231.0)
+#define _FA_BOOT_MAGIC_B (28531.0)
+texture2D FA_TemporalBoot
+{
+    Width = 1; Height = 1; Format = RGBA32F;
+};
+storage2D FA_TemporalBootStorage { Texture = FA_TemporalBoot; };
 sampler2D FA_StateSampler
 {
     Texture = FA_State;
@@ -327,6 +341,7 @@ groupshared uint FA_SAMPLES;
 groupshared float FA_LutSh[_FA_LUT_SIZE];
 groupshared int FA_StateFail;
 groupshared int FA_StateNative;
+groupshared int FA_ColdStart;
 groupshared float FA_StateKnee;
 groupshared float FA_StateGain;
 
@@ -676,19 +691,54 @@ void FlexAgX_State(uint3 id : SV_DispatchThreadID, uint3 tid : SV_GroupThreadID)
         return;
     }
 
-    // Load this frame's histogram and the retained scene reference into
-    // shared memory in parallel; the analysis below then runs without
-    // per-item texture latency.
+    // Load CURRENT histogram first. Do not fetch the previous histogram
+    // until the temporal validity marker and retained controller state have
+    // been checked. An uninitialized previous-scene texture has no contract.
     if (lane < 64)
-    {
         FA_HistSh[lane] = tex2Dfetch(FA_HistStorage, int2((int)lane, 0)).x;
-        FA_PrevSh[lane] = tex2Dfetch(FA_HistPrevStorage, int2((int)lane, 0)).r;
-    }
     if (lane == 64)
     {
         FA_T = tex2Dfetch(FA_HistStorage, int2(64, 0)).x;
         FA_C = tex2Dfetch(FA_HistStorage, int2(65, 0)).x;
         FA_SAMPLES = tex2Dfetch(FA_HistStorage, int2(66, 0)).x;
+    }
+    barrier();
+
+    // One workgroup owns this state pass. Source-visible validation rejects
+    // first use, stale resources, effect-disable frame gaps and counter resets.
+    // A texture's contents are inspected ONLY as a validity tag until accepted.
+    if (lane == 0)
+    {
+        float4 stamp = tex2Dfetch(FA_TemporalBootStorage, int2(0, 0));
+        uint previous = (uint)framecount - 1u;
+        bool markerOK = (stamp.x == _FA_BOOT_MAGIC_A) &&
+                        (stamp.y == _FA_BOOT_MAGIC_B) &&
+                        (stamp.z == (float)(previous & 65535u)) &&
+                        (stamp.w == (float)(previous >> 16u));
+        bool valid = false;
+        if (markerOK)
+        {
+            float4 prior0 = tex2Dfetch(FA_StateStorage, int2(0, 0));
+            float4 prior1 = tex2Dfetch(FA_StateStorage, int2(1, 0));
+            valid = all(prior0 == prior0) && all(prior1 == prior1) &&
+                    all(abs(prior0) <= float4(32.0, 8.0, 1.0, 1.0)) &&
+                    all(abs(prior1) <= float4(1.0, 1.0, _FA_GAIN_LIMIT, 1.0)) &&
+                    (prior1.y == 0.0 || prior1.y == 1.0);
+        }
+        FA_ColdStart = valid ? 0 : 1;
+    }
+    barrier();
+
+    if (lane < 64)
+    {
+        float currentNorm = (FA_T > 0u) ? ((float)FA_HistSh[lane] / (float)FA_T) : 0.0;
+        if (FA_ColdStart != 0)
+            FA_PrevSh[lane] = currentNorm; // first scene compares to itself
+        else
+        {
+            float oldNorm = tex2Dfetch(FA_HistPrevStorage, int2((int)lane, 0)).r;
+            FA_PrevSh[lane] = (oldNorm >= 0.0 && oldNorm <= 1.0) ? oldNorm : currentNorm;
+        }
     }
     barrier();
 
@@ -732,8 +782,17 @@ void FlexAgX_State(uint3 id : SV_DispatchThreadID, uint3 tid : SV_GroupThreadID)
             e90 = values[1];
         }
 
-        float4 old0 = tex2Dfetch(FA_StateStorage, int2(0, 0));
-        float4 old1 = tex2Dfetch(FA_StateStorage, int2(1, 0));
+        // Cold start has a complete finite default for every state component.
+        // Read old resources only after the temporal validity check succeeds.
+        float firstKnee = AutoHighlightKnee ?
+            clamp(exp2(e90), _FA_KNEE_MIN, _FA_KNEE_MAX) : HighlightKnee;
+        float4 old0 = float4(e50, 0.0, firstKnee, 0.0);
+        float4 old1 = float4(0.0, 0.0, 0.0, 0.0);
+        if (FA_ColdStart == 0)
+        {
+            old0 = tex2Dfetch(FA_StateStorage, int2(0, 0));
+            old1 = tex2Dfetch(FA_StateStorage, int2(1, 0));
+        }
         float x = old0.x;             // adapted scene key (log2)
         float v = old0.y;             // key velocity (EV/s)
         float knee = old0.z;          // smoothed auto highlight knee
@@ -884,6 +943,19 @@ void FlexAgX_State(uint3 id : SV_DispatchThreadID, uint3 tid : SV_GroupThreadID)
         float norm = (FA_T != 0u) ? (float)FA_HistSh[lane] / (float)FA_T : 0.0;
         tex2Dstore(FA_HistPrevStorage, int2((int)lane, 0), float4(norm, 0.0, 0.0, 0.0));
     }
+
+    // Finalize the temporal marker after the state and previous-scene writes.
+    // The signed framecount source is handled as a 32-bit uint, split into two
+    // uint16 limbs that are exactly representable by the RGBA32F marker.
+    barrier();
+    if (lane == 0)
+    {
+        uint now = (uint)framecount;
+        tex2Dstore(FA_TemporalBootStorage, int2(0, 0),
+            float4(_FA_BOOT_MAGIC_A, _FA_BOOT_MAGIC_B,
+                   (float)(now & 65535u), (float)(now >> 16u)));
+    }
+    barrier();
 
     // S10/S11: build a monotone 1D curve LUT. A failed validation lowers the
     // knee and retries; the final fallback is normalized to preserve white.

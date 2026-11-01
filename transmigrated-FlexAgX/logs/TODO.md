@@ -5,7 +5,8 @@
 - [x] Add bounded correction-probe HTTP API and injected ports
 - [x] Unit, seeded property, and invalid JSON tests
 - [ ] ReShade FX compiler validation on D3D11/D3D12/GL 4.3/Vulkan
-- [ ] First frame and effect reload: FA_State / FA_HistPrev initialization proof
+- [x] Add F18/F32 defensive source-level marker and cold-baseline initialization; CPU/static verified
+- [ ] F18/F32: prove first frame, effect re-enable and reload behavior on ReShade GPU, including storage barriers
 - [ ] Resolve F39 and F40 visual/encoding contracts with operator
 - [ ] F23/F24 deadband/velocity behavior contract and tests
 - [ ] Migrate accepted corrections into independent CPU pass implementations
@@ -18,3 +19,10 @@
 - [ ] Native ReShade compiler / actual GPU frame capture and independent color comparison
 - [ ] Resolve FA_State and FA_HistPrev first-use/reload initialization
 - [ ] Decide gamut/encoding F39/F40 contracts before source modification
+
+## v0.3.0 F18/F32
+- [x] Add finite state defaults and previous-scene baseline for invalid startup marker
+- [x] Validate 32-bit frame sequencing across wrap, gaps, corruption and replay-like repeated frame indices
+- [x] Structural source mutation regression and isolated temporal harness phase
+- [ ] Native FX compilation and ReShade GPU startup/reload acceptance
+- [ ] Strict reset-on-reload mechanism if a backend preserves resources without a lifecycle signal

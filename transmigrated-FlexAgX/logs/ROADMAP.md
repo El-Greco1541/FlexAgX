@@ -8,3 +8,5 @@ Production gate remains locked for every new material change until operator clea
 
 ## v0.2 effect treatment
 Static and CPU harness complete. Next stage is a separate ReShade compiler/GPU runner; then first-use resource initialization and bounded fidelity evaluation. No production authority granted.
+
+- v0.3.0: F18/F32 source mitigation and temporal harness completed; pending native acceptance. Expansion remains gated.

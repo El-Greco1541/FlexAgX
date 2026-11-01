@@ -1,6 +1,6 @@
 # Transmigrated FlexAgX — correction-first shader development
 
-**Status: STAGED RESEARCH · Phase 1: CORRECT FIRST · Harness v0.2.0 · Expansion: NOT YET AUTHORIZED**
+**Status: STAGED RESEARCH · Phase 1: CORRECT FIRST · Temporal correction v0.3.0 · Expansion: NOT YET AUTHORIZED**
 
 This independent workspace starts with the original **FlexAgX 1.2** by **El-Greco1541** (MIT licensed), uses the existing 43-finding audit and prior CPU-server architecture as research inputs, and makes narrowly documented shader corrections before expanding behavior. It does **not** replace, edit or claim upstream authorship for the original shader.
 
@@ -11,7 +11,7 @@ This independent workspace starts with the original **FlexAgX 1.2** by **El-Grec
 | Explicit conditional hue-angle guards in both P4 and P8 | F38 | Avoid invoking `atan2(0,0)` for achromatic pixels where the shader-language result is undefined |
 | Extra initial histogram-zeroing pass (P0) before P1 | F41 | Prevent first-use histogram atomic accumulation on uninitialized counters at the source-pass level |
 
-This is an intentional **9-pass FX candidate**: one correction preclear pass plus the original eight passes. **F41 GPU/runtime verification remains pending**, and the persistent exposure state and previous histogram also need separate initialization guarantees. Source edits are documented in [the correction ledger](docs/CORRECTION_LEDGER.md).
+This is an intentional **9-pass FX candidate**: one correction preclear pass plus the original eight passes. **F41 GPU/runtime verification remains pending**, and CT-003 introduces defensive temporal marker validation and finite initialization for the persistent state and previous histogram, with native backend acceptance still pending. Source edits are documented in [the correction ledger](docs/CORRECTION_LEDGER.md).
 
 ## Workspace
 
@@ -32,7 +32,7 @@ transmigrated-FlexAgX/
 - Original: [El-Greco1541/FlexAgX](https://github.com/El-Greco1541/FlexAgX), release 1.2.
 - Root fork [MIT LICENSE](../LICENSE) retains the original copyright and license notice.
 - Original SHA-256: `e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d`.
-- Corrected candidate SHA-256: `ff5f38cfc4f21bee6521b62aeb996eba6ed5bedd95c3745de82ac32d9199f3da`.
+- Corrected candidate SHA-256: `9116e0c2f4d13214b678f387bf05723348d0910117755e9a4c3de6addb894c68`.
 - The old `cpu-server/` and `code-transmigration/` workspaces remain unchanged. This is a separate staging branch.
 
 ## Run local correction probes (not a renderer)
@@ -77,6 +77,12 @@ The suite validates reference immutability, source edit locations, preserved ori
 
 ## Correctness-first release conditions
 
-Before adding color features, more API servers or GPU glue, resolve the behavior decisions in [PENDING_DECISIONS](docs/PENDING_DECISIONS.md). Highest outstanding risks are **FA_State/FA_HistPrev cold-start**, GPU compiler acceptance, and **F39/F40 gamut/encoding behavior**. Do not substitute visual opinions or throughput measurements for reproducible contracts.
+Before adding color features, more API servers or GPU glue, resolve the behavior decisions in [PENDING_DECISIONS](docs/PENDING_DECISIONS.md). Highest outstanding risks are **FA_State/FA_HistPrev native cold-start/reload acceptance**, GPU compiler acceptance, and **F39/F40 gamut/encoding behavior**. Do not substitute visual opinions or throughput measurements for reproducible contracts.
 
 **Do not expose the probe API beyond localhost.** The public fork is not anonymous at GitHub-account level. Upstream MIT attribution is retained. This package contains no authorization to merge, deploy, publish a shader release or clear the project production gate.
+
+## v0.3.0 — F18/F32 cold-start correction (staged)
+
+CT-003 adds a validated `FA_TemporalBoot` record to the shader state pass. A missing or discontinuous marker causes finite controller defaults and a current-histogram first-frame baseline. It does not add any passes, alter the upstream shader, or deploy a backend. See [Temporal boot correction](docs/TEMPORAL_BOOT_V03.md) for exact limits and the GPU acceptance matrix.
+
+**Updated verification:** 48/48 pytest and 40,366/40,366 cumulative static, CPU, adversarial and simulated-frame checks across two completed campaigns. No real ReShade rendering or FX compilation was performed. The older v0.2 evidence is historical and not a claim of v0.3 GPU parity.

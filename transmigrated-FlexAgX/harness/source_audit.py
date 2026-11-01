@@ -24,4 +24,30 @@ def check_corrections(source,reference):
         if not ('if (C > 1.0e-6)' in out and out.index('if (C > 1.0e-6)')<out.index('h = atan2(b, a)')):
             errors.append('OUTPUT_HUE_GUARD')
     except ValueError:errors.append('HUE_SECTION_MISSING')
+    # Cold start F18/F32: boot validation must precede any retained histogram
+    # use; rejects absent/stale markers and corrupted prior state.
+    try:
+        state=source[source.index('void FlexAgX_State('):source.index('// P3:')]
+        read_prev='tex2Dfetch(FA_HistPrevStorage, int2((int)lane, 0)).r'
+        read_state='old0 = tex2Dfetch(FA_StateStorage, int2(0, 0));'
+        if not ('Format = RGBA32F' in source[source.index('texture2D FA_TemporalBoot'):source.index('storage2D FA_TemporalBootStorage')]
+                and 'float4 stamp = tex2Dfetch(FA_TemporalBootStorage, int2(0, 0));' in state
+                and 'FA_ColdStart = valid ? 0 : 1;' in state
+                and 'stamp.z == (float)(previous & 65535u)' in state
+                and 'stamp.w == (float)(previous >> 16u)' in state):
+            errors.append('COLD_MARKER_MISSING')
+        if not (state.index('FA_ColdStart = valid ? 0 : 1;') < state.index(read_prev)
+                and state.index('if (FA_ColdStart != 0)') < state.index(read_prev)
+                and 'FA_PrevSh[lane] = currentNorm;' in state):
+            errors.append('HISTPREV_BOOT_GUARD_MISSING')
+        if not (state.index('float4 old0 = float4(e50, 0.0, firstKnee, 0.0);') < state.index(read_state)
+                and state.index('if (FA_ColdStart == 0)') < state.index(read_state)
+                and 'all(prior0 == prior0)' in state and 'all(prior1 == prior1)' in state):
+            errors.append('STATE_BOOT_GUARD_MISSING')
+        if not ('tex2Dstore(FA_TemporalBootStorage, int2(0, 0),' in state and
+                state.index('tex2Dstore(FA_StateStorage, int2(1, 0)') < state.index('tex2Dstore(FA_TemporalBootStorage, int2(0, 0)')
+                and state.index('tex2Dstore(FA_HistPrevStorage, int2((int)lane, 0)') < state.index('tex2Dstore(FA_TemporalBootStorage, int2(0, 0)')):
+            errors.append('BOOT_COMMIT_ORDER_INVALID')
+    except ValueError:
+        errors.append('TEMPORAL_BOOT_SECTION_MISSING')
     return errors

@@ -39,3 +39,9 @@ Runs create new `harness/results/fx-*` directories with JSON evidence; the runne
 Tests constrain this Python research harness and probes, not arbitrary native shader runtime operations. They do not establish ReShade compiler compatibility, GPU storage synchronization, full color science parity, durability, or secure external API service. In particular `FA_State` and `FA_HistPrev` first-use are known gaps.
 
 If a native ReShade compiler and GPU test rig become available, create a separately authorized backend-specific adapter with cold-start, reload, disabled/bypass, odd framebuffer sizes, gamut extremes and replayable screenshot/telemetry fixtures. Store measured error thresholds, not marketing-equivalence claims.
+
+## v0.3.0 temporal campaign
+
+The runner now includes an eighth isolated phase `temporal` to exercise 32-bit frame markers, corruption, disable gaps and first-frame normalized histograms. The source-check phase hashes the changed shader and rejects missing cold-state guards.
+
+Commands: `python -m harness.runner --seed 20261101 --frames 1000` and `python -m harness.runner --seed 731234 --frames 2000`. Historic v0.2 reports remain separately archived. Native ReShade startup/reload remains **NOT RUN**.

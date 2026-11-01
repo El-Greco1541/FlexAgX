@@ -2,7 +2,7 @@
 
 The following are not silently altered because they change user-visible semantics or lack a verified target backend.
 
-1. **F18/F32:** FA_State / FA_HistPrev first-use initialization, effect reload and resumed framecount. Need source-visible bootstrapping supported by ReShade runtime, then actual GPU testing. CT-002 clears only histogram counters.
+1. **F18/F32:** CT-003 now includes marker validation, finite state seeds and a cold histogram baseline. Native ReShade compilation, first-frame and effect-reload resource-lifetime and marker-collision acceptance remain **open**. CT-002 clears the histogram counters separately.
 2. **F23/F24:** deadband/velocity carryover and adaptation-direction semantics. Decide freeze-vs-decay behavior with frame-sequence fixtures.
 3. **F29/F36:** scene-cut correction and `AutoExposureStrength=0` internal state tracking. Define a time/step contract.
 4. **F30/F31:** superwhite and negative input transfer function domain. Choose scene-referred vs encoded-display input contract.

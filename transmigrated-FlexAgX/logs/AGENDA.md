@@ -9,3 +9,5 @@
 2. Establish available GPU/ReShade test rig.
 3. Resolve cold-start persistent state semantics.
 4. Await explicit human decision for any expansion or promotion.
+
+- F18/F32: obtain native ReShade first-use/reload tests before declaring runtime correction complete.

@@ -1,7 +1,7 @@
 {
-  "version": "0.1.0",
+  "version": "0.3.0",
   "original_sha256": "e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d",
-  "corrected_sha256": "ff5f38cfc4f21bee6521b62aeb996eba6ed5bedd95c3745de82ac32d9199f3da",
+  "corrected_sha256": "9116e0c2f4d13214b678f387bf05723348d0910117755e9a4c3de6addb894c68",
   "edits": [
     {
       "id": "F38-HUE-GUARD",
@@ -18,6 +18,16 @@
     {
       "id": "F41-CLEAR-PASS",
       "source_occurrences": 1
+    },
+    {
+      "id": "F18-F32-TEMPORAL-MARKER",
+      "source_occurrences": 1,
+      "runtime_verified": false
+    },
+    {
+      "id": "F18-F32-COLD-STATE-SEED",
+      "source_occurrences": 1,
+      "runtime_verified": false
     }
   ],
   "original_pass_count": 8,

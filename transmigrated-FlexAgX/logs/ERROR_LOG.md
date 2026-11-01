@@ -13,3 +13,5 @@
 - H02-02: ReShade FX compiler and hardware GPU unavailable. Classified NOT_RUN, not PASS.
 - H02-03: P0 histogram preclear addresses counters only; persistent FA_State/FA_HistPrev cold-start and backend memory ordering remain open.
 - H02-04: No actual full-frame shader render was executed. CPU sampling/image fixtures are independent models of selected functions.
+
+- **CT-003 residual**: No GPU compiler or ReShade runtime available; texture marker first-use, resource reload and synchronization remain unverified. Sentinel collision is theoretically possible; marker is not an attestation primitive.
