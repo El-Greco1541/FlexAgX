@@ -72,4 +72,25 @@ def check_corrections(source,reference):
             errors.append('SCENE_CUT_TWO_OBSERVATIONS_MISSING')
     except ValueError:
         errors.append('SCENE_CUT_SECTION_MISSING')
+    # CT-006 F39: output-branch gamut guard must run AFTER the strength blend,
+    # and only touch out-of-gamut composites. F40 exact 0%-bypass retained.
+    try:
+        fn=source[source.index('float3 FA_ConstrainGamutAfterMix('):source.index('// P8: Oklab')]
+        out=source[source.index('float4 FlexAgX_OutputPS'):source.index('technique FlexAgX')]
+        if not ('if (all(composite >= float3(0.0, 0.0, 0.0)) &&' in fn and
+                'all(composite <= float3(1.0, 1.0, 1.0)))' in fn and
+                'for (int i = 0; i < 12; ++i)' in fn and
+                'FA_LinearFromOklab(float3(L, lab.y * mid, lab.z * mid))' in fn and
+                'return clamp(FA_LinearFromOklab(float3(L, lab.y * lo, lab.z * lo)), 0.0, 1.0);' in fn):
+            errors.append('COMPOSITE_GAMUT_GUARD_INVALID')
+        if not (out.index('float3 finalLinear = lerp(') <
+                out.index('finalLinear = FA_ConstrainGamutAfterMix(finalLinear);') <
+                out.index('if (DebugView == 1)')):
+            errors.append('COMPOSITE_GAMUT_GUARD_ORDER')
+        if not (out.index('if (OverallStrength <= 0.0 && DebugView == 0)') <
+                out.index('return originalEncoded;') <
+                out.index('float3 orig = FA_WhiteBalance(')):
+            errors.append('EXACT_ZERO_BYPASS_MISSING')
+    except ValueError:
+        errors.append('COMPOSITE_GAMUT_SECTION_MISSING')
     return errors

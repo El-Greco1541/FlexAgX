@@ -36,3 +36,10 @@ A disabled frame does not refresh the marker, so the next active frame is treate
 - CPU/static tests: 100 pytest; 107,000 counted deterministic checks across two runs; 16 harness self-tests; native GPU not executed.
 - Corrected candidate SHA-256: `311941a715b8396e01c3f57df850c6a28207cf82c2a6f074be0a4cf95e3bfef5`; upstream FX SHA-256 remains `e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d`.
 - Operator choice of scene-cut temporal semantics and GPU acceptance remains required. See `docs/CT005_SCENE_CUT_CONFIRMATION.md`.
+
+## CT-006 / F39 and F40 — v0.6.0 staged candidate
+
+- **F39 corrected at source/CPU-oracle level:** after the strength blend, out-of-gamut linear composites are re-mapped through 12 bounded Oklab chroma bisections, avoiding primary per-channel clipping. In-gamut composites are passed through unchanged.
+- **F40 intentionally not repaired:** exact 0% encoded passthrough remains the governing UI behavior; mismatch between input and output encoding at small positive strength is documented and regression-tested as a known discontinuity requiring Operator policy selection.
+- Candidate shader SHA-256: `6603e5ecb42458ce55845021d56c653ed01806ecaead3a5be21c69b6152808ca`. Original FX SHA-256 unchanged: `e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d`.
+- Evidence and alternative strategies: `docs/CT006_F39_GAMUT_AND_F40_ENCODING.md`; GPU compilation and visual certification remain open. Production gate locked.

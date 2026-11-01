@@ -1,17 +1,17 @@
-# FlexAgX v0.5.0 — correction-first verification
+# v0.6.0 verification — F39 gamut correction and F40 policy hold
 
-**2026-11-01 · STAGED · Production gate LOCKED**
+Date: 2026-11-01. Status: **PASS (CPU + static + local HTTP only)**. Production gate: **LOCKED**.
 
-**CT-005 / F29:** Prevent one-frame false scene-cut confirmation when `dt >= 100 ms`; require a previously observed candidate and accumulated time. **F36 remains unchanged.**
+- Python regression suite: **113 / 113** tests passed.
+- Isolated harness self-tests: **16 / 16** passed.
+- Seed 20261101 at 1,000 synthetic frames: **62,274 / 62,274** checks passed.
+- Seed 731234 at 2,000 synthetic frames: **63,271 / 63,271** checks passed.
+- Cumulative **125,545 / 125,545 checks passed** across repeated and independent phases; not 125,545 unique tests.
+- Original shader SHA-256 `e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d` unchanged.
+- Current shader candidate SHA-256 `6603e5ecb42458ce55845021d56c653ed01806ecaead3a5be21c69b6152808ca`.
 
-| Seed | Simulated frames | Counted checks | Result |
-| --- | ---: | ---: | --- |
-| 20261101 | 1,000 | 52,986 | PASS |
-| 731234 | 2,000 | 54,014 | PASS |
-| **Total** | **3,000** | **107,000** | **PASS** |
+F39: post-blend conditional gamut mapper source structure, in-gamut identity, out-of-gamut bounds and CPU Oklab hue witnesses passed. It is **not GPU-certified**. F40: tests establish that exact 0% encoded bypass remains, and a near-zero cross-encoding discontinuity is **not** removed. Retaining this policy requires Operator acceptance.
 
-Additional **100/100 pytest**, **16/16 isolated harness self-tests**. Counts are check executions, not unique assertions or GPU frames. Source-mutation guards and 4,000 prior-candidate equivalence fixtures were run.
+Raw case-level reports are in the separate full-evidence ZIP. Summary JSON in `harness/evidence/V06_...`.
 
-**Original FX:** byte-identical to El-Greco1541 1.2. **FX passes:** nine (one preclear plus eight original). Only the F29 source section was changed relative to v0.4.0.
-
-**Unverified:** ReShade FX compilation, GPU execution, true effect reload, GPU storage ordering, visual parity, Operator acceptance of scene-cut semantics and the F36/F39/F40 policy decisions. Full per-case evidence is in the separately packaged evidence ZIP.
+**Not tested:** ReShade FX compiler, actual GPU image output, backend storage barriers, proper color-profile management, platform-specific drivers, native float32 precision and visual quality.

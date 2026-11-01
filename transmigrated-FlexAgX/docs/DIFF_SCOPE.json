@@ -1,7 +1,7 @@
 {
-  "version": "0.5.0",
+  "version": "0.6.0",
   "original_sha256": "e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d",
-  "corrected_sha256": "311941a715b8396e01c3f57df850c6a28207cf82c2a6f074be0a4cf95e3bfef5",
+  "corrected_sha256": "6603e5ecb42458ce55845021d56c653ed01806ecaead3a5be21c69b6152808ca",
   "edits": [
     {
       "id": "F38-HUE-GUARD",
@@ -36,6 +36,16 @@
     {
       "id": "CT-005-F29-TWO_OBSERVATION_CUT",
       "runtime_verified": false
+    },
+    {
+      "id": "CT-006-F39-POST_BLEND_GAMUT",
+      "gpu_verified": false,
+      "runtime_verified": false,
+      "source_only": false
+    },
+    {
+      "id": "F40-CROSS_ENCODING_ZERO_STRENGTH_POLICY_HOLD",
+      "semantic_change": false
     }
   ],
   "original_pass_count": 8,

@@ -1,6 +1,6 @@
 # Transmigrated FlexAgX — correction-first shader development
 
-**Status: STAGED RESEARCH · Phase 1: CORRECT FIRST · Deadband correction candidate v0.4.0 · Expansion: NOT YET AUTHORIZED**
+**Status: STAGED RESEARCH · Phase 1: CORRECT FIRST · F39 candidate v0.6.0 · Expansion: NOT YET AUTHORIZED**
 
 This independent workspace starts with the original **FlexAgX 1.2** by **El-Greco1541** (MIT licensed), uses the existing 43-finding audit and prior CPU-server architecture as research inputs, and makes narrowly documented shader corrections before expanding behavior. It does **not** replace, edit or claim upstream authorship for the original shader.
 
@@ -32,7 +32,7 @@ transmigrated-FlexAgX/
 - Original: [El-Greco1541/FlexAgX](https://github.com/El-Greco1541/FlexAgX), release 1.2.
 - Root fork [MIT LICENSE](../LICENSE) retains the original copyright and license notice.
 - Original SHA-256: `e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d`.
-- Corrected candidate SHA-256: `9116e0c2f4d13214b678f387bf05723348d0910117755e9a4c3de6addb894c68`.
+- Current corrected candidate SHA-256: `6603e5ecb42458ce55845021d56c653ed01806ecaead3a5be21c69b6152808ca`.
 - The old `cpu-server/` and `code-transmigration/` workspaces remain unchanged. This is a separate staging branch.
 
 ## Run local correction probes (not a renderer)
@@ -98,3 +98,26 @@ The corrected S5 step now stops residual scene-key velocity when the exposure-ke
 CT-005 requires a prior discrepant frame before confirming a scene cut. A single slow/stalled frame cannot trigger an exposure scene-cut correction merely because clamped `dt` exceeds 100 ms. The existing histogram distance calculation, persistence threshold and rate-limited applied exposure are unchanged. This is a narrowly staged correctness candidate, not a certified GPU fix; [CT-005 contract](docs/CT005_SCENE_CUT_CONFIRMATION.md) and [source diff](docs/CT005_SOURCE_DIFF.patch) document it.
 
 **Verification:** 100/100 pytest, 16/16 harness self-tests, and two completed campaigns totaling 107,000/107,000 CPU/static checks (seeds 20261101 and 731234, 3,000 synthetic frames). F36 internal tracking at 0% automatic exposure is deliberately preserved. Original shader remains immutable (SHA-256 `e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d`). Real ReShade compilation, GPU rendering and Operator behavioral acceptance remain outstanding. Production gate LOCKED.
+
+## v0.6.0 — F39 post-blend gamut guard; F40 explicit policy hold
+
+The new `FA_ConstrainGamutAfterMix` stage runs **only for out-of-gamut
+composites after** the original white-balanced/processed strength blend.
+Already in-gamut values are unchanged; outliers are bounded through a
+12-iteration Oklab constant-lightness chroma search rather than routine
+RGB hard clipping. The original pass order remains **nine** (including P0
+histogram preclear); all earlier exposure/scene-cut corrections remain.
+
+**F40 has not been behaviorally repaired.** The exact 0%-strength encoded
+bypass remains in place, even when output encoding differs from input.
+A near-zero discontinuity is therefore possible and has tests, not a new
+policy. See [CT-006/F39-F40 contract](docs/CT006_F39_GAMUT_AND_F40_ENCODING.md).
+
+**v0.6.0 verified locally:** 113/113 pytest tests, 16/16 harness self-tests,
+and 125,545/125,545 counted checks across two process-isolated campaigns
+(1,000 and 2,000 simulated frames). This is not ReShade compiler acceptance,
+a GPU test, nor an approved visual correction. See `VERIFICATION_REPORT.md`.
+
+`python -m harness.runner --seed 20261101 --frames 1000`
+
+**Gate:** remain staged; do not merge or deploy without explicit Operator clearance.

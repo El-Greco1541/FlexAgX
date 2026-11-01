@@ -1,35 +1,43 @@
 {
-  "version": "0.5.0",
+  "version": "0.6.0",
   "date": "2026-11-01",
-  "scope": "CPU_STATIC_MODEL_NOT_GPU",
+  "subject": "F39 post-blend gamut correction, F40 policy hold",
+  "execution_scope": "CPU_STATIC_AND_LOCAL_HTTP_NOT_GPU",
   "status": "PASS",
   "pytest": {
-    "passed": 100,
+    "passed": 113,
     "failed": 0
   },
-  "selftest": {
+  "harness_selftest": {
     "passed": 16,
     "failed": 0
   },
   "campaigns": [
     {
-      "version": "0.5.0",
-      "subject": "Transmigrated FlexAgX effect \u2014 static and CPU correction probes",
-      "execution_scope": "NOT_GPU_OR_FX_COMPILER",
       "seed": 731234,
       "frames": 2000,
       "status": "PASS",
-      "checks": 54014,
-      "passed": 54014,
+      "checks": 63271,
+      "passed": 63271,
       "failed": 0,
+      "run_id": "fx-fc56fa32a774",
       "phases": [
+        {
+          "phase": "gamut",
+          "status": "PASS",
+          "checks": 9257,
+          "passed": 9257,
+          "failed": 0,
+          "elapsed_seconds": 1.126,
+          "evidence_sha256": "328c78598196fcb39957e2b50f915f056b97e3d6ca65ae7074620f39298be5c3"
+        },
         {
           "phase": "scene_cut",
           "status": "PASS",
           "checks": 25715,
           "passed": 25715,
           "failed": 0,
-          "elapsed_seconds": 1.199,
+          "elapsed_seconds": 1.161,
           "evidence_sha256": "87808080db3b1c3c1476d574a85271b1292523d815e94243555104b4258c6aa4"
         },
         {
@@ -38,7 +46,7 @@
           "checks": 7602,
           "passed": 7602,
           "failed": 0,
-          "elapsed_seconds": 1.254,
+          "elapsed_seconds": 1.029,
           "evidence_sha256": "fa45491b8e2d64bac683448cc0f298bf4f6f38ca37633ef8a0ca4a89eb8aa663"
         },
         {
@@ -47,7 +55,7 @@
           "checks": 8111,
           "passed": 8111,
           "failed": 0,
-          "elapsed_seconds": 1.381,
+          "elapsed_seconds": 1.063,
           "evidence_sha256": "92fd60f89131fdcc22ec8bed841f70c607a59e8a3e6fc0008c1575ac5bee8142"
         },
         {
@@ -56,7 +64,7 @@
           "checks": 20,
           "passed": 20,
           "failed": 0,
-          "elapsed_seconds": 1.156,
+          "elapsed_seconds": 0.994,
           "evidence_sha256": "2f867ce90c3cb2771b1247a6be05d65a4b96bc58eaab55e7a6071aaf109030a9"
         },
         {
@@ -65,7 +73,7 @@
           "checks": 3987,
           "passed": 3987,
           "failed": 0,
-          "elapsed_seconds": 1.221,
+          "elapsed_seconds": 1.099,
           "evidence_sha256": "6d38f56cb9bdddac12f0541622d55b9d902d4267a16a8263c30d2508df17017b"
         },
         {
@@ -74,7 +82,7 @@
           "checks": 2520,
           "passed": 2520,
           "failed": 0,
-          "elapsed_seconds": 1.26,
+          "elapsed_seconds": 1.194,
           "evidence_sha256": "2c52c6034f53f4043ed756037e99aa8802d235fb1ebdbbea0f1fbbe2cef03394"
         },
         {
@@ -83,7 +91,7 @@
           "checks": 1181,
           "passed": 1181,
           "failed": 0,
-          "elapsed_seconds": 1.749,
+          "elapsed_seconds": 1.846,
           "evidence_sha256": "48978ca198a984d5d330db670ead918eaef3423080b1f26e6becbf58ccb998ab"
         },
         {
@@ -92,7 +100,7 @@
           "checks": 2550,
           "passed": 2550,
           "failed": 0,
-          "elapsed_seconds": 1.333,
+          "elapsed_seconds": 0.968,
           "evidence_sha256": "5dac87ae1de1731802d92a54aef5b469267cdd3f78b4a3ded8c4d858b41cc815"
         },
         {
@@ -101,7 +109,7 @@
           "checks": 2055,
           "passed": 2055,
           "failed": 0,
-          "elapsed_seconds": 1.484,
+          "elapsed_seconds": 1.311,
           "evidence_sha256": "2ad866abebb1bcf6ca66768640761360a88e3620a16a38f5d210a3b00b396a8e"
         },
         {
@@ -110,72 +118,36 @@
           "checks": 273,
           "passed": 273,
           "failed": 0,
-          "elapsed_seconds": 2.97,
-          "evidence_sha256": "d4544e96c3a41dd4ae40ffa800e274e16a42aef874a9704529c969c71d03852a"
+          "elapsed_seconds": 2.396,
+          "evidence_sha256": "09896dbaced11fb67a7d8e268fc93e566595de731c09a0df2522376a20d23166"
         }
-      ],
-      "errors": [],
-      "elapsed_seconds": 15.024,
-      "runtime_limits": {
-        "child_output_bytes": 524288,
-        "retained_output_bytes": 8192,
-        "per_suite_seconds": {
-          "scene_cut": 40,
-          "adaptation": 35,
-          "temporal": 35,
-          "source": 25,
-          "hue": 50,
-          "histogram": 55,
-          "interface": 75,
-          "metamorphic": 40,
-          "torture": 80,
-          "live_http": 90
-        }
-      },
-      "toolchain": {
-        "status": "NOT_RUN",
-        "reason": "No executable ReShade FX compiler found; neither GL shader validators nor HLSL compiler alone certify ReShade FX semantics",
-        "tools": {
-          "reshadefx": "NOT_FOUND",
-          "glslangValidator": "NOT_FOUND",
-          "dxc": "NOT_FOUND",
-          "fxc": "NOT_FOUND",
-          "nvidia-smi": "NOT_FOUND",
-          "vulkaninfo": "NOT_FOUND"
-        },
-        "gpu_runtime": "NOT_DETECTED",
-        "native_shader_compilation": "NOT_EXECUTED",
-        "native_effect_rendering": "NOT_EXECUTED",
-        "scope": "This probe does not attempt to claim FX compiler or GPU acceptance."
-      },
-      "unverified": [
-        "ReShade FX compiler acceptance",
-        "D3D11/D3D12/Vulkan/OpenGL GPU execution",
-        "original and corrected shader pixel identity",
-        "FA_State/FA_HistPrev boot-marker implementation requires native ReShade reload/cold-start acceptance",
-        "backend storage barrier semantics",
-        "F36 internal tracking policy unchanged and awaiting acceptance",
-        "F39/F40 gamut and encoding policy"
       ]
     },
     {
-      "version": "0.5.0",
-      "subject": "Transmigrated FlexAgX effect \u2014 static and CPU correction probes",
-      "execution_scope": "NOT_GPU_OR_FX_COMPILER",
       "seed": 20261101,
       "frames": 1000,
       "status": "PASS",
-      "checks": 52986,
-      "passed": 52986,
+      "checks": 62274,
+      "passed": 62274,
       "failed": 0,
+      "run_id": "fx-a15fb3df4348",
       "phases": [
+        {
+          "phase": "gamut",
+          "status": "PASS",
+          "checks": 9288,
+          "passed": 9288,
+          "failed": 0,
+          "elapsed_seconds": 1.223,
+          "evidence_sha256": "e23bfd1d1024dcd66585219e27e3d3b34cdbe49e4e6cd343702027e459fe92d3"
+        },
         {
           "phase": "scene_cut",
           "status": "PASS",
           "checks": 25715,
           "passed": 25715,
           "failed": 0,
-          "elapsed_seconds": 1.032,
+          "elapsed_seconds": 1.152,
           "evidence_sha256": "573e369ee2d4101297ebc765b20748c1fd3f135a9ebf5b12e64082fa4537d6b1"
         },
         {
@@ -184,7 +156,7 @@
           "checks": 7602,
           "passed": 7602,
           "failed": 0,
-          "elapsed_seconds": 1.11,
+          "elapsed_seconds": 1.138,
           "evidence_sha256": "eaa16f5709dc81289c29434fcb499ed30ff03ed31b7763ff8fb67b271e4704ad"
         },
         {
@@ -193,7 +165,7 @@
           "checks": 8111,
           "passed": 8111,
           "failed": 0,
-          "elapsed_seconds": 1.115,
+          "elapsed_seconds": 1.286,
           "evidence_sha256": "9a0e6aa2c315534f67347a313770c94048f5d038df5216373182aa57c210ffcd"
         },
         {
@@ -202,7 +174,7 @@
           "checks": 20,
           "passed": 20,
           "failed": 0,
-          "elapsed_seconds": 1.016,
+          "elapsed_seconds": 1.088,
           "evidence_sha256": "e99d973012b00605160511bb2f0d49a4e79312a11ff411e4ce1898f35f0ca84a"
         },
         {
@@ -211,7 +183,7 @@
           "checks": 3987,
           "passed": 3987,
           "failed": 0,
-          "elapsed_seconds": 0.987,
+          "elapsed_seconds": 1.162,
           "evidence_sha256": "180c7d00104c874671ce97a231693bdd10d0265851ba120e0fa3e6fd6b8e879c"
         },
         {
@@ -220,7 +192,7 @@
           "checks": 2520,
           "passed": 2520,
           "failed": 0,
-          "elapsed_seconds": 1.115,
+          "elapsed_seconds": 1.331,
           "evidence_sha256": "ec0dec3a2220f9a9713ab165e6186407867e4d4096f47da91b02416fed3c057e"
         },
         {
@@ -229,7 +201,7 @@
           "checks": 1181,
           "passed": 1181,
           "failed": 0,
-          "elapsed_seconds": 1.958,
+          "elapsed_seconds": 1.892,
           "evidence_sha256": "dfe2e664d6a438874911d0812f119ab92cae0a7e00b0a9c881a7022cdb659ef2"
         },
         {
@@ -238,7 +210,7 @@
           "checks": 2550,
           "passed": 2550,
           "failed": 0,
-          "elapsed_seconds": 1.072,
+          "elapsed_seconds": 1.097,
           "evidence_sha256": "848edebb1e49075ee0e76365750e2ae8bc34c9240c68ec545c9bc3d61cfadbfa"
         },
         {
@@ -247,7 +219,7 @@
           "checks": 1027,
           "passed": 1027,
           "failed": 0,
-          "elapsed_seconds": 1.5,
+          "elapsed_seconds": 1.279,
           "evidence_sha256": "a1f6e9b5e2f7f40e1416335c5a90cd3a4506cb2d0b8ad1b18e28938839902ef6"
         },
         {
@@ -256,64 +228,26 @@
           "checks": 273,
           "passed": 273,
           "failed": 0,
-          "elapsed_seconds": 2.505,
-          "evidence_sha256": "f786224dbf02bdbf3f03d634748563f8aae7da1b2ea984f7775755946a498d31"
+          "elapsed_seconds": 2.694,
+          "evidence_sha256": "b5b4ba913d38c587f4598d5ae3b7fce80d2b1fdd8d055f25be2334b0b06a880c"
         }
-      ],
-      "errors": [],
-      "elapsed_seconds": 13.431,
-      "runtime_limits": {
-        "child_output_bytes": 524288,
-        "retained_output_bytes": 8192,
-        "per_suite_seconds": {
-          "scene_cut": 40,
-          "adaptation": 35,
-          "temporal": 35,
-          "source": 25,
-          "hue": 50,
-          "histogram": 55,
-          "interface": 75,
-          "metamorphic": 40,
-          "torture": 80,
-          "live_http": 90
-        }
-      },
-      "toolchain": {
-        "status": "NOT_RUN",
-        "reason": "No executable ReShade FX compiler found; neither GL shader validators nor HLSL compiler alone certify ReShade FX semantics",
-        "tools": {
-          "reshadefx": "NOT_FOUND",
-          "glslangValidator": "NOT_FOUND",
-          "dxc": "NOT_FOUND",
-          "fxc": "NOT_FOUND",
-          "nvidia-smi": "NOT_FOUND",
-          "vulkaninfo": "NOT_FOUND"
-        },
-        "gpu_runtime": "NOT_DETECTED",
-        "native_shader_compilation": "NOT_EXECUTED",
-        "native_effect_rendering": "NOT_EXECUTED",
-        "scope": "This probe does not attempt to claim FX compiler or GPU acceptance."
-      },
-      "unverified": [
-        "ReShade FX compiler acceptance",
-        "D3D11/D3D12/Vulkan/OpenGL GPU execution",
-        "original and corrected shader pixel identity",
-        "FA_State/FA_HistPrev boot-marker implementation requires native ReShade reload/cold-start acceptance",
-        "backend storage barrier semantics",
-        "F36 internal tracking policy unchanged and awaiting acceptance",
-        "F39/F40 gamut and encoding policy"
       ]
     }
   ],
-  "checks_total": 107000,
+  "total_checks": 125545,
+  "total_passed": 125545,
+  "total_failed": 0,
   "original_sha256": "e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d",
-  "candidate_sha256": "311941a715b8396e01c3f57df850c6a28207cf82c2a6f074be0a4cf95e3bfef5",
-  "source_change": "CT-005_F29_TWO_OBSERVATION_CONFIRMATION",
-  "open": [
-    "FX compiler and GPU runtime",
-    "F36 zero-strength internal tracking policy",
-    "F39/F40 gamut and output encoding",
-    "Operator approval of CT-004 and CT-005 semantics",
-    "Runtime frame scheduling/reload and GPU resource lifetime"
+  "corrected_sha256": "6603e5ecb42458ce55845021d56c653ed01806ecaead3a5be21c69b6152808ca",
+  "corrections": {
+    "F39": "POST_BLEND_BOUNDARY_CANDIDATE_SOURCE_AND_CPU_VERIFIED",
+    "F40": "EXACT_ZERO_BYPASS_RETAINED_POLICY_OPEN"
+  },
+  "unverified": [
+    "Actual ReShade FX compilation",
+    "GPU gamut mapping and image-color equivalence",
+    "native first-frame reload boot marker",
+    "F40 continuity under cross-encoding and non-neutral settings",
+    "GPU numerical rounding and performance"
   ]
 }

@@ -1,11 +1,10 @@
 {
   "project": "transmigrated-FlexAgX",
-  "version": "0.5.0",
-  "status": "STAGED_CORRECTION_NOT_GPU_CERTIFIED",
-  "manifest_scope": "curated GitHub staging files; full per-case evidence distributed separately",
-  "file_count": 71,
+  "version": "0.6.0",
+  "status": "STAGED_NOT_GPU_CERTIFIED",
+  "file_count": 77,
   "original_sha256": "e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d",
-  "corrected_sha256": "311941a715b8396e01c3f57df850c6a28207cf82c2a6f074be0a4cf95e3bfef5",
+  "corrected_sha256": "6603e5ecb42458ce55845021d56c653ed01806ecaead3a5be21c69b6152808ca",
   "files": [
     {
       "path": ".gitignore",
@@ -19,18 +18,18 @@
     },
     {
       "path": "README.md",
-      "sha256": "3e29d6607cc4abd89e6b1a33abf812c399670de9c17065e90dcc393280cb2e35",
-      "bytes": 8223
+      "sha256": "4175222fc207f3d8efdaea8cb527c8a8e8dd76cec54aafbe60e8905190f0c20b",
+      "bytes": 9465
     },
     {
       "path": "VERIFICATION_REPORT.json",
-      "sha256": "707dd0e7cbcb74b61ed196310ae23773b0de369fa4acf24290a95a869ee073fb",
-      "bytes": 10365
+      "sha256": "decf99e034879a0254c582cdc5b27e99f205247dfea6a36126d4f4d10b904275",
+      "bytes": 7713
     },
     {
       "path": "VERIFICATION_REPORT.md",
-      "sha256": "0343eccea2b037a16e67652952528b3add63d829bb7be9d8809b715680814fbc",
-      "bytes": 1133
+      "sha256": "e63799e5c90730fa16cecf969fe414406db7f5ddeed7667724307d8df322b088",
+      "bytes": 1390
     },
     {
       "path": "correction_api/__init__.py",
@@ -64,8 +63,8 @@
     },
     {
       "path": "docs/CORRECTION_LEDGER.md",
-      "sha256": "e540b0803815235f3bea051dc1b23e0eb3bf27b4ead51fb1c73a8bc8341e39a6",
-      "bytes": 5132
+      "sha256": "b29e906bb977274bf81cf963a276acaced3d54f8e5e0079282c647d1e99af224",
+      "bytes": 6064
     },
     {
       "path": "docs/CT004_DEADBAND_SETTLING.md",
@@ -88,9 +87,19 @@
       "bytes": 1522
     },
     {
+      "path": "docs/CT006_F39_GAMUT_AND_F40_ENCODING.md",
+      "sha256": "cdb1a3d36d6aeb8cf4dcf957febadc40958b8c059de6756286a6d5a166576448",
+      "bytes": 3600
+    },
+    {
+      "path": "docs/CT006_SOURCE_DIFF.patch",
+      "sha256": "1c22b8f1b7e3dc74e11067a001930521834781e58438c34cc456aa13da0ba04a",
+      "bytes": 3096
+    },
+    {
       "path": "docs/DIFF_SCOPE.json",
-      "sha256": "dde5724cf4186ae58cab78adfe743d350d22fa33828710da5e90733ec0ee51d0",
-      "bytes": 1026
+      "sha256": "814547e5f9648309aeeda64a63e7e08395192d514860bb5c16f089440878e2eb",
+      "bytes": 1275
     },
     {
       "path": "docs/EFFECT_HARNESS.md",
@@ -99,8 +108,8 @@
     },
     {
       "path": "docs/PENDING_DECISIONS.md",
-      "sha256": "42c84eb0c1dec14b785f74ef81524d245c8b91c0c2b418c1195cf0dcf11101e0",
-      "bytes": 1820
+      "sha256": "0bd080e84462bc6b0f7b5b242759f29717e5900263a3ddb4974f3737c1089013",
+      "bytes": 2037
     },
     {
       "path": "docs/SOURCE_DIFF.patch",
@@ -121,6 +130,11 @@
       "path": "harness/adaptation_oracle.py",
       "sha256": "7e317b79ace8e273d83cf562a7e645fef1cd88e96661df8df53b67b74e3a9b9d",
       "bytes": 2123
+    },
+    {
+      "path": "harness/color_oracle.py",
+      "sha256": "30b86e5d78e1525845ac82191d47bb5dd9c6837203c5e8b4580614dc5b4684db",
+      "bytes": 2986
     },
     {
       "path": "harness/evidence/CAMPAIGN_1000_SEED_20261101.json",
@@ -151,6 +165,16 @@
       "path": "harness/evidence/V05_SEED_731234_2000.json",
       "sha256": "2bee2efddd0cf180342e4325d113ca50dacc97e7cfbd53fde9ea292ecb849e92",
       "bytes": 4244
+    },
+    {
+      "path": "harness/evidence/V06_SEED_20261101_1000.json",
+      "sha256": "0cf23fa4c81daa4f22a6783d4cf6875f554d87a2aacdbbc5cc19f97c7343ce7c",
+      "bytes": 4593
+    },
+    {
+      "path": "harness/evidence/V06_SEED_731234_2000.json",
+      "sha256": "74e3ea92dabc4b97575bb16ceff020d4a4058ce05f22f079388681c675bf44c8",
+      "bytes": 4591
     },
     {
       "path": "harness/evidence/full/20261101_1000/RUN_REPORT.json",
@@ -244,8 +268,8 @@
     },
     {
       "path": "harness/runner.py",
-      "sha256": "f4474495f896a7055f5b2f61259493c58adb65376b90bab7a41d74f20bd364f3",
-      "bytes": 7047
+      "sha256": "ccb28218b472127e0b33057883561fbf5f927f18eeb959e1dd10eff05b385a96",
+      "bytes": 7144
     },
     {
       "path": "harness/scene_cut_oracle.py",
@@ -259,13 +283,13 @@
     },
     {
       "path": "harness/source_audit.py",
-      "sha256": "9f9e55eeea44bb4782a01a2599ae1a9c191be5a98e1ddf1b744df3bcab52e75a",
-      "bytes": 4909
+      "sha256": "eb75471e563256aadbcc60ffd876019bb4ae431f979abdc1bbe6a507de7a4357",
+      "bytes": 6294
     },
     {
       "path": "harness/suites.py",
-      "sha256": "a0d7b4d49f8513f4cb4e06274187d73974186563694b6b706d19bf2b59c7e061",
-      "bytes": 20689
+      "sha256": "9b2f2ece06441315d40f8c1716957de4fcefa1234c1e926d9112843e6881f333",
+      "bytes": 22704
     },
     {
       "path": "harness/temporal_oracle.py",
@@ -279,28 +303,28 @@
     },
     {
       "path": "logs/AGENDA.md",
-      "sha256": "c553b709eda3279308d1242f2386c937420f18f5dc771ff3ccde3b0cb13b3405",
-      "bytes": 922
+      "sha256": "ff9a29d8e4390a16387a8d6fbef8a46d7d5180029a348e3122e6f5b68274400a",
+      "bytes": 1112
     },
     {
       "path": "logs/ERROR_LOG.md",
-      "sha256": "cd8b7044e5331b2021bdee8d792171ebc29ac302eb58eb82760d304a1b6802a6",
-      "bytes": 1919
+      "sha256": "4c08ec39df927a6058071f0fcf78792d5a44a3133f3c16cff69b41e9795bab1a",
+      "bytes": 2096
     },
     {
       "path": "logs/NOTES.md",
-      "sha256": "665deeef5de058494aee8c3fb2ff1ed37ec8d634927b4f48949301aa99a142f1",
-      "bytes": 1227
+      "sha256": "97d1c675badd9faf3fefebf5a92cacadaabdac10b1a088cdcbf9e1638166259d",
+      "bytes": 1489
     },
     {
       "path": "logs/ROADMAP.md",
-      "sha256": "c41dc18862650b263bd83d5030749ce6e9b276461662dd0faedacc2dc65883ea",
-      "bytes": 1351
+      "sha256": "2d694324d153b6deb40d22c4f1b05d3205d861bee4454bcc41b15e3cc9135446",
+      "bytes": 1533
     },
     {
       "path": "logs/TODO.md",
-      "sha256": "7f1b0fd8711ce36980704a86307a8f926c9088df4713c9d8f98f713935c56b46",
-      "bytes": 2990
+      "sha256": "640bb76204cde58062f622f7b9be9a9078214741710400fbf564e7bd2d41ee0f",
+      "bytes": 3250
     },
     {
       "path": "reference/FlexAgX_1.2.fx",
@@ -319,8 +343,8 @@
     },
     {
       "path": "shader/FlexAgX_transmigrated.fx",
-      "sha256": "311941a715b8396e01c3f57df850c6a28207cf82c2a6f074be0a4cf95e3bfef5",
-      "bytes": 54601
+      "sha256": "6603e5ecb42458ce55845021d56c653ed01806ecaead3a5be21c69b6152808ca",
+      "bytes": 56247
     },
     {
       "path": "tests/conftest.py",
@@ -331,6 +355,11 @@
       "path": "tests/test_adaptation.py",
       "sha256": "861dd2e57c0ec5c268818337081ed416c2b94fc26395a70f88e79769e867ead5",
       "bytes": 2360
+    },
+    {
+      "path": "tests/test_color_contract_v06.py",
+      "sha256": "0b11c33081c427648229339f62432d23f9b906770caa5dba9ea55633ff576e39",
+      "bytes": 3812
     },
     {
       "path": "tests/test_correction_api.py",

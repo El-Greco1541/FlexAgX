@@ -14,3 +14,8 @@ Static and CPU harness complete. Next stage is a separate ReShade compiler/GPU r
 v0.4 candidate: F23/F24 source mitigation and tests; next F29/F36 semantic contract decision; F39/F40 gamut/encoding contract; native graphics certification.
 
 v0.5 candidate: F29 two-observation scene-cut guard staged and CPU-tested; next Operator acceptance of F29/F36 semantics, native FX/GPU verification, then independent gamut/encoding research F39/F40.
+
+
+### CT-006 v0.6.0 — 2026-11-01
+
+CT-006 v0.6 research complete in static/CPU scope. Next: GPU toolchain and color-profile acceptance; F40 remains policy hold, F30/F31 unresolved.

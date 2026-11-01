@@ -13,3 +13,8 @@ Source references and shader remain byte-identical. Seven isolated phases and li
 v0.4 CT-004: Deliberately minimal FX S5 edit, keeping rate limit and phase structure. A CPU oracle is not an FX runtime. Original source remains immutable.
 
 v0.5 CT-005 is a deliberate one-line conditional change in S6, with a captured previous-candidate flag. No pass additions and no changes to F36 or gamut/encoding. Synthetic probes are not native GPU evidence.
+
+
+### CT-006 v0.6.0 — 2026-11-01
+
+CT-006/F39: bounded post-strength Oklab gamut remap, unchanged in-gamut; F40 exact encoded 0% bypass unchanged and noted discontinuity. SHA-256=6603e5ecb42458ce55845021d56c653ed01806ecaead3a5be21c69b6152808ca. GPU unverified.

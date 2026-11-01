@@ -19,3 +19,8 @@
 v0.4 CT-004: F23 residual motion inside the deadband reproduced then removed under proposed settle-to-rest policy; F24 neutral speed selection is inert after settle. No new unresolved CPU/static test failures. Native GPU certification pending.
 
 v0.5 CT-005: Reproduced one-frame false scene-cut confirmation at 100..250ms in pre-change source oracle; candidate rejects first observation. No test failures recorded in two completed bounded campaigns. Native timing and GPU acceptance remain open.
+
+
+### CT-006 v0.6.0 — 2026-11-01
+
+CT-006 none in completed CPU harness campaigns; F40 intentional near-zero encoding discontinuity, F39 GPU/backend behavior not yet verified.

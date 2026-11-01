@@ -1195,15 +1195,47 @@ float4 FlexAgX_DetailApplyPS(float4 position : SV_Position, float2 texcoord : TE
     return float4(rgb * ratio, b.a);
 }
 
+// CT-006 / F39: the original branch is white-balanced before blending and can
+// lie outside the display gamut even when the processed branch is mapped.
+// Re-constrain ONLY out-of-gamut composites; leave in-gamut results bit-identical
+// through this helper. This is a 12-step constant-lightness chroma reduction,
+// not RGB channel clipping (except final floating-point safety saturation).
+// CPU numerical probes are not a substitute for an actual FX/GPU compiler run.
+float3 FA_ConstrainGamutAfterMix(float3 composite)
+{
+    if (all(composite >= float3(0.0, 0.0, 0.0)) &&
+        all(composite <= float3(1.0, 1.0, 1.0)))
+        return composite;
+
+    float3 lab = FA_OklabFromLinear(composite);
+    float L = clamp(lab.x, 0.0, 1.0);
+    float lo = 0.0;
+    float hi = 1.0;
+    for (int i = 0; i < 12; ++i)
+    {
+        float mid = 0.5 * (lo + hi);
+        float3 trial = FA_LinearFromOklab(float3(L, lab.y * mid, lab.z * mid));
+        if (all(trial >= float3(0.0, 0.0, 0.0)) &&
+            all(trial <= float3(1.0, 1.0, 1.0)))
+            lo = mid;
+        else
+            hi = mid;
+    }
+    return clamp(FA_LinearFromOklab(float3(L, lab.y * lo, lab.z * lo)), 0.0, 1.0);
+}
+
 // -----------------------------------------------------------------------------
 // P8: Oklab chroma roll-off, strength mix, debug, output encoding and dither.
 // -----------------------------------------------------------------------------
 float4 FlexAgX_OutputPS(float4 position : SV_Position, float2 texcoord : TEXCOORD0) : SV_Target
 {
     float4 originalEncoded = tex2D(FA_BackBufferSampler, texcoord);
-    // Exact pass-through at 0% strength: no decode/encode round-trip and no
-    // dither, so the "0% turns it off" tooltip is bit-accurate. Debug views
-    // remain available as explicit diagnostics even at 0%.
+    // F40 contract (unchanged): exact encoded pass-through at 0% strength.
+    // If InputEncoding != OutputEncoding, ANY nonzero strength requests output
+    // conversion and therefore may visibly jump relative to the exact bypass.
+    // Choosing a continuous cross-encoding transition is a separate UI policy.
+    // No decode/encode round-trip or dither in this zero-strength path.
+    // Debug views remain available as explicit diagnostics even at 0%.
     if (OverallStrength <= 0.0 && DebugView == 0)
         return originalEncoded;
     // Color temperature is applied before the Oklab chroma roll-off so the
@@ -1255,6 +1287,9 @@ float4 FlexAgX_OutputPS(float4 position : SV_Position, float2 texcoord : TEXCOOR
     float Cp = y * Cmax;
     float3 outLinear = clamp(FA_LinearFromOklab(float3(L, Cp * ch, Cp * sh)), 0.0, 1.0);
     float3 finalLinear = lerp(orig, outLinear, OverallStrength / 100.0);
+    // F39: the white-balanced original branch may exceed gamut after mixing.
+    // Run the safety mapper after (not before) lerp to avoid channel clipping.
+    finalLinear = FA_ConstrainGamutAfterMix(finalLinear);
 
     if (DebugView == 1)
     {

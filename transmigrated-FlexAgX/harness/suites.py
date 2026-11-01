@@ -11,7 +11,7 @@ from .source_audit import check_corrections
 
 ROOT=Path(__file__).resolve().parents[1]
 REFERENCE_SHA='e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d'
-CANDIDATE_SHA='311941a715b8396e01c3f57df850c6a28207cf82c2a6f074be0a4cf95e3bfef5'
+CANDIDATE_SHA='6603e5ecb42458ce55845021d56c653ed01806ecaead3a5be21c69b6152808ca'
 
 def checked(data, phase, detail, cases):
     assert data, f'{phase}: {detail}'
@@ -301,7 +301,47 @@ def scene_cut_suite(seed,frames):
         checked(result['applied_auto_ev']==0 and result['total_gain_ev']==manual and result['tracker_advanced']==bool(i%2),'scene_cut',f'F36 unchanged contribution {i}',cases)
     return cases
 
-SUITES={'scene_cut':scene_cut_suite,'adaptation':adaptation_suite,'temporal':temporal_suite,'source':source_suite,'hue':hue_suite,'histogram':histogram_suite,'interface':interface_suite,'metamorphic':metamorphic_suite,'torture':torture_suite}
+def gamut_suite(seed, frames):
+    """CT-006 F39 post-blend chroma containment; CT-007 F40 policy witnesses.
+
+    A CPU mathematical oracle only. Not a GPU rendering or FX compilation test.
+    """
+    from .color_oracle import (constrain_composite, to_lab, ingamut, mixed,
+                               encode, decode, bypass_or_encode)
+    import math
+    cases=[];rng=random.Random(seed ^ 0xF3940)
+    for i in range(2100):
+        c=tuple(rng.random() for _ in range(3))
+        checked(constrain_composite(c)==c,'gamut',f'in gamut identity {i}',cases)
+    forced=0;hue_verified=0
+    for i in range(2600):
+        orig=tuple(rng.uniform(-.3,2.2) for _ in range(3))
+        processed=tuple(rng.uniform(.02,.9) for _ in range(3))
+        strength=rng.uniform(.001,99.9)
+        unguarded=mixed(orig,processed,strength)
+        result=constrain_composite(unguarded)
+        checked(ingamut(result),'gamut',f'bounded postblend {i}',cases)
+        if ingamut(unguarded):
+            checked(result==unguarded,'gamut',f'unchanged already in gamut {i}',cases)
+        else:
+            forced+=1
+            L,a,b=to_lab(unguarded)
+            if .05<L<.95 and math.hypot(a,b)>1e-4:
+                _,aa,bb=to_lab(result)
+                n=math.hypot(a,b)*math.hypot(aa,bb)
+                if n>1e-8:
+                    checked((a*aa+b*bb)/n>.999,'gamut',f'hue direction preserved {i}',cases)
+                    hue_verified+=1
+    checked(forced>100 and hue_verified>100,'gamut','out gamut and hue witnesses exercised',cases)
+    for i in range(900):
+        code=rng.uniform(.01,.99)
+        lin=decode(code,'srgb')
+        checked(bypass_or_encode(code,lin,0,'gamma22')==code,'gamut',f'exact zero strength bypass {i}',cases)
+        checked(abs(bypass_or_encode(code,lin,.0001,'gamma22')-code)>1e-6,'gamut',f'cross encoding jump disclosed {i}',cases)
+        checked(abs(bypass_or_encode(code,lin,.0001,'srgb')-code)<1e-6,'gamut',f'matching encoding continuity {i}',cases)
+    return cases
+
+SUITES={'gamut':gamut_suite,'scene_cut':scene_cut_suite,'adaptation':adaptation_suite,'temporal':temporal_suite,'source':source_suite,'hue':hue_suite,'histogram':histogram_suite,'interface':interface_suite,'metamorphic':metamorphic_suite,'torture':torture_suite}
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('phase',choices=SUITES);p.add_argument('--seed',type=int,required=True);p.add_argument('--frames',type=int,default=1000);p.add_argument('--output',type=Path,required=True)

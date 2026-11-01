@@ -45,3 +45,8 @@
 - [ ] Operator acceptance of two-observation scene-cut policy.
 - [ ] Native ReShade GPU/FX compilation, visual and frame-timing tests; test freeze/re-enable/reload.
 - [ ] F39/F40 gamut and output encoding decisions.
+
+
+### CT-006 v0.6.0 — 2026-11-01
+
+[x] CT-006 F39 post-mix source guard, numerical model, mutation tests and seeded fuzz. [ ] F40 output-continuity policy selection. [ ] Native ReShade FX compiler and visual acceptance. [ ] Driver/backend texture validation.
