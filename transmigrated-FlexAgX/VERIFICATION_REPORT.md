@@ -1,23 +1,15 @@
-# FlexAgX correction v0.3.0 — F18/F32 effect verification
+# FlexAgX staged correction v0.4.0 — Verification
 
-**2026-11-01 · Staged; production gate LOCKED**
+**Date:** 2026-11-01. **Subject:** CT-004/F23-F24 proposed deadband velocity settling. **Production gate:** LOCKED.
 
-**Result:** 48/48 pytest PASS, two bounded harness campaigns PASS, 40,366/40,366 cumulative check executions, zero recorded failures.
-
-| Seed | Simulated frames | Check executions | Failed |
+| Campaign | Synthetic frames | Counted CPU/static checks | Failed |
 | --- | ---: | ---: | ---: |
-| 20261101 | 1,000 | 19,669 | 0 |
-| 731234 | 2,000 | 20,697 | 0 |
-| **Combined** | **3,000** | **40,366** | **0** |
+| Seed 20261101 | 1,000 | 27,271 | 0 |
+| Seed 731234 | 2,000 | 28,299 | 0 |
+| **Total** | **3,000** | **55,570** | **0** |
 
-The added temporal phase validates marker mismatch, state poison, scene-baseline normalization, uint32 frame rollover and disabled-gap behavior. All eight phases in both campaigns passed, including local HTTP and adversarial validation. The per-phase machine-readable report is `VERIFICATION_REPORT.json`. Full test evidence is included in the distribution ZIP; a compact summary can be staged in GitHub.
+Additional: **79/79 pytest passed; 16/16 bounded-runner self-tests passed**. The check counts are executions, not unique test definitions; they include existing inherited suites and 7,602 adaptation-check executions per campaign. See machine-readable report for precise per-phase counts; do not treat these as distinct bugs fixed.
 
-## Integrity
+**Source:** Original FlexAgX 1.2 upstream FX unchanged and SHA-256 pinned. Candidate retains nine FX passes; the S5 deadband fragment is the only shader edit relative to v0.3.0.
 
-- Original upstream FX SHA-256 `e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d` — **unchanged**.
-- Corrected candidate SHA-256 `9116e0c2f4d13214b678f387bf05723348d0910117755e9a4c3de6addb894c68`.
-- Original 8 passes and F41 preclear retained (9 total).
-
-## Scope limit
-
-The tests do **not execute the shader** in ReShade, nor prove compiler validity, actual GPU resource ordering, fresh texture initialization, pixel-level fidelity, or a strict effect reload lifecycle. The marker may theoretically collide with undefined texture data. F18/F32 is **source-mitigated, native-runtime-pending**, not fully closed. See `docs/TEMPORAL_BOOT_V03.md`.
+**Acceptance boundary:** CPU and static assertions are evidence of the proposed source-level contract only. FX compiler, ReShade GPU backend, storage ordering, color/pixel fidelity, startup/reload, scene-cut and gamut/encoding behavior remain unverified or undecided. See `docs/CT004_DEADBAND_SETTLING.md`.

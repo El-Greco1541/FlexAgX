@@ -50,4 +50,15 @@ def check_corrections(source,reference):
             errors.append('BOOT_COMMIT_ORDER_INVALID')
     except ValueError:
         errors.append('TEMPORAL_BOOT_SECTION_MISSING')
+    # CT-004 F23/F24: explicit neutral/settled velocity, no artificial
+    # DarkenSpeed branch when the target is within the configured deadband.
+    try:
+        adaptation = source[source.index('// S5: critically damped key adaptation'):source.index('// S6: compare')]
+        if not ('if (abs(target - x) <= Deadband)' in adaptation and
+                'v = 0.0;' in adaptation and
+                adaptation.index('v = 0.0;') < adaptation.index('float tau =') and
+                'else\n            {\n                float tau =' in adaptation):
+            errors.append('DEADBAND_VELOCITY_SETTLE_MISSING')
+    except ValueError:
+        errors.append('DEADBAND_SECTION_MISSING')
     return errors

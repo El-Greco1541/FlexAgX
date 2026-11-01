@@ -26,3 +26,12 @@
 - [x] Structural source mutation regression and isolated temporal harness phase
 - [ ] Native FX compilation and ReShade GPU startup/reload acceptance
 - [ ] Strict reset-on-reload mechanism if a backend preserves resources without a lifecycle signal
+
+## v0.4.0 CT-004 F23/F24
+- [x] Reproduce residual velocity drift with v0.3 source oracle
+- [x] Propose a deadband settle-to-rest source correction; zero velocity when inside band
+- [x] Verify unchanged outside-band equations, deadband=0 and source mutation sensitivity
+- [x] Run bounded CPU, HTTP and adversarial harness campaigns
+- [ ] Obtain Operator acceptance of settle-to-rest versus gradual decay semantics
+- [ ] Native ReShade compilation and first-frame/reload GPU tests
+- [ ] F29/F36 scene-cut and zero-strength policy decision; F39/F40 gamut/transfer policy decision

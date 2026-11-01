@@ -11,7 +11,7 @@ from .source_audit import check_corrections
 
 ROOT=Path(__file__).resolve().parents[1]
 REFERENCE_SHA='e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d'
-CANDIDATE_SHA='9116e0c2f4d13214b678f387bf05723348d0910117755e9a4c3de6addb894c68'
+CANDIDATE_SHA='abbb4cf5e5ca97cdcfc694567e8e4b462bf19634a2b4d3d60d83d73cac184dde'
 
 def checked(data, phase, detail, cases):
     assert data, f'{phase}: {detail}'
@@ -226,7 +226,38 @@ def torture_suite(seed,frames):
         prev=out
     return cases
 
-SUITES={'temporal':temporal_suite,'source':source_suite,'hue':hue_suite,'histogram':histogram_suite,'interface':interface_suite,'metamorphic':metamorphic_suite,'torture':torture_suite}
+
+def adaptation_suite(seed,frames):
+    """CT-004 numerical and source-witness checks. Not GPU or timing certification."""
+    from .adaptation_oracle import step_key, legacy_key_step, scene_cut_probe
+    cases=[]; rng=random.Random(seed ^ 0xF23F24)
+    # Regression reproduction: legacy drift inside the UI deadband.
+    before=legacy_key_step(-4.,1.5,-3.98,16.667)
+    after=step_key(-4.,1.5,-3.98,16.667)
+    checked(before.key != -4. and after.key == -4. and after.velocity == 0., 'adaptation','legacy drift removed',cases)
+    checked(step_key(-4.,-2.,-4.,16.667,deadband=0.).key == -4., 'adaptation','exact target neutral when deadband zero',cases)
+    for i in range(2400):
+        x=rng.uniform(-14,6); v=rng.uniform(-6,6);band=rng.uniform(0,.1)
+        target=x+rng.uniform(-band,band) if band else x
+        dt=rng.uniform(0,260)
+        out=step_key(x,v,target,dt,deadband=band)
+        checked(out.settled and out.key == x and out.velocity==0.,'adaptation',f'neutral deadband {i}',cases)
+    for i in range(2400):
+        x=rng.uniform(-13,5);v=rng.uniform(-3,3)
+        band=rng.uniform(0,.1);target=x+rng.choice([-1,1])*rng.uniform(band+.05,.7)
+        dt=rng.uniform(1,260);bright=rng.uniform(.1,3);dark=rng.uniform(.1,5);rate=rng.uniform(.5,6)
+        out=step_key(x,v,target,dt,band,bright,dark,rate)
+        old=legacy_key_step(x,v,target,dt,band,bright,dark,rate)
+        checked(not out.settled and abs(out.key-old.key)<1e-12 and abs(out.velocity-old.velocity)<1e-12,'adaptation',f'unchanged outside deadband {i}',cases)
+        checked(abs(out.velocity)<=rate+1e-12,'adaptation',f'velocity bounded {i}',cases)
+    for i in range(400):
+        # Diagnostic only: current shader requires sustained histogram change.
+        threshold=.1; dt=rng.uniform(.001,.22);sensitivity=rng.uniform(.1,.6)
+        fired,retained,advanced=scene_cut_probe(sensitivity+.01,sensitivity,0,dt*1000)
+        checked(fired == (min(.25,max(.001,dt))>=threshold) and (advanced==fired),'adaptation',f'existing scene-cut clock {i}',cases)
+    return cases
+
+SUITES={'adaptation':adaptation_suite,'temporal':temporal_suite,'source':source_suite,'hue':hue_suite,'histogram':histogram_suite,'interface':interface_suite,'metamorphic':metamorphic_suite,'torture':torture_suite}
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('phase',choices=SUITES);p.add_argument('--seed',type=int,required=True);p.add_argument('--frames',type=int,default=1000);p.add_argument('--output',type=Path,required=True)

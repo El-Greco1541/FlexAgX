@@ -1,6 +1,6 @@
 # Transmigrated FlexAgX — correction-first shader development
 
-**Status: STAGED RESEARCH · Phase 1: CORRECT FIRST · Temporal correction v0.3.0 · Expansion: NOT YET AUTHORIZED**
+**Status: STAGED RESEARCH · Phase 1: CORRECT FIRST · Deadband correction candidate v0.4.0 · Expansion: NOT YET AUTHORIZED**
 
 This independent workspace starts with the original **FlexAgX 1.2** by **El-Greco1541** (MIT licensed), uses the existing 43-finding audit and prior CPU-server architecture as research inputs, and makes narrowly documented shader corrections before expanding behavior. It does **not** replace, edit or claim upstream authorship for the original shader.
 
@@ -86,3 +86,9 @@ Before adding color features, more API servers or GPU glue, resolve the behavior
 CT-003 adds a validated `FA_TemporalBoot` record to the shader state pass. A missing or discontinuous marker causes finite controller defaults and a current-histogram first-frame baseline. It does not add any passes, alter the upstream shader, or deploy a backend. See [Temporal boot correction](docs/TEMPORAL_BOOT_V03.md) for exact limits and the GPU acceptance matrix.
 
 **Updated verification:** 48/48 pytest and 40,366/40,366 cumulative static, CPU, adversarial and simulated-frame checks across two completed campaigns. No real ReShade rendering or FX compilation was performed. The older v0.2 evidence is historical and not a claim of v0.3 GPU parity.
+
+## v0.4.0 — F23/F24 deadband settling (staged)
+
+The corrected S5 step now stops residual scene-key velocity when the exposure-key error is within the configured inclusive deadband. Outside the deadband, the original source equations remain unchanged. This is a **proposed correctness contract**, not a GPU-certified fix or an Operator-approved policy change. See [CT-004 contract](docs/CT004_DEADBAND_SETTLING.md) and [source diff](docs/CT004_SOURCE_DIFF.patch).
+
+**New validation:** 79/79 pytest; 55,570/55,570 cumulative checks across two fully completed CPU/static harness campaigns (1,000 and 2,000 simulated frames). There has been **no** native ReShade compilation or GPU execution. F29/F36 diagnostic holdouts and F39/F40 color policy remain open. Production gate LOCKED.

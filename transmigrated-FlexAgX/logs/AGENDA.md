@@ -11,3 +11,5 @@
 4. Await explicit human decision for any expansion or promotion.
 
 - F18/F32: obtain native ReShade first-use/reload tests before declaring runtime correction complete.
+
+v0.4: Review CT-004 semantics and evidence; obtain Operator decision on settle versus decay; plan actual ReShade/GPU verification.

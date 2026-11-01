@@ -9,3 +9,5 @@
 Source references and shader remain byte-identical. Seven isolated phases and live HTTP tests passed at seeds 20261101 and 731234, 1,000/2,000 simulated frames respectively; 24,138 counted checks. More than one campaign reuses parts of the test corpus.
 
 - v0.3.0 F18/F32: dual sentinel + split 32-bit frame marker, validation before retained-state use; CPU model and source tests PASS; native FX acceptance pending.
+
+v0.4 CT-004: Deliberately minimal FX S5 edit, keeping rate limit and phase structure. A CPU oracle is not an FX runtime. Original source remains immutable.

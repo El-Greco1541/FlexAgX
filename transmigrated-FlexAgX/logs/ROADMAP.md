@@ -10,3 +10,5 @@ Production gate remains locked for every new material change until operator clea
 Static and CPU harness complete. Next stage is a separate ReShade compiler/GPU runner; then first-use resource initialization and bounded fidelity evaluation. No production authority granted.
 
 - v0.3.0: F18/F32 source mitigation and temporal harness completed; pending native acceptance. Expansion remains gated.
+
+v0.4 candidate: F23/F24 source mitigation and tests; next F29/F36 semantic contract decision; F39/F40 gamut/encoding contract; native graphics certification.

@@ -839,12 +839,22 @@ void FlexAgX_State(uint3 id : SV_DispatchThreadID, uint3 tid : SV_GroupThreadID)
             // The w clamp (w*dt <= 0.5) makes the integrator unconditionally
             // stable at every frametime the clamp allows.
             float target = e50;
-            if (abs(target - x) < Deadband) target = x;
-            float tau = (target > x) ? BrightenSpeed : DarkenSpeed;
-            float w = 1.0 / max(tau, 2.0 * dt);
-            float acceleration = w * w * (target - x) - 2.0 * w * v;
-            v = clamp(v + acceleration * dt, -MaxChangeRate, MaxChangeRate);
-            x += v * dt;
+            // CT-004 / F23-F24: the user-facing deadband means the adapted
+            // key must remain stationary when the error is within tolerance.
+            // Clearing residual velocity also makes an exactly neutral target
+            // independent of the BrightenSpeed/DarkenSpeed branch.
+            if (abs(target - x) <= Deadband)
+            {
+                v = 0.0;
+            }
+            else
+            {
+                float tau = (target > x) ? BrightenSpeed : DarkenSpeed;
+                float w = 1.0 / max(tau, 2.0 * dt);
+                float acceleration = w * w * (target - x) - 2.0 * w * v;
+                v = clamp(v + acceleration * dt, -MaxChangeRate, MaxChangeRate);
+                x += v * dt;
+            }
 
             // S6: compare against a retained scene baseline. If a substantial
             // difference persists for 0.10 s, accept the new histogram as the

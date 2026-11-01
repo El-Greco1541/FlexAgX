@@ -19,3 +19,11 @@
 The F18/F32 corrective source change uses an explicit **temporal marker**, not a guaranteed initial texture fill. Its magic values and consecutive framecount checks allow a safe fallback for uninitialized, stale, or corrupted retained textures. However, a marker could theoretically collide with arbitrary initial contents; neither this model nor the static harness proves that memory is zeroed or that backend resource lifetimes match the assumptions. A native ReShade restart/reload test is a hard acceptance requirement.
 
 A disabled frame does not refresh the marker, so the next active frame is treated as a cold start. A valid retained controller state is reused only for a consecutive frame. Framecount is stored in two exact 16-bit float limbs and interpreted modulo 2^32; no float32 precision collapse is introduced by the marker. The source has nine passes, unchanged by CT-003.
+
+## CT-004 / F23-F24 — v0.4.0 bounded candidate
+
+- Source change: inclusive deadband (`abs(target - x) <= Deadband`) now settles `v=0` and holds `x` exactly, bypassing direction/speed selection until the error exits the band.
+- Untouched: outside-deadband dynamics, scene-cut correction (F29), zero-auto-exposure internal tracking (F36), gamut/encoding policy (F39/F40) and all other FX passes.
+- Evidence: 79 pytest tests and 55,570 cumulative deterministic CPU/static check executions; source mutation rejected; GPU unverified.
+- **Operator decision:** settle-to-rest is a candidate policy justified by the UI deadband tooltip. Do not promote or conflate with external approval. See `docs/CT004_DEADBAND_SETTLING.md`.
+- Candidate SHA-256: `abbb4cf5e5ca97cdcfc694567e8e4b462bf19634a2b4d3d60d83d73cac184dde`. Upstream remains `e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d`.
