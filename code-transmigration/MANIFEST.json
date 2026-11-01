@@ -1,0 +1,32 @@
+{
+  "file_count": 23,
+  "files": {
+    ".gitignore": "1aa47de691059ffcc861db327382a6c49c5d5901cf8226950400b101cb4d320a",
+    "README.md": "5b3e3213d64de12361ee57f4c8415b55604b2a63107565225551f4e0dbdc042a",
+    "VERIFICATION_REPORT.json": "7146edaaa9aeb439dd40b1b4acf16bc93a5eee40b9653d185aafaf4d8536dc99",
+    "VERIFICATION_REPORT.md": "405e491893199f386bba962e945d168426299cb341d9a8d4cdf5726e247dbd71",
+    "docs/BOUNDARIES.md": "706892022c1623a3e991bdfb974831d150e612371c72b45c34b484633846588b",
+    "docs/SOURCE_MAP.md": "e2a804df7b81d895674ff0d459f59f6583d539d4fda9dcea5680b72b472e470e",
+    "logs/AGENDA.md": "8b4f211e0a23ae3454121095ad2683a2ac5d8317bd6bd7088d5bab51e15e6594",
+    "logs/ERROR_LOG.md": "5d6a08cafd5c529a701cc6c523b19e7d4f96c890d8c64279ee6d31ddce3f71f7",
+    "logs/NOTES.md": "c2bb7b016eacf6bbb95db2570f51a173957d88efe14c357399d898b5f5aef809",
+    "logs/ROADMAP.md": "1a710063cf9c91521f4b14d54a22ed7c89fc8c8cf2ae8e83951b735bae574f53",
+    "logs/TODO.md": "78a7a11536971e92633082f00c38dbef7fc3db873746459562dd2eb8ccdcc6d8",
+    "reference/FlexAgX_1.2.fx": "e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d",
+    "requirements-dev.txt": "8636f9ab1a075be9f3039e2a6471837259c4f36b625bcaf7a3d9a1edd2419c6d",
+    "requirements.txt": "9f8ac5da824fe3833a8cf3f0c73f66d54a4248f91a68ce825d3c29bc779efbf4",
+    "tests/conftest.py": "9708bfe0b6878d5a709efbde4efca22dde8021490f4d55bf4d102de936b007b8",
+    "tests/test_boundaries.py": "60f66f8c05463509f39f7e3a2cb939b044994471246bbbca04837a2f63bf3800",
+    "tests/test_correctness.py": "656a0f81920f1fe8c865d45b56a1ae737f4b31ea3f22349619023173d36a63a1",
+    "transmigration/__init__.py": "a4ea4a98c2134ed0725c778e3b0aa7950d53bed49ec27ad3480f96bd7a5312dc",
+    "transmigration/adapters.py": "6877456bf8b5520e5045fb20059ea05ec449543c1d19452274e4fff2b17a66e2",
+    "transmigration/api.py": "0e31ecb7c87b084ffb28e1da464561402026282287bc4a9d2c05e096d1888ffb",
+    "transmigration/dependencies.py": "25d0662235d65e36bcc7521097264de9ac384468456df11b44c740355e9a329f",
+    "transmigration/glue.py": "c4ca85a66e7a906d0700eda8dae36ceb10f3c43e35d710c25255329bd4ce7101",
+    "transmigration/modules.py": "d8c9b2a9d078de6029cdcdd5504ad7f14ad36208e054576ed13b7569682afe04"
+  },
+  "original_sha256": "e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d",
+  "production_gate": "LOCKED",
+  "root": "code-transmigration",
+  "version": "0.1.0"
+}

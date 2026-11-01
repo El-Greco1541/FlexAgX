@@ -1,0 +1,14 @@
+{
+  "anonymization_scan": "PASS_BEST_EFFORT",
+  "fidelity": "CPU_APPROXIMATION_NOT_GPU_EQUIVALENT",
+  "historical_artifacts_reused": false,
+  "null_policy": "CONTRACT_BOUNDARIES_TYPED_SENTINELS",
+  "production_gate": "LOCKED",
+  "source_sha256": "e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d",
+  "test_command": "python -m pytest tests -q",
+  "test_exit_code": 0,
+  "test_failed_count": 0,
+  "test_passed_count": 64,
+  "test_scope": "LOCAL_ONLY",
+  "version": "0.1.0"
+}
