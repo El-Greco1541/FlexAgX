@@ -1,26 +1,42 @@
-# R4 Verification Report
+# FlexAgX CPU Server v0.5.0 — Verification report
 
 **Date:** 2026-11-01  
-**Scope:** staged CPU API/harness; production locked  
-**Result:** PASS — 1040/1040 counted checks
+**Stage:** experimental, production gate LOCKED  
+**Harness:** PASS — **1060 / 1060** counted checks, seed `20261104`, **1000** sequential torture frames  
+**Reference shader:** SHA-256 `e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d` — unchanged from El-Greco1541 release 1.2
 
-| Test phase | Checks | Passed | Failed | Duration (s) |
-|---|---:|---:|---:|---:|
-| static_audit | 1 | 1 | 0 | 1.319 |
-| harness_selftest | 1 | 1 | 0 | 3.725 |
-| regression_and_assurance | 44 | 44 | 0 | 3.127 |
-| validation | 333 | 333 | 0 | 2.575 |
-| metamorphic | 85 | 85 | 0 | 1.820 |
-| adversarial | 567 | 567 | 0 | 2.821 |
-| torture | 5 | 5 | 0 | 7.156 |
-| distributed_guarded | 4 | 4 | 0 | 4.882 |
+| Phase | Checks | Outcome |
+| --- | ---: | --- |
+| static_audit | 1 | PASS |
+| harness_selftest | 1 | PASS |
+| regression_and_assurance | 53 | PASS |
+| validation | 333 | PASS |
+| metamorphic | 85 | PASS |
+| adversarial | 567 | PASS |
+| torture | 5 | PASS |
+| distributed_guarded | 4 | PASS |
+| distributed_v05 | 8 | PASS |
+| ackdrop_v05 | 3 | PASS |
 
-The final full run used **350 sequential torture frames** (seed `20261108`). A separate reproducible maximum-size **1000-frame torture run** (seed `20261106`) passed 5/5 suites. Full 1000-frame runs at seeds `20261102` and `20261103` also passed before the final four-check distributed accounting was added.
+## Demonstrated v0.5.0 behaviors
 
-## What was tested
+- Matching frame replay returns exactly the recorded response without reapplying temporal controller state.
+- Conflicting duplicate or stale frame indices fail closed.
+- Zero-strength bypass is journaled, retaining exact identity output without exposure-state progression.
+- Controller state and frame receipt share an atomic SQLite transaction when durable path is configured.
+- A controller restart replays committed output and rejects uncommitted state.
+- A downstream renderer failure does not commit the candidate state.
+- A local forwarding proxy that **drops a successful finalize acknowledgment** triggers gateway receipt recovery without a double commit.
+- Seeded fuzz, image property tests, and both inherited/expanded live-service fault suites passed.
+- Structural audit, harness watchdog self-test and pinned source hashes passed.
 
-Input and structural fuzz, mathematical/image invariants, boundedness and controller state, process-failure containment, source integrity, real localhost five-server rollback, output/evidence null exclusion, and harness self-fault injection.
+## Known limitations / open errors
 
-## What remains unverified
+1. Legacy `/v1/control/step` and `/v1/control/commit` remain unsequenced compatibility endpoints. Do not allow external access.
+2. In-memory mode is still the default without `FLEXAGX_STATE_DB`. Durable mode requires an explicit local SQLite file/volume; only one controller worker is supported.
+3. SQLite persists logical receipts but database file size, disk quota, backup, crash-corruption recovery, and process-level native resource budgets remain operational responsibilities.
+4. Replayed records are bounded (512, total serialized receipts <=128 MiB, per-record <=20 MiB). Once evicted, old frames fail closed rather than replaying.
+5. No authentication, cross-host consensus, TLS, WAN partition certification, Docker/Windows certification, or ReShade/GPU equivalence has been established.
+6. Previous v0.4 archived reports contain filenames with dates later than this report; they remain historical artifacts and are not relied upon for this v0.5 verdict.
 
-Actual GPU/ReShade operation, production-grade durability, authentication, WAN failures, total termination proof for native libraries, production performance and pixel identity. No previously reported shader defect is marked resolved.
+**Execution evidence note:** The v0.5 harness wrote its verified final PASS report. Its enclosing 1,000-frame invocation subsequently hit an external command-session timeout; the JSON evidence was independently read and validated, and no service processes remained running. Report this distinction rather than claiming the wrapper returned a clean exit code.

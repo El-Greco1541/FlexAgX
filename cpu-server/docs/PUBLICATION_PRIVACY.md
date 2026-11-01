@@ -12,3 +12,7 @@ This publicly visible **research/staging** branch contains no intentionally incl
 ## Handling rules
 
 Before additional public commits, scan added assets for secrets, local paths, identifying names, GPS/network addresses other than localhost, crash dumps, cookies, API request recordings, and real user data. Never commit `.env`, `.venv`, `__pycache__`, `.pytest_cache`, or runtime test outputs generated from real sessions.
+
+## v0.5.0 note
+
+The transaction journal stores complete image-result receipts locally. Do not publish SQLite databases, cached real-session frames, connection credentials or crash dumps. Test packages use synthetic images and ephemeral temporary SQLite files, and no database is committed. GitHub metadata and original MIT attribution remain public.

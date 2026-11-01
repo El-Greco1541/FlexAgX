@@ -47,7 +47,7 @@ def main():
     limits={'body_bytes':21_000_000,'decoded_image_pixels':2_000_000,'base64_chars':20_000_000,
         'histogram_bins':64,'lut_size':1024,'lut_build_attempts':4,'hue_gamut_iterations':10,
         'controller_binary_search_iterations':30,'max_sessions':128,'max_pending':128,
-        'pending_ttl_seconds':30,'http_timeout_seconds_per_service':15,'harness_frames_max':1000}
+        'pending_ttl_seconds':30,'durable_receipts_max':512,'durable_receipt_budget_bytes':134217728,'http_timeout_seconds_per_service':15,'harness_frames_max':1000}
     result={'files_checked':len(SOURCE_FILES)+len(HARNESS_FILES),'ast_nodes_inspected':total_ast,'loops_found':total_for,
             'unbounded_while_loops':while_loops,'state_fields_initialized':len(fields(State)),
             'limits':limits,'verdict':'PASS','limitation':'structural guard; no formal total-termination proof'}

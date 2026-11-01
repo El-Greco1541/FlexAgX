@@ -41,3 +41,16 @@ Result includes `image_png_base64`, `width`, `height`, `mode`, and (when process
 ## API safety properties (development only)
 
 PNG is checked for format and an upper bound of 2,000,000 pixels. The request model limits the input base64 field length. Session IDs permit only letters, numbers, hyphen, underscore. All relevant settings are bounded to the UI-provided ranges. The application is not a security boundary: unauthenticated parties could still use or reset sessions if network-accessible.
+
+## v0.5.0 frame idempotency and controller journal
+
+Public `POST /v1/frame` is keyed on `(session_id, frame_index)`. It fingerprints canonical request JSON (including image and settings) and returns the originally committed response for an exact repeat, or HTTP 409 for a conflicting/stale index. A higher frame index may proceed. Bypass frames retain exact output and are journaled without temporal advancement.
+
+Internal controller endpoints (not secure external ingress):
+
+- `POST /v1/control/receipt`: `session_id`, `frame_index`, `request_digest`; returns `status: NEW` with an explicit sentinel or `status: REPLAY` with `response`.
+- `POST /v1/control/prepare`: prior `ControlRequest` plus `frame_index` and `request_digest`; stores a bounded temporary candidate.
+- `POST /v1/control/finalize`: `token` and `response`; atomically stores exposure state and replay receipt, returns `COMMITTED` or `ALREADY_COMMITTED`.
+- `POST /v1/control/bypass`: journals a bypass result without advancing exposure state.
+
+`FLEXAGX_STATE_DB` selects an on-disk SQLite file for durable local commits. Default `:memory:` is appropriate only for transient isolated tests. No JSON `null` is used in these contracts; unavailable output is represented by a typed sentinel. Legacy direct control step/commit endpoints are not replay-protected.

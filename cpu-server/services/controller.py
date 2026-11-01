@@ -1,9 +1,9 @@
 from fastapi import FastAPI, HTTPException
-from flexagx.contracts import ControlRequest, ControlResult, TokenRequest, PrepareResult, CommitResult
+from flexagx.contracts import ControlRequest, ControlResult, FrameResult, TokenRequest, PrepareResult, CommitResult, FrameReceiptQuery, FrameReceiptResult, FinalizeRequest, FinalizeResult, BypassRecordRequest
 from flexagx.assurance import install_guards
 from flexagx.controller import SessionStore
 
-app=FastAPI(title='FlexAgX Controller Microserver',version='0.3.0')
+app=FastAPI(title='FlexAgX Controller Microserver',version='0.5.0')
 install_guards(app)
 store=SessionStore()
 
@@ -17,7 +17,7 @@ def api_step(req:ControlRequest):
 
 @app.post('/v1/control/prepare',response_model=PrepareResult)
 def api_prepare(req:ControlRequest):
-    try: return store.prepare(req.session_id,req.observation,req.settings,req.dt_ms)
+    try: return store.prepare(req.session_id,req.observation,req.settings,req.dt_ms,req.frame_index,req.request_digest)
     except ValueError as e: raise HTTPException(status_code=409,detail=str(e)) from e
 
 @app.post('/v1/control/commit',response_model=CommitResult)
@@ -34,3 +34,18 @@ def api_state(session_id:str):
 
 @app.delete('/v1/control/sessions/{session_id}')
 def api_reset(session_id:str): return {'reset':store.reset(session_id)}
+
+@app.post('/v1/control/receipt',response_model=FrameReceiptResult)
+def api_receipt(req:FrameReceiptQuery):
+    try: return store.receipt(req.session_id,req.frame_index,req.request_digest)
+    except ValueError as e: raise HTTPException(status_code=409,detail=str(e)) from e
+
+@app.post('/v1/control/finalize',response_model=FinalizeResult)
+def api_finalize(req:FinalizeRequest):
+    try: return store.finalize(req.token,req.response)
+    except ValueError as e: raise HTTPException(status_code=409,detail=str(e)) from e
+
+@app.post('/v1/control/bypass',response_model=FrameResult)
+def api_bypass(req:BypassRecordRequest):
+    try: return store.record_bypass(req.session_id,req.frame_index,req.request_digest,req.response)
+    except ValueError as e: raise HTTPException(status_code=409,detail=str(e)) from e

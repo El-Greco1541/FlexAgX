@@ -42,3 +42,7 @@ On Windows PowerShell set each `$env:NAME='value'` variable before starting the 
 ## ReShade relationship
 
 There is no direct call path from this API into ReShade. ReShade shaders execute inside graphics API pipelines; an FX effect cannot be exposed as an HTTP server simply by compiling the `.fx` file. An authenticated, explicitly authorized ReShade add-on or separate GPU capture/processing bridge would be a **future, separately gated project**. No such connector is included.
+
+## v0.5.0 transaction recovery
+
+The single controller process owns a SQLite journal (`sessions` and `receipts`). The gateway performs a read-only receipt check before every frame; a unique candidate undergoes prepare, render and finalize. Finalize persists result and state in one local SQLite transaction; lost acknowledgments are resolved with one bounded read. SQLite file state survives process restarts only when an on-disk path is configured. In-memory tests intentionally do not persist. Do not run multiple controller workers or expose internal endpoints to untrusted traffic.

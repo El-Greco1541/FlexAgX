@@ -1,4 +1,4 @@
-"""Fail-closed staged harness runner (v0.4): bounded output, fresh evidence, strict reconciliation.
+"""Fail-closed staged harness runner (v0.5): bounded output, fresh evidence, strict reconciliation.
 
 No background operation. No production deployment. Applies watchdogs to each child and
 process group. JSON evidence uses sentinels, never null or nonfinite scalars.
@@ -19,7 +19,7 @@ import threading
 import time
 
 ROOT = Path(__file__).resolve().parents[1]
-RESULTS = ROOT / 'results_v04'
+RESULTS = ROOT / 'results_v05'
 PINNED_SHADER_SHA256 = 'e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d'
 MAX_OUTPUT_BYTES = 1_048_576
 TAIL_BYTES = 12_288
@@ -154,6 +154,10 @@ def suite_catalog(seed: int, frames: int, run_dir: Path):
         phases.append((phase,cmd,limit,'phase'))
     phases.append(('distributed_guarded',[sys.executable,'tests/distributed_guarded.py',
         '--seed',str(seed),'--output',str(run_dir/'distributed_guarded.json')],80,'phase'))
+    phases.append(('distributed_v05',[sys.executable,'tests/distributed_v05.py',
+        '--seed',str(seed),'--output',str(run_dir/'distributed_v05.json')],80,'phase'))
+    phases.append(('ackdrop_v05',[sys.executable,'tests/ackdrop_v05.py',
+        '--seed',str(seed),'--output',str(run_dir/'ackdrop_v05.json')],80,'phase'))
     return phases
 
 
@@ -168,7 +172,7 @@ def baseline_hashes():
     return len(baseline)
 
 def main():
-    parser=argparse.ArgumentParser(description='Staged, bounded, fail-closed FlexAgX v0.4 harness')
+    parser=argparse.ArgumentParser(description='Staged, bounded, fail-closed FlexAgX v0.5 harness')
     parser.add_argument('--frames',type=int,default=900)
     parser.add_argument('--seed',type=int,default=20261101)
     opts=parser.parse_args()
@@ -190,7 +194,7 @@ def main():
     env={**os.environ,'PYTHONPATH':str(ROOT),'PYTHONHASHSEED':'0',
          'OPENBLAS_NUM_THREADS':'1','OMP_NUM_THREADS':'1','MKL_NUM_THREADS':'1',
          'OMP_THREAD_LIMIT':'1','PYTHONDONTWRITEBYTECODE':'1'}
-    out={'version':'0.4.0','seed':opts.seed,'frame_count':opts.frames,
+    out={'version':'0.5.0','seed':opts.seed,'frame_count':opts.frames,
          'run_id':run_id,'reference_shader_sha256':initial,
          'application_baseline_sha256':sha(BASELINE_FILE),'application_files_pinned':baseline_count,
          'production_gate':'LOCKED',

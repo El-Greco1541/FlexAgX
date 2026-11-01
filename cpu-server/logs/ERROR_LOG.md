@@ -17,3 +17,13 @@
 | R04-05 | No authentication, durable state, distributed consensus or WAN outage testing | Explicitly out of scope for this staged harness |
 
 No unresolved harness failure was observed in the completed final suite. No prior F01–F43 source-level issue is claimed resolved.
+
+## v0.5.0 review
+
+| ID | Observation | Disposition |
+| --- | --- | --- |
+| T05-01 | Repeated frame index previously advanced exposure twice | Corrected for `/v1/frame` with durable receipts |
+| T05-02 | Renderer failure before finalize could leave pending work | Bounded abort; restart discards uncommitted provisional state |
+| T05-03 | Lost HTTP ACK after controller finalize makes success uncertain | One bounded receipt lookup; retry same fingerprint if unavailable |
+| T05-04 | Legacy `/v1/control/step` and `/commit` omit frame-level replay protection | **OPEN**: must be gated/deprecated for production |
+| T05-05 | SQLite file growth, corruption, authentication and multi-replica coherency | **OPEN**: require operational controls and design clearance |

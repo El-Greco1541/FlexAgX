@@ -9,6 +9,9 @@ import threading
 import copy
 import time
 import uuid
+import os
+from .journal import Journal
+from .contracts import FrameReceiptResult, FrameResult, FinalizeResult, Sentinel
 import numpy as np
 from .contracts import Observation, Settings, ControlResult, PrepareResult, CommitResult, Sentinel
 from .compute import GREY, LOG_MIN, dn
@@ -114,13 +117,16 @@ def step(state:State,obs:Observation,settings:Settings,dt_ms:float)->ControlResu
 
 
 class SessionStore:
-    def __init__(self,max_sessions=128):
-        self._states:dict[str,State]={}
+    def __init__(self,max_sessions=128,db_path=None):
+        self._journal=Journal(db_path if db_path is not None else os.getenv("FLEXAGX_STATE_DB",":memory:"))
+        self._states:dict[str,State]={sid:State(**raw) for sid,(raw,idx) in self._journal.load().items()}
         self._lock=threading.RLock()
         self.max_sessions=max_sessions
+        if len(self._states)>max_sessions: raise ValueError("persisted session population exceeds configured bound")
         self._pending: dict[str, tuple[str,int,State,float]] = {}
         self._max_pending=128
         self._pending_seconds=30.0
+        self._pending_identity: dict[str,tuple[str,int,str]]={}
 
     def step(self,session_id,obs,settings,dt_ms):
         with self._lock:
@@ -132,7 +138,7 @@ class SessionStore:
 
     def get(self,session_id):
         with self._lock:
-            return (self._states[session_id].summary() if session_id in self._states
+            return (self._states[session_id].summary() if session_id in self._states and self._states[session_id].frames>0
                     else Sentinel(kind='NOT_FOUND',reason='session does not exist',fallback='REJECT').model_dump())
 
     def reset(self,session_id):
@@ -140,17 +146,77 @@ class SessionStore:
             removed=session_id in self._states
             if removed: del self._states[session_id]
             for token, (owner, _, _, _) in list(self._pending.items()):
-                if owner==session_id: del self._pending[token]
+                if owner==session_id:
+                    del self._pending[token]
+                    self._pending_identity.pop(token,None)
+            self._journal.reset(session_id)
             return removed
 
     def _expire(self):
         now=time.monotonic()
         for token, (owner, base, candidate, expiry) in list(self._pending.items()):
-            if now>=expiry: del self._pending[token]
+            if now>=expiry:
+                del self._pending[token]
+                self._pending_identity.pop(token,None)
 
-    def prepare(self,session_id,obs,settings,dt_ms):
+    def receipt(self,session_id,frame_index,request_digest):
+        with self._lock:
+            found=self._journal.find(session_id,frame_index)
+            if found:
+                if found[0]!=request_digest: raise ValueError('frame index already committed with different request')
+                return FrameReceiptResult(status='REPLAY',response=FrameResult.model_validate_json(found[1]))
+            if frame_index<=self._journal.last(session_id):
+                raise ValueError('stale or evicted frame: cannot safely replay')
+            if any(identity[0]==session_id and identity[1]==frame_index for identity in self._pending_identity.values()):
+                raise ValueError('frame index currently pending')
+            return FrameReceiptResult(status='NEW')
+
+    def record_bypass(self,session_id,frame_index,request_digest,response):
+        """Journal bypass output without incrementing temporal frames."""
         with self._lock:
             self._expire()
+            found=self.receipt(session_id,frame_index,request_digest)
+            if found.status=='REPLAY': return found.response
+            if any(identity[0]==session_id for identity in self._pending_identity.values()):
+                raise ValueError('session has a pending frame')
+            if session_id not in self._states and len(self._states)>=self.max_sessions:
+                raise ValueError("session capacity exceeded")
+            candidate=self._states[session_id] if session_id in self._states else State()
+            self._journal.write(session_id,frame_index,request_digest,response.model_dump(mode='json'),uuid.uuid4().hex,candidate.__dict__)
+            self._states[session_id]=candidate
+            return response
+
+    def finalize(self,token,response):
+        with self._lock:
+            self._expire()
+            found_token=self._journal.conn.execute('SELECT session_id,frame_index,digest,response_json FROM receipts WHERE token=?',(token,)).fetchone()
+            if found_token:
+                stored=FrameResult.model_validate_json(found_token[3])
+                if stored.model_dump()==response.model_dump():
+                    return FinalizeResult(committed=True,state='ALREADY_COMMITTED')
+                raise ValueError('same token with mismatched response')
+            pending=self._pending.get(token)
+            if not pending: return FinalizeResult(committed=False,state='EXPIRED')
+            owner,base,candidate,expiry=pending
+            identity=self._pending_identity.get(token)
+            if identity is None: return FinalizeResult(committed=False,state='CONFLICT')
+            sid,index,digest=identity
+            if sid!=owner or response.session_id!=sid or response.frame_index!=index:
+                raise ValueError('finalize identity mismatch')
+            current=self._states[owner].frames if owner in self._states else -1
+            if current!=base: return FinalizeResult(committed=False,state='CONFLICT')
+            if owner not in self._states and len(self._states)>=self.max_sessions:
+                return FinalizeResult(committed=False,state='CONFLICT')
+            self._journal.write(sid,index,digest,response.model_dump(mode='json'),token,candidate.__dict__)
+            self._states[sid]=candidate
+            self._pending.pop(token,None);self._pending_identity.pop(token,None)
+            return FinalizeResult(committed=True,state='COMMITTED')
+
+    def prepare(self,session_id,obs,settings,dt_ms,frame_index=0,request_digest='0'*64):
+        with self._lock:
+            self._expire()
+            check=self.receipt(session_id,frame_index,request_digest)
+            if check.status=="REPLAY": raise ValueError("already committed: use receipt")
             if any(owner==session_id for owner, _, _, _ in self._pending.values()):
                 raise ValueError('session already has a pending frame')
             if len(self._pending)>=self._max_pending:
@@ -162,6 +228,7 @@ class SessionStore:
             result=step(state,obs,settings,dt_ms)
             token=uuid.uuid4().hex
             self._pending[token]=(session_id,base,state,time.monotonic()+self._pending_seconds)
+            self._pending_identity[token]=(session_id,frame_index,request_digest)
             return PrepareResult(token=token,control=result,expires_in_seconds=30)
 
     def commit(self,token):
@@ -170,6 +237,7 @@ class SessionStore:
             if token not in self._pending:
                 return CommitResult(committed=False,state='EXPIRED')
             owner,base,candidate,expiry=self._pending.pop(token)
+            self._pending_identity.pop(token,None)
             current=self._states[owner].frames if owner in self._states else -1
             if current!=base:
                 return CommitResult(committed=False,state='CONFLICT')
@@ -183,5 +251,6 @@ class SessionStore:
             self._expire()
             if token in self._pending:
                 del self._pending[token]
+                self._pending_identity.pop(token,None)
                 return CommitResult(committed=False,state='ABORTED')
             return CommitResult(committed=False,state='NOT_FOUND')

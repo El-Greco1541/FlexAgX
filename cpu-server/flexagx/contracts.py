@@ -81,6 +81,8 @@ class ControlRequest(WireModel):
     dt_ms: float = Field(ge=0, le=60_000)
     observation: Observation
     settings: Settings = Field(default_factory=Settings)
+    frame_index: int = Field(default=0, ge=0, le=2**63-1)
+    request_digest: str = Field(default="0"*64, min_length=64, max_length=64, pattern=r"^[a-f0-9]{64}$")
 
 
 class ControlResult(WireModel):
@@ -169,3 +171,28 @@ class TokenRequest(WireModel):
 class CommitResult(WireModel):
     committed: bool
     state: Literal['COMMITTED','ABORTED','EXPIRED','CONFLICT','NOT_FOUND']
+
+
+class FrameReceiptQuery(WireModel):
+    session_id: str = Field(pattern=r"^[A-Za-z0-9_-]{1,64}$")
+    frame_index: int = Field(ge=0, le=2**63-1)
+    request_digest: str = Field(min_length=64,max_length=64,pattern=r"^[a-f0-9]{64}$")
+
+
+class FrameReceiptResult(WireModel):
+    status: Literal['NEW','REPLAY']
+    response: FrameResult | Sentinel = Field(default_factory=lambda: Sentinel(kind='NOT_APPLICABLE',reason='frame is not committed',fallback='RETRY_EXPLICIT'))
+
+
+class FinalizeRequest(WireModel):
+    token: str = Field(min_length=32,max_length=64,pattern=r'^[a-f0-9]+$')
+    response: FrameResult
+
+
+class FinalizeResult(WireModel):
+    committed: bool
+    state: Literal['COMMITTED','ALREADY_COMMITTED','CONFLICT','EXPIRED','NOT_FOUND']
+
+
+class BypassRecordRequest(FrameReceiptQuery):
+    response: FrameResult
