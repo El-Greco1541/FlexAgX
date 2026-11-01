@@ -1,21 +1,17 @@
-# Roadmap
-1. **v0.1 correction baseline:** F38 guard and F41 preclear, source/audit/CPU-probe checks.
-2. **v0.2 cold-start assurance:** design and verify state/previous-hist initialization on the actual runtime.
-3. **v0.3 source-semantics decisions:** deadband, superwhite, gamut/strength and transfer contract fixtures.
-4. **v0.4 modular expansion:** independently executable pass equations, correct intermediate formats, API contracts and glue.
-5. **Runtime acceptance:** ReShade FX compiler, GPU runs, cross-API fidelity, security and explicit release decision.
-Production gate remains locked for every new material change until operator clearance.
+# FlexAgX — current roadmap (synchronized 2026-11-01)
 
-## v0.2 effect treatment
-Static and CPU harness complete. Next stage is a separate ReShade compiler/GPU runner; then first-use resource initialization and bounded fidelity evaluation. No production authority granted.
+**Policy:** correct first, expand second; prefer verified behavior and explicit module contracts over performance. All production work is gated by Operator approval.
 
-- v0.3.0: F18/F32 source mitigation and temporal harness completed; pending native acceptance. Expansion remains gated.
+| Milestone | Result | Standing |
+| --- | --- | --- |
+| v0.1 FX baseline | F38 hue guard, F41 histogram clear, provenance and CPU/API probe | Source/CPU tested; GPU open |
+| v0.2 effect harness | Isolated seeded static, numerical, API and synthetic-frame tests | Tested; not GPU-equivalent |
+| v0.3 temporal initialization | CT-003 marker and baseline reset | Source/CPU tested; GPU open |
+| v0.4 adaptation deadband | CT-004 velocity settle to rest | Candidate; Operator policy acceptance open |
+| v0.5 scene-cut confirmation | CT-005 two observations | Candidate; Operator policy acceptance open |
+| v0.6 gamut correction | CT-006 post-blend gamut and F40 policy hold | Candidate; CPU/static tested |
+| Next acceptance phase | ReShade FX compiler, GPU frame/reload and color fixtures | **Not started in this environment** |
+| Future expansion | Pass-level ports, API glue, color-space contracts | Deferred pending correctness acceptance |
+| Production release | Requires explicit Operator clearance | **LOCKED** |
 
-v0.4 candidate: F23/F24 source mitigation and tests; next F29/F36 semantic contract decision; F39/F40 gamut/encoding contract; native graphics certification.
-
-v0.5 candidate: F29 two-observation scene-cut guard staged and CPU-tested; next Operator acceptance of F29/F36 semantics, native FX/GPU verification, then independent gamut/encoding research F39/F40.
-
-
-### CT-006 v0.6.0 — 2026-11-01
-
-CT-006 v0.6 research complete in static/CPU scope. Next: GPU toolchain and color-profile acceptance; F40 remains policy hold, F30/F31 unresolved.
+Current open decisions are maintained in [PENDING_DECISIONS](../docs/PENDING_DECISIONS.md); actionable tests are tracked in [TODO](TODO.md). Keep historical source-diff patches and test evidence immutable.

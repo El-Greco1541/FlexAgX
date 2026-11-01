@@ -1,15 +1,16 @@
 {
   "project": "transmigrated-FlexAgX",
   "version": "0.6.0",
+  "maintenance_revision": "documentation-sync-2026-11-01",
   "status": "STAGED_NOT_GPU_CERTIFIED",
-  "file_count": 77,
+  "file_count": 79,
   "original_sha256": "e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d",
   "corrected_sha256": "6603e5ecb42458ce55845021d56c653ed01806ecaead3a5be21c69b6152808ca",
   "files": [
     {
       "path": ".gitignore",
-      "sha256": "89abdea68bb5b0135f03898a1b0116cdd2a7d19e96824e806dbaecc57adc2f3b",
-      "bytes": 309
+      "sha256": "97ce3b544c0b386c14269c3e31df8c1102f3428d85ca7d849af3b9ffca1503e8",
+      "bytes": 285
     },
     {
       "path": "LICENSE",
@@ -18,8 +19,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "4175222fc207f3d8efdaea8cb527c8a8e8dd76cec54aafbe60e8905190f0c20b",
-      "bytes": 9465
+      "sha256": "93957e8a1420a45dbe65e680cfaef886b05732251b1eba9c45bc8651d5615940",
+      "bytes": 7178
     },
     {
       "path": "VERIFICATION_REPORT.json",
@@ -112,9 +113,19 @@
       "bytes": 2037
     },
     {
+      "path": "docs/REPOSITORY_SYNC.md",
+      "sha256": "049f06b95b19fb097d7ba37e99ec7cde70796039661ea7711dc31cfa0d8336ac",
+      "bytes": 3540
+    },
+    {
       "path": "docs/SOURCE_DIFF.patch",
       "sha256": "ad58f6596612660874b5e55030794010985000ce4f9151010bab22f0d8d93a2d",
       "bytes": 5556
+    },
+    {
+      "path": "docs/SYNC_AUDIT.md",
+      "sha256": "810e69027449361cfa799d461540d4ea64e8c4355136def8e78d9f8f9a7f67b6",
+      "bytes": 2444
     },
     {
       "path": "docs/TEMPORAL_BOOT_V03.md",
@@ -318,13 +329,13 @@
     },
     {
       "path": "logs/ROADMAP.md",
-      "sha256": "2d694324d153b6deb40d22c4f1b05d3205d861bee4454bcc41b15e3cc9135446",
-      "bytes": 1533
+      "sha256": "813065f068ba66426c926f062c0d5d45485d41119ab031f2409f1a33e1da2a26",
+      "bytes": 1447
     },
     {
       "path": "logs/TODO.md",
-      "sha256": "640bb76204cde58062f622f7b9be9a9078214741710400fbf564e7bd2d41ee0f",
-      "bytes": 3250
+      "sha256": "bb9b113fec81686d68e1f806c822b28c1d9e2aea842aa8edc2783dcd7e0d7976",
+      "bytes": 2137
     },
     {
       "path": "reference/FlexAgX_1.2.fx",

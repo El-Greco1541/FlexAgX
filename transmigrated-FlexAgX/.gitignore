@@ -1,18 +1,17 @@
+# Local test and Python caches
 __pycache__/
 .pytest_cache/
 .venv/
-.env
 *.pyc
+
+# Credentials and runtime data
+.env
 *.sqlite3
 *.db
 *.log
-results_tmp/
 
-# Harness execution evidence is archived separately; do not commit transient data.
+# Temporary test outputs; committed synthetic reports live under harness/evidence/
+results_tmp/
 harness/results/
 harness/tmp/
-*.sqlite3
-*.db
-
-# Local v0.3.0 full source/CPU simulation evidence, bundled separately
 harness/correction_results/
