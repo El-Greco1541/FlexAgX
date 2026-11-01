@@ -1,0 +1,26 @@
+{
+  "version": "0.1.0",
+  "original_sha256": "e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d",
+  "corrected_sha256": "ff5f38cfc4f21bee6521b62aeb996eba6ed5bedd95c3745de82ac32d9199f3da",
+  "edits": [
+    {
+      "id": "F38-HUE-GUARD",
+      "source_occurrences": 1
+    },
+    {
+      "id": "F38-OUTPUT-GUARD",
+      "source_occurrences": 1
+    },
+    {
+      "id": "F41-CLEAR-FUNCTION",
+      "source_occurrences": 1
+    },
+    {
+      "id": "F41-CLEAR-PASS",
+      "source_occurrences": 1
+    }
+  ],
+  "original_pass_count": 8,
+  "corrected_pass_count": 9,
+  "status": "STAGED_NOT_GPU_VERIFIED"
+}

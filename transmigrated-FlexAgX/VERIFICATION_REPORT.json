@@ -1,0 +1,24 @@
+{
+  "version": "0.1.0",
+  "status": "STAGED_RESEARCH",
+  "date": "2026-11-01",
+  "pass": "PASS",
+  "pytest_tests": 30,
+  "seeded_hue_cases": 256,
+  "seeded_histogram_cases": 256,
+  "static_privacy_scan_files": 23,
+  "original_sha256": "e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d",
+  "candidate_sha256": "ff5f38cfc4f21bee6521b62aeb996eba6ed5bedd95c3745de82ac32d9199f3da",
+  "original_pass_count": 8,
+  "candidate_pass_count": 9,
+  "source_correction_ids": [
+    "F38",
+    "F41"
+  ],
+  "actual_gpu_test": "NOT_PERFORMED",
+  "reshade_compiler_test": "NOT_PERFORMED",
+  "production": "LOCKED",
+  "source_initialization_limited_to_histogram_counters": true,
+  "old_state_initialization": "UNVERIFIED",
+  "external_deployment": "NOT_PERFORMED"
+}

@@ -1,0 +1,90 @@
+--- a/reference/FlexAgX_1.2.fx
++++ b/shader/FlexAgX_transmigrated.fx
+@@ -579,10 +579,22 @@
+     // exactly, so the default takes a bit-identical bypass path.
+     if (ColorTemp == 6500.0)
+         return rgb;
+     float3 lms = mul(FA_RGB_TO_LMS, rgb) * FA_ColorTempGain();
+     return mul(FA_LMS_TO_RGB, lms);
++}
++
++// -----------------------------------------------------------------------------
++// P0 (correction F41): explicit histogram clear before atomic accumulation.
++// This extra pass runs every frame, even when visual processing is bypassed.
++// GPU/FX compiler and synchronization behavior still require backend testing.
++// -----------------------------------------------------------------------------
++[numthreads(128, 1, 1)]
++void FlexAgX_ClearHistogram(uint3 id : SV_DispatchThreadID)
++{
++    if (id.x < 67u)
++        tex2Dstore(FA_HistStorage, int2((int)id.x, 0), 0u);
+ }
+ 
+ // -----------------------------------------------------------------------------
+ // P1: sampled log-luminance histogram plus all-sample/white counters (half-resolution).
+ // -----------------------------------------------------------------------------
+@@ -997,15 +1009,21 @@
+     if (OverallStrength <= 0.0 && DebugView == 0) return float4(0.0, 0.0, 0.0, 0.0);
+     float4 source = tex2D(FA_BackBufferSampler, texcoord);
+     float3 src = FA_Decode(source.rgb);
+     float3 inLab = FA_OklabFromLinear(src);
+     float inputChroma = length(inLab.yz);
+-    float hIn = (inputChroma < 1.0e-4) ? 0.0 : atan2(inLab.z, inLab.y);
++    float hIn = 0.0;
++    if (inputChroma >= 1.0e-4)
++        hIn = atan2(inLab.z, inLab.y);
+ 
+     float3 curved = max(tex2D(FA_ASampler, texcoord).rgb, 0.0);
+     float3 lab = FA_OklabFromLinear(curved);
+-    float h = atan2(lab.z, lab.y);
++    float curvedChroma = length(lab.yz);
++    float h = 0.0;
++    // F38: guard the polar origin before invoking atan2, not afterwards.
++    if (curvedChroma > 1.0e-6)
++        h = atan2(lab.z, lab.y);
+     float delta = FA_WrapAngle(hIn - h);
+     // Weight by the SOURCE chroma: AgX desaturates the shoulder, so weighting
+     // by the curved chroma faded the restoration out exactly where hue drift
+     // is strongest. Source chroma does not collapse and the magnitude of the
+     // rotated vector is preserved, so this is safe for near-neutral pixels too.
+@@ -1112,12 +1130,19 @@
+     // which previously collapsed such pixels to pure white (Cmax = 0).
+     float L = min(lab.x, 1.0);
+     float a = lab.y;
+     float b = lab.z;
+     float C = sqrt(a * a + b * b);
+-    float h = atan2(b, a);
+-    float ch = cos(h), sh = sin(h);
++    float h = 0.0;
++    float ch = 1.0, sh = 0.0;
++    // F38: the achromatic angle is not defined on all target languages.
++    if (C > 1.0e-6)
++    {
++        h = atan2(b, a);
++        ch = cos(h);
++        sh = sin(h);
++    }
+ 
+     // 10 bisection iterations give ~4e-4 chroma precision; skipped entirely
+     // for achromatic pixels.
+     float Cmax = 0.0;
+     if (C > 1.0e-6)
+@@ -1177,10 +1202,18 @@
+ // Pass chain. The histogram pass dispatches ceil-half-resolution groups; the
+ // detail mean/base stages run as full-screen pixel-shader passes.
+ // -----------------------------------------------------------------------------
+ technique FlexAgX
+ {
++    // F41: a separate GPU pass provides a source-visible clear-before-add stage.
++    pass FlexAgX_ClearHistogramPass
++    {
++        ComputeShader = FlexAgX_ClearHistogram;
++        DispatchSizeX = 1;
++        DispatchSizeY = 1;
++        DispatchSizeZ = 1;
++    }
+     pass FlexAgX_HistogramPass
+     {
+         ComputeShader = FlexAgX_Histogram;
+         DispatchSizeX = (BUFFER_WIDTH + 31) / 32;
+         DispatchSizeY = (BUFFER_HEIGHT + 31) / 32;
