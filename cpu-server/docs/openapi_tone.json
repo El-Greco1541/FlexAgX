@@ -1,0 +1,211 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "FlexAgX Tone-Curve Microserver",
+    "version": "0.3.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tone/build": {
+      "post": {
+        "summary": "Api Build",
+        "operationId": "api_build_v1_tone_build_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ToneRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ToneResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ToneRequest": {
+        "properties": {
+          "gain": {
+            "type": "number",
+            "maximum": 4.0,
+            "minimum": 0.25,
+            "title": "Gain"
+          },
+          "knee": {
+            "type": "number",
+            "maximum": 0.55,
+            "minimum": 0.4,
+            "title": "Knee"
+          },
+          "shadow_preservation": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Shadow Preservation"
+          },
+          "input_encoding": {
+            "type": "integer",
+            "enum": [
+              0,
+              1
+            ],
+            "title": "Input Encoding",
+            "default": 0
+          },
+          "output_encoding": {
+            "type": "integer",
+            "enum": [
+              0,
+              1
+            ],
+            "title": "Output Encoding",
+            "default": 0
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "gain",
+          "knee",
+          "shadow_preservation"
+        ],
+        "title": "ToneRequest"
+      },
+      "ToneResult": {
+        "properties": {
+          "lut": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 1024,
+            "minItems": 1024,
+            "title": "Lut"
+          },
+          "validation_passed": {
+            "type": "boolean",
+            "title": "Validation Passed"
+          },
+          "used_fallback": {
+            "type": "boolean",
+            "title": "Used Fallback"
+          },
+          "attempts": {
+            "type": "integer",
+            "maximum": 4.0,
+            "minimum": 1.0,
+            "title": "Attempts"
+          },
+          "final_knee": {
+            "type": "number",
+            "maximum": 0.55,
+            "minimum": 0.4,
+            "title": "Final Knee"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "lut",
+          "validation_passed",
+          "used_fallback",
+          "attempts",
+          "final_knee"
+        ],
+        "title": "ToneResult"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "flexagx/__init__.py": "91447944015cec709e8aa7655f7e9d64e1e4508e7023a57fe3746911c0fc6fed",
+  "flexagx/assurance.py": "7c92b78ac07d401861be4c47dd7b98b9076f2edfd904e6b75d86dba91ebeae6a",
+  "flexagx/cli.py": "283eff203aa44f8f9ba59a5ab8eb2fdfd5818daed552b2cbdf3a84e23f831f20",
+  "flexagx/compute.py": "01fe01fd4bb7807aafcb4554e4ad24e18590e656d9756b3ec9e54c16260187f4",
+  "flexagx/contracts.py": "a83d53a20ef9a17063a8ea25cb4a033936adf07a01bf104b0bd7f1d153e9f905",
+  "flexagx/controller.py": "df1d51b6c04d468fc80028ed44223a9b392d39334b5b7efa92870a0ab32bc919",
+  "reference/FlexAgX_original.fx": "e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d",
+  "requirements.txt": "1f523a29df655cad89b641358d104572609a0a55f881dc6004e52b8ec8be6046",
+  "services/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "services/controller.py": "16099491ddd724bd683eed8f42aa96f4afe5614910714a181b3504e02b5165b6",
+  "services/gateway.py": "464cba101817e2ed3526f71ee6410251fb70736665abd0e01a6ced0696c9e62d",
+  "services/observer.py": "ef9922424c44fc8892611ac14318706d5509421027c192b104c5beb432fef81d",
+  "services/renderer.py": "afca281a42ce9892fc8b7e936ecdf0039b22eaac715ade5c32c30da435b1db35",
+  "services/tone.py": "a4602998df07a3c0e1360f1fa3932337b6a3935af3c5a0961161f51b268f9104",
+  "tests/distributed_guarded.py": "60e3938693501668c883da22a468b9dbeef17a29b4f6b0ee988b526882681e0c",
+  "tests/distributed_smoke.py": "0f7fddcabdfcfec28e46911e4702b8692b90af410f54d9d3f1239a99337c78be",
+  "tests/test_api_failures.py": "d9c76dcf2c943a6ee3fbf72f8ad9050507bb178044ea4d8ee4a8a2ddcd0cebb0",
+  "tests/test_assurance.py": "16ff041cc80578357fb13ff05747d796f5fd65f0c5852d7281d5a74cd7e8e772",
+  "tests/test_contracts.py": "7e1a938580870f67e5e0fb91734339d7764794e2eb0a3e193bf7e6cd06e65bd4",
+  "tests/test_transmigration.py": "bf6b9e7726bc5b25fdf7e291cde5ccf35f6ba81810d881a82e644856305bb6c4"
+}

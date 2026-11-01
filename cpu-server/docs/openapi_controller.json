@@ -1,0 +1,677 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "FlexAgX Controller Microserver",
+    "version": "0.3.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/control/step": {
+      "post": {
+        "summary": "Api Step",
+        "operationId": "api_step_v1_control_step_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ControlRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ControlResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/control/prepare": {
+      "post": {
+        "summary": "Api Prepare",
+        "operationId": "api_prepare_v1_control_prepare_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ControlRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrepareResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/control/commit": {
+      "post": {
+        "summary": "Api Commit",
+        "operationId": "api_commit_v1_control_commit_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommitResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/control/abort": {
+      "post": {
+        "summary": "Api Abort",
+        "operationId": "api_abort_v1_control_abort_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommitResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/control/sessions/{session_id}": {
+      "get": {
+        "summary": "Api State",
+        "operationId": "api_state_v1_control_sessions__session_id__get",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Api Reset",
+        "operationId": "api_reset_v1_control_sessions__session_id__delete",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CommitResult": {
+        "properties": {
+          "committed": {
+            "type": "boolean",
+            "title": "Committed"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "COMMITTED",
+              "ABORTED",
+              "EXPIRED",
+              "CONFLICT",
+              "NOT_FOUND"
+            ],
+            "title": "State"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "committed",
+          "state"
+        ],
+        "title": "CommitResult"
+      },
+      "ControlRequest": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,64}$",
+            "title": "Session Id"
+          },
+          "dt_ms": {
+            "type": "number",
+            "maximum": 60000.0,
+            "minimum": 0.0,
+            "title": "Dt Ms"
+          },
+          "observation": {
+            "$ref": "#/components/schemas/Observation"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/Settings"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "session_id",
+          "dt_ms",
+          "observation"
+        ],
+        "title": "ControlRequest"
+      },
+      "ControlResult": {
+        "properties": {
+          "gain": {
+            "type": "number",
+            "title": "Gain"
+          },
+          "gain_ev": {
+            "type": "number",
+            "title": "Gain Ev"
+          },
+          "knee": {
+            "type": "number",
+            "title": "Knee"
+          },
+          "auto_ev": {
+            "type": "number",
+            "title": "Auto Ev"
+          },
+          "scene_key": {
+            "type": "number",
+            "title": "Scene Key"
+          },
+          "initialized": {
+            "type": "boolean",
+            "title": "Initialized"
+          },
+          "warmup": {
+            "type": "number",
+            "title": "Warmup"
+          },
+          "scene_cut": {
+            "type": "boolean",
+            "title": "Scene Cut"
+          },
+          "valid_count": {
+            "type": "integer",
+            "title": "Valid Count"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "gain",
+          "gain_ev",
+          "knee",
+          "auto_ev",
+          "scene_key",
+          "initialized",
+          "warmup",
+          "scene_cut",
+          "valid_count"
+        ],
+        "title": "ControlResult"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "Observation": {
+        "properties": {
+          "histogram": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "maxItems": 64,
+            "minItems": 64,
+            "title": "Histogram"
+          },
+          "valid_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Valid Count"
+          },
+          "white_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "White Count"
+          },
+          "sample_count": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Sample Count"
+          },
+          "e50": {
+            "type": "number",
+            "title": "E50"
+          },
+          "e90": {
+            "type": "number",
+            "title": "E90"
+          },
+          "phase_x": {
+            "type": "integer",
+            "enum": [
+              0,
+              1
+            ],
+            "title": "Phase X"
+          },
+          "phase_y": {
+            "type": "integer",
+            "enum": [
+              0,
+              1
+            ],
+            "title": "Phase Y"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "histogram",
+          "valid_count",
+          "white_count",
+          "sample_count",
+          "e50",
+          "e90",
+          "phase_x",
+          "phase_y"
+        ],
+        "title": "Observation"
+      },
+      "PrepareResult": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 32,
+            "pattern": "^[a-f0-9]+$",
+            "title": "Token"
+          },
+          "control": {
+            "$ref": "#/components/schemas/ControlResult"
+          },
+          "expires_in_seconds": {
+            "type": "integer",
+            "maximum": 30.0,
+            "minimum": 1.0,
+            "title": "Expires In Seconds"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "token",
+          "control",
+          "expires_in_seconds"
+        ],
+        "title": "PrepareResult"
+      },
+      "Settings": {
+        "properties": {
+          "OverallStrength": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Overallstrength",
+            "default": 100.0
+          },
+          "DebugView": {
+            "type": "integer",
+            "maximum": 2.0,
+            "minimum": 0.0,
+            "title": "Debugview",
+            "default": 0
+          },
+          "AutoExposureStrength": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Autoexposurestrength",
+            "default": 30.0
+          },
+          "ExposureOffset": {
+            "type": "number",
+            "maximum": 2.0,
+            "minimum": -2.0,
+            "title": "Exposureoffset",
+            "default": 0.0
+          },
+          "FreezeExposure": {
+            "type": "boolean",
+            "title": "Freezeexposure",
+            "default": false
+          },
+          "BrightenSpeed": {
+            "type": "number",
+            "maximum": 3.0,
+            "minimum": 0.1,
+            "title": "Brightenspeed",
+            "default": 0.6
+          },
+          "DarkenSpeed": {
+            "type": "number",
+            "maximum": 5.0,
+            "minimum": 0.1,
+            "title": "Darkenspeed",
+            "default": 1.2
+          },
+          "MaxChangeRate": {
+            "type": "number",
+            "maximum": 6.0,
+            "minimum": 0.5,
+            "title": "Maxchangerate",
+            "default": 3.0
+          },
+          "SceneChangeSensitivity": {
+            "type": "number",
+            "maximum": 0.6,
+            "minimum": 0.1,
+            "title": "Scenechangesensitivity",
+            "default": 0.35
+          },
+          "Deadband": {
+            "type": "number",
+            "maximum": 0.1,
+            "minimum": 0.0,
+            "title": "Deadband",
+            "default": 0.04
+          },
+          "ClipGuard": {
+            "type": "number",
+            "maximum": 5.0,
+            "minimum": 0.5,
+            "title": "Clipguard",
+            "default": 2.0
+          },
+          "AutoHighlightKnee": {
+            "type": "boolean",
+            "title": "Autohighlightknee",
+            "default": true
+          },
+          "HighlightKnee": {
+            "type": "number",
+            "maximum": 0.55,
+            "minimum": 0.4,
+            "title": "Highlightknee",
+            "default": 0.5
+          },
+          "ShadowPreservation": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Shadowpreservation",
+            "default": 50.0
+          },
+          "HueRestoration": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Huerestoration",
+            "default": 100.0
+          },
+          "GamutRolloffStart": {
+            "type": "number",
+            "maximum": 0.95,
+            "minimum": 0.6,
+            "title": "Gamutrolloffstart",
+            "default": 0.8
+          },
+          "ColorTemp": {
+            "type": "number",
+            "maximum": 12000.0,
+            "minimum": 2000.0,
+            "title": "Colortemp",
+            "default": 6500
+          },
+          "LocalDetail": {
+            "type": "number",
+            "maximum": 50.0,
+            "minimum": 0.0,
+            "title": "Localdetail",
+            "default": 20.0
+          },
+          "InputEncoding": {
+            "type": "integer",
+            "enum": [
+              0,
+              1
+            ],
+            "title": "Inputencoding",
+            "default": 0
+          },
+          "OutputEncoding": {
+            "type": "integer",
+            "enum": [
+              0,
+              1
+            ],
+            "title": "Outputencoding",
+            "default": 0
+          },
+          "Dithering": {
+            "type": "boolean",
+            "title": "Dithering",
+            "default": true
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Settings"
+      },
+      "TokenRequest": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 32,
+            "pattern": "^[a-f0-9]+$",
+            "title": "Token"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "title": "TokenRequest"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

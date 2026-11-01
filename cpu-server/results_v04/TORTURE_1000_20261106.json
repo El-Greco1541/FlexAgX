@@ -1,0 +1,94 @@
+{
+  "phase": "torture",
+  "seed": 20261106,
+  "checks": 5,
+  "passed": 5,
+  "failed": 0,
+  "findings": [],
+  "cases": [
+    {
+      "name": "torture_frames",
+      "status": "pass",
+      "detail": "",
+      "expected": {
+        "kind": "NOT_APPLICABLE",
+        "reason": "test case has no comparison value",
+        "fallback": "SKIP"
+      },
+      "observed": {
+        "frames": 1000,
+        "http_status": {
+          "200": 1000
+        },
+        "seconds": 6.681,
+        "latency_ms": {
+          "p50": 5.93,
+          "p95": 11.031,
+          "max": 28.121
+        },
+        "session_frames": 819
+      },
+      "duration_ms": 0
+    },
+    {
+      "name": "oversize_image_rejected_before_render",
+      "status": "pass",
+      "detail": "",
+      "expected": {
+        "kind": "NOT_APPLICABLE",
+        "reason": "test case has no comparison value",
+        "fallback": "SKIP"
+      },
+      "observed": {
+        "pixels": 2002225,
+        "status": 422
+      },
+      "duration_ms": 1135.424
+    },
+    {
+      "name": "near_limit_image_bypass",
+      "status": "pass",
+      "detail": "",
+      "expected": {
+        "kind": "NOT_APPLICABLE",
+        "reason": "test case has no comparison value",
+        "fallback": "SKIP"
+      },
+      "observed": {
+        "pixels": 1999396,
+        "status": 200
+      },
+      "duration_ms": 1411.443
+    },
+    {
+      "name": "session_capacity_and_recovery",
+      "status": "pass",
+      "detail": "",
+      "expected": {
+        "kind": "NOT_APPLICABLE",
+        "reason": "test case has no comparison value",
+        "fallback": "SKIP"
+      },
+      "observed": {
+        "capacity": 3,
+        "limit_enforced": true
+      },
+      "duration_ms": 1.087
+    },
+    {
+      "name": "parallel_sessions",
+      "status": "pass",
+      "detail": "",
+      "expected": {
+        "kind": "NOT_APPLICABLE",
+        "reason": "test case has no comparison value",
+        "fallback": "SKIP"
+      },
+      "observed": {
+        "workers": 6,
+        "iterations_per_worker": 10
+      },
+      "duration_ms": 541.594
+    }
+  ]
+}

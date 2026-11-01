@@ -1,7 +1,7 @@
 # FlexAgX CPU server simulation — staging entry point
 
-The independently developed CPU/API/microserver simulation is staged separately from the upstream ReShade shader. Original author: El-Greco1541 (MIT). Original shader release 1.2 SHA-256: e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d.
+The independently developed CPU/API/microserver simulation is located at [cpu-server/README.md](cpu-server/README.md). The original upstream root README and MIT license remain untouched.
 
-**Status:** research-stage only; not deployed or approved for production. See the self-contained CPU-server staging package for the complete source and tests. The upstream root README and license are unchanged.
+**Status:** research/staged, not deployed, not a GPU implementation, not released to production.
 
-**Privacy:** project materials are screened for contributor names, private paths, host identifiers and secrets. GitHub account and commit metadata remain public, as does mandatory upstream MIT attribution.
+Upstream shader author: [El-Greco1541](https://github.com/El-Greco1541/FlexAgX). Original shader version 1.2, SHA-256 `e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d`.

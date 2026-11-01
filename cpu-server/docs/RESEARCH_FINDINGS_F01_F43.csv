@@ -1,0 +1,44 @@
+id,classification,priority,evidence,finding,source_lines_1_based,next_action_or_disposition
+F01,capability,Info,SOURCE,Eight-pass ordered processing architecture,1180–1237,Baseline architectural fact; no defect alleged
+F02,capability,Info,SOURCE,64-bin log-luminance sampling and counters,595–646,Baseline statistical capability
+F03,capability,Info,SOURCE,"Persisted exposure state, scene-cut and rate limiting",693–865,Baseline controller capability
+F04,capability,Info,SOURCE,"Dynamic tone-curve LUT, retry, and fallback",876–959,Local validation implemented; full-pipeline check separate
+F05,capability,Info,SOURCE,"Oklab, white balance, local detail and dithering",454–583; 973–1174,Baseline rendering functions
+F06,bug candidate,P1,SOURCE+CPU,White-balance discontinuity at near-zero overall strength,1097–1109; 1144–1162,Ratify strength semantics; test s=0 vs s→0+
+F07,contract ambiguity,P2,SOURCE+INFERENCE,BrightenSpeed/DarkenSpeed names appear reversed relative to rendered exposure response,766–776; 825–853,"Run light↔dark step trace, confirm intended UI semantics"
+F08,state coupling,P2,SOURCE,Debug mode enables histogram/controller work at strength=0,595–605; 655–666,Decide active vs passive diagnostics
+F09,design tradeoff,P2,SOURCE+ALGEBRA,Histogram excludes pure black but Clip Guard counts all samples,615–646; 763–766,Specify intended image-composition sensitivity
+F10,conditional risk,P1,CONDITIONAL,Zero-initialized previous histogram can yield first-frame distance 0.5,753–806,Resolve first-use reference initialization
+F11,scope gap,P2,SOURCE,No explicit SDR/scRGB/PQ/HLG presentation-color-space handling,336–359; 1097–1174,Declare SDR-only support or explicit display-space contract
+F12,performance candidate,P2,SOURCE COUNTS,5×5 detail passes and iterative gamut search are work drivers,1027–1073; 1117–1135,Collect per-pass GPU timings
+F13,state coupling,P2,SOURCE,Bypass stops adaptation but retains prior controller state,659–665; 719–737,Define disable/reactivation policy
+F14,design characteristic,Info,SOURCE+ALGEBRA,Auto-knee target clamps outside 0.40–0.55 P90 luminance,749–751,Record intentional adaptive range
+F15,assurance gap,P2,SOURCE,LUT acceptance does not prove saturated RGB or fallback full-pipeline validity,876–959; 973–1174,Expand independent end-to-end tests
+F16,performance candidate,P2,SOURCE,Debug output computes image stages whose results may be unused,1097–1162; 1180–1237,Measure diagnostic-mode overhead
+F17,bug candidate,P2,SOURCE+CPU,Clipping warning threshold depends on white-balanced original,1105–1109; 1148–1152,Specify whether warning measures raw source or adjusted color
+F18,conditional risk,P1,CONDITIONAL,No source-declared initialization protocol for all persisted state resources,232–265; 652–737,Verify startup/reload/reset state on each backend
+F19,verification gap,P1,SOURCE+DOCUMENTATION,Typed integer texture declaration guidance inconsistent across versioned references,232–240,Compile unchanged effect with exact FX compiler versions
+F20,bug candidate,P1,SOURCE+CPU,Frame-global 2×2 sampling can alias a stationary 50% checkerboard to 0% or 100%,607–632,Test realistic footage and exposure traces
+F21,state coupling,P2,SOURCE,Freeze holds adapted key but updates histogram reference,818–875,Specify expected freeze/unfreeze transition
+F22,design characteristic,Info,SOURCE,Two 5×5 stages yield up to 9×9 dependency footprint,1027–1073,Retain for equivalence and halo studies
+F23,contract ambiguity,P2,SOURCE+CPU,Deadband removes positional error but not prior velocity,766–776,Test settling and residual drift
+F24,contract ambiguity,P2,SOURCE,Deadband selects DarkenSpeed when target == adapted key,770–775,Check directional control semantics
+F25,performance candidate,P2,SOURCE,Fixed display-gray bisection and LUT construction repeated every active frame,825–839; 876–959,Benchmark repeated constant-setting frames
+F26,research alternative,Info,CPU HYPOTHESIS,Spatially distributed sampling improves four synthetic periodic test fixtures,607–614,Not implemented; compare broader scenes before proposing patch
+F27,positive verification,Info,CPU SWEEP,Hermite tangent upper guards did not activate in tested legal sweeps,400–425,Do not assume redundant on GPU
+F28,design characteristic,Info,SOURCE,Output dither is spatially fixed and independent of framecount,506–508; 1163–1171,Evaluate stationary pattern perceptual preferences
+F29,design characteristic,P2,SOURCE+CPU,Scene-cut internal-key correction not multiplied by dt; visible EV separately rate-limited,778–806; 825–853,Test pause/cut timing semantics; not direct visible EV-rate failure
+F30,scope gap,P2,SOURCE+CPU,sRGB decoder saturates encoded superwhite values above 1,336–353,Confirm input domain and SDR/HDR scope
+F31,conditional risk,P3,SOURCE+CPU,Mixed-sign encoded RGB can enter histogram with negative luminance,336–340; 622–629,Only relevant for invalid/signed upstream inputs
+F32,conditional risk,P2,CONDITIONAL,Freeze before first initialization can leave auto knee at lower clamp,719–761; 855–864,Depends on startup state; test frozen first-enable
+F33,design characteristic,Info,SOURCE+CPU,Gamut roll-off compresses some in-gamut chroma,1136–1145,Likely intentional soft-knee behavior; measure appearance
+F34,mathematical limitation,Info,PROOF,Fixed one-pixel-per-2×2 selection cannot exactly estimate every possible image,607–614,Not an implementation bug; bound sampling errors
+F35,positive verification,Info,CPU DOUBLE,AgX inset/outset matrices are inverse-consistent in CPU float64,484–496,Keep positive evidence; GPU float32 still open
+F36,contract ambiguity,P2,SOURCE,AutoExposureStrength=0 does not stop knee and scene-key adaptation,735–761; 809–861,Define independent auto-exposure vs auto-knee controls
+F37,bug candidate,P2,SOURCE+CPU,Odd-size framebuffers have phase-dependent sample counts,607–620; 1182–1195,Test odd resolutions and zero-sample cases
+F38,conditional risk,P1,SOURCE+API SPEC,"Achromatic/black path evaluates undefined atan2(0,0) before chroma guard",1110–1126,GPU/backend NaN and nonfinite pixel tests required
+F39,bug candidate,P1,SOURCE+CPU,Strength blend may reintroduce out-of-gamut values after processed-branch gamut mapping,1105–1146; 1162–1173,Compare partial strength under warm/cool temperatures
+F40,bug candidate,P1,SOURCE+CPU,Input/output transfer mismatch causes separate near-zero-strength discontinuity,336–359; 1097–1105; 1144–1162,Define whether 0% bypass includes output encoding
+F41,conditional risk,P1,SOURCE+CONDITIONAL,Histogram atomic additions precede first source-visible clear,635–645; 659–685; 1180–1195,Verify GPU initialization for first active frame/reload
+F42,performance candidate,P2,SOURCE,Zero-strength exact image bypass leaves eight declared technique passes,1097–1105; 1180–1237,Measure residual passes/draws and GPU time
+F43,performance candidate,P2,SOURCE,LocalDetail=0 bypasses calculations but retains P5–P7 passes,1027–1029; 1054–1056; 1078–1083; 1210–1230,Measure pass overhead before considering scheduling changes

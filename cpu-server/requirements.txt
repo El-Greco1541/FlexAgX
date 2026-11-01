@@ -1,0 +1,7 @@
+fastapi>=0.110,<1
+uvicorn>=0.25,<1
+pydantic>=2,<3
+numpy>=1.26,<3
+scipy>=1.11,<2
+Pillow>=10,<13
+httpx>=0.26,<1

@@ -1,0 +1,13 @@
+{
+  "artifact_version": "0.1.0",
+  "date": "2026-11-01",
+  "production_gate": "LOCKED",
+  "source_sha256": "e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d",
+  "tests": [
+    {"name":"pytest local+microserver-contract tests","status":"PASS","passed":19,"failed":0},
+    {"name":"distributed HTTP smoke","status":"PASS","servers_started":5,"frame_pipeline":"gateway-observer-controller-tone-renderer","mode":"separate localhost HTTP servers"},
+    {"name":"Python compileall","status":"PASS"},
+    {"name":"reference source byte identity","status":"PASS"}
+  ],
+  "not_tested": ["Docker build","ReShade FX compilation","GPU execution","real-time throughput","HDR correctness","back-end bitwise fidelity","multiuser security","production deployment"]
+}

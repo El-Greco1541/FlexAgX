@@ -1,0 +1,26 @@
+# Development only. Gateway bound to loopback; the microservers are not
+# published to the host. No authentication, TLS or durable state is provided.
+services:
+  observer:
+    build: .
+    command: uvicorn services.observer:app --host 0.0.0.0 --port 8000
+  controller:
+    build: .
+    command: uvicorn services.controller:app --host 0.0.0.0 --port 8000 --workers 1
+  tone:
+    build: .
+    command: uvicorn services.tone:app --host 0.0.0.0 --port 8000
+  renderer:
+    build: .
+    command: uvicorn services.renderer:app --host 0.0.0.0 --port 8000
+  gateway:
+    build: .
+    environment:
+      GATEWAY_MODE: distributed
+      OBSERVER_URL: http://observer:8000
+      CONTROLLER_URL: http://controller:8000
+      TONE_URL: http://tone:8000
+      RENDERER_URL: http://renderer:8000
+    ports:
+      - '127.0.0.1:8080:8000'
+    depends_on: [observer,controller,tone,renderer]

@@ -1,0 +1,343 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "FlexAgX CPU Renderer Microserver",
+    "version": "0.3.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/render": {
+      "post": {
+        "summary": "Api Render",
+        "operationId": "api_render_v1_render_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RenderResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "RenderRequest": {
+        "properties": {
+          "image_png_base64": {
+            "type": "string",
+            "maxLength": 20000000,
+            "minLength": 4,
+            "title": "Image Png Base64"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/Settings"
+          },
+          "gain_ev": {
+            "type": "number",
+            "maximum": 2.0,
+            "minimum": -2.0,
+            "title": "Gain Ev"
+          },
+          "lut": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 1024,
+            "minItems": 1024,
+            "title": "Lut"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "image_png_base64",
+          "gain_ev",
+          "lut"
+        ],
+        "title": "RenderRequest"
+      },
+      "RenderResult": {
+        "properties": {
+          "image_png_base64": {
+            "type": "string",
+            "maxLength": 20000000,
+            "minLength": 4,
+            "title": "Image Png Base64"
+          },
+          "width": {
+            "type": "integer",
+            "maximum": 2000000.0,
+            "minimum": 1.0,
+            "title": "Width"
+          },
+          "height": {
+            "type": "integer",
+            "maximum": 2000000.0,
+            "minimum": 1.0,
+            "title": "Height"
+          },
+          "backend": {
+            "type": "string",
+            "title": "Backend",
+            "default": "cpu-numpy-scipy"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "image_png_base64",
+          "width",
+          "height"
+        ],
+        "title": "RenderResult"
+      },
+      "Settings": {
+        "properties": {
+          "OverallStrength": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Overallstrength",
+            "default": 100.0
+          },
+          "DebugView": {
+            "type": "integer",
+            "maximum": 2.0,
+            "minimum": 0.0,
+            "title": "Debugview",
+            "default": 0
+          },
+          "AutoExposureStrength": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Autoexposurestrength",
+            "default": 30.0
+          },
+          "ExposureOffset": {
+            "type": "number",
+            "maximum": 2.0,
+            "minimum": -2.0,
+            "title": "Exposureoffset",
+            "default": 0.0
+          },
+          "FreezeExposure": {
+            "type": "boolean",
+            "title": "Freezeexposure",
+            "default": false
+          },
+          "BrightenSpeed": {
+            "type": "number",
+            "maximum": 3.0,
+            "minimum": 0.1,
+            "title": "Brightenspeed",
+            "default": 0.6
+          },
+          "DarkenSpeed": {
+            "type": "number",
+            "maximum": 5.0,
+            "minimum": 0.1,
+            "title": "Darkenspeed",
+            "default": 1.2
+          },
+          "MaxChangeRate": {
+            "type": "number",
+            "maximum": 6.0,
+            "minimum": 0.5,
+            "title": "Maxchangerate",
+            "default": 3.0
+          },
+          "SceneChangeSensitivity": {
+            "type": "number",
+            "maximum": 0.6,
+            "minimum": 0.1,
+            "title": "Scenechangesensitivity",
+            "default": 0.35
+          },
+          "Deadband": {
+            "type": "number",
+            "maximum": 0.1,
+            "minimum": 0.0,
+            "title": "Deadband",
+            "default": 0.04
+          },
+          "ClipGuard": {
+            "type": "number",
+            "maximum": 5.0,
+            "minimum": 0.5,
+            "title": "Clipguard",
+            "default": 2.0
+          },
+          "AutoHighlightKnee": {
+            "type": "boolean",
+            "title": "Autohighlightknee",
+            "default": true
+          },
+          "HighlightKnee": {
+            "type": "number",
+            "maximum": 0.55,
+            "minimum": 0.4,
+            "title": "Highlightknee",
+            "default": 0.5
+          },
+          "ShadowPreservation": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Shadowpreservation",
+            "default": 50.0
+          },
+          "HueRestoration": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Huerestoration",
+            "default": 100.0
+          },
+          "GamutRolloffStart": {
+            "type": "number",
+            "maximum": 0.95,
+            "minimum": 0.6,
+            "title": "Gamutrolloffstart",
+            "default": 0.8
+          },
+          "ColorTemp": {
+            "type": "number",
+            "maximum": 12000.0,
+            "minimum": 2000.0,
+            "title": "Colortemp",
+            "default": 6500
+          },
+          "LocalDetail": {
+            "type": "number",
+            "maximum": 50.0,
+            "minimum": 0.0,
+            "title": "Localdetail",
+            "default": 20.0
+          },
+          "InputEncoding": {
+            "type": "integer",
+            "enum": [
+              0,
+              1
+            ],
+            "title": "Inputencoding",
+            "default": 0
+          },
+          "OutputEncoding": {
+            "type": "integer",
+            "enum": [
+              0,
+              1
+            ],
+            "title": "Outputencoding",
+            "default": 0
+          },
+          "Dithering": {
+            "type": "boolean",
+            "title": "Dithering",
+            "default": true
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Settings"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}
