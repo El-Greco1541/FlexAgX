@@ -1,0 +1,65 @@
+{
+  "schema": "flexagx.ct009.repeat_compilation.v1",
+  "date": "2026-11-01",
+  "stage": "CT-009",
+  "source": "operator_supplied_reshade_log_excerpt",
+  "log_line_count": 1514,
+  "log_sha256": "af5b4a293c507bb54e220d7c89e4a24994bec5ee2c72cf43e3ed8652ce70e5d8",
+  "raw_log_publicly_committed": false,
+  "shader_filename": "FlexAgX_transmigrated_CT009_X4000_candidate.fx",
+  "shader_sha256_on_windows": null,
+  "compiler_entries": [
+    {
+      "timestamp": "20:54:34.416",
+      "seconds": 3.043,
+      "level": "INFO"
+    },
+    {
+      "timestamp": "20:55:47.192",
+      "seconds": 0.017,
+      "level": "INFO"
+    },
+    {
+      "timestamp": "20:56:28.346",
+      "seconds": 0.016,
+      "level": "INFO"
+    },
+    {
+      "timestamp": "20:56:54.284",
+      "seconds": 0.018,
+      "level": "INFO"
+    },
+    {
+      "timestamp": "20:57:22.143",
+      "seconds": 0.017,
+      "level": "INFO"
+    },
+    {
+      "timestamp": "20:58:03.640",
+      "seconds": 0.016,
+      "level": "INFO"
+    }
+  ],
+  "shader_compiler_diagnostics": {
+    "X4000": 0,
+    "X3571": 0,
+    "errors": 0
+  },
+  "whole_excerpt": {
+    "compiler_success_entries": 472,
+    "shader_compilations_with_warnings_excluding_flexagx": 61,
+    "x4000_diagnostics_other_shaders": 948
+  },
+  "toolchain_info_present_in_this_excerpt": false,
+  "previous_log_toolchain": "ReShade 6.7.3.2150, D3D12; sourced to previous session log only",
+  "confirmed": "No FlexAgX shader diagnostics in this excerpt, one substantial compilation with INFO-only status",
+  "unverified": [
+    "candidate_sha256_on_windows",
+    "rendering_visual_parity",
+    "first_frame_and_reload",
+    "temporal_state_and_sync",
+    "other_backends",
+    "production"
+  ],
+  "production_gate": "LOCKED"
+}
