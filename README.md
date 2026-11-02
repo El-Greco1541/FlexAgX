@@ -106,6 +106,19 @@ FlexAgX features intuitive parameters organized by functional category:
 
 ---
 
+## Acknowledgments 👏
+
+FlexAgX builds on the following algorithms, techniques, and resources:
+
+- **AgX tone mapping** by Troy Sobotka. The base tone curve, its polynomial approximation, and the inset/outset chroma matrices follow the AgX view transform, as used in Blender.
+- **Oklab colour space** by Björn Ottosson. Used for perceptual lightness and chroma processing, hue restoration, and gamut mapping.
+- **Planckian locus approximation** from Kim et al. (2002), "Design of advanced color-temperature control system for HDTV applications," *Journal of the Korean Physical Society*. Used to derive white points for the Colour Temperature control.
+- **Guided image filter** by Kaiming He, Jian Sun, and Xiaoou Tang ("Guided Image Filtering," ECCV 2010 / TPAMI 2013). Used as the edge-aware base layer for the Detail control.
+- **Interleaved Gradient Noise** by Jorge Jimenez (SIGGRAPH 2014, "Next Generation Post Processing in Call of Duty: Advanced Warfare"). Used for the Dithering option.
+- **sRGB transfer function**, as defined in IEC 61966-2-1, along with the gamma 2.2 curve.
+- **von Kries chromatic adaptation** in LMS space, used for white balance.
+- **ReShade** framework, which provides the shader runtime, compute shader support, and the frame-time uniform.
+
 ## License 📄
 
 Distributed under the MIT License. See `LICENSE` for more information.
