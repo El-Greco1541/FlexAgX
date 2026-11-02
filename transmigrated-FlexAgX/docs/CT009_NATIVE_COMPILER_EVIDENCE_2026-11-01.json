@@ -1,0 +1,31 @@
+{
+  "schema": "flexagx.native_compile_evidence.v1",
+  "date": "2026-11-01",
+  "stage": "CT-009",
+  "candidate": "FlexAgX_transmigrated_CT009_X4000_candidate.fx",
+  "staged_git_blob_sha": "12580cef4e2d9218cc019f8b78594b33bb03626b",
+  "windows_shader_sha256": null,
+  "windows_shader_hash_binding": "PENDING",
+  "reshade_version": "6.7.3.2150",
+  "runtime_backend": "D3D12",
+  "full_compile_seconds": 1.774,
+  "full_compile_status": "SUCCESS_NO_SHADER_WARNINGS_IN_SUPPLIED_LOG",
+  "rapid_subsequent_compile_seconds": 0.019,
+  "shader_warning_codes": {
+    "X4000": 0,
+    "X3571": 0
+  },
+  "shader_warning_total": 0,
+  "shader_compile_errors": 0,
+  "other_runtime_warnings": 6,
+  "other_runtime_warning_class": "IGNORED_LOADLIBRARY_TO_AVOID_DEADLOCK",
+  "ct008_baseline": {
+    "X4000": 19,
+    "X3571": 0
+  },
+  "raw_log_sha256": "27ca6f59511ca3398ddb8ad39f378a6525e9b1e32481c72318069ce04d82cdf8",
+  "raw_log_committed": false,
+  "native_gpu_rendering_certified": false,
+  "production_gate": "LOCKED",
+  "note": "Parsed from operator-supplied log; shader path, addresses and hardware identity omitted from published evidence."
+}
