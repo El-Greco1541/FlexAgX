@@ -12,7 +12,7 @@ RESULTS = ("decoded", "encoded", "result", "result",
            "result", "balanced", "constrained")
 
 def find_span(s, name):
-    m = re.search(r"\\bfloat(?:3)?\\s+" + name + r"\\s*\\([^;{}]*\\)\\s*\\{", s)
+    m = re.search(r"\bfloat(?:3)?\s+" + name + r"\s*\([^;{}]*\)\s*\{", s)
     assert m, name
     depth = 0
     for i in range(s.index("{", m.start()), len(s)):
@@ -35,9 +35,9 @@ def test_initialized_single_exit(name, out):
     s = TRIAL.read_text(encoding="utf8")
     a, b = find_span(s, name)
     body = s[a:b]
-    assert len(re.findall(r"\\breturn\\s+\\w+\\s*;", body)) == 1
-    assert re.search(r"\\b" + out + r"\\s*=\\s*", body)
-    assert re.search(r"\\breturn\\s+" + out + r"\\s*;", body)
+    assert len(re.findall(r"\breturn\s+\w+\s*;", body)) == 1
+    assert re.search(r"\b" + out + r"\s*=\s*", body)
+    assert re.search(r"\breturn\s+" + out + r"\s*;", body)
 
 def test_ct008_and_pass_chain():
     a = BASE.read_text(encoding="utf8")
