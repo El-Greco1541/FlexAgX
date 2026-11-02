@@ -17,14 +17,20 @@
 
 This is a second recorded multi-second, warning-free compilation of the CT-009-named effect following the previous **1.774-second, warning-free** run. The later 0.016–0.018-second entries may be cached and are not five independent full compiler validations. It is not a GPU image-quality or equivalence test.
 
-The uploaded fragment **does not repeat** the ReShade version, renderer API, GPU, driver or program initialization lines. The separate prior CT-009 session log identified ReShade 6.7.3.2150 and D3D12; this new fragment alone cannot independently confirm those attributes. It also records a *filename*, not a Windows shader SHA-256.
+The uploaded fragment **does not repeat** the ReShade version, renderer API, GPU, driver or program initialization lines. The separate prior CT-009 session log identified ReShade 6.7.3.2150 and D3D12; this new fragment alone cannot independently confirm those attributes. It also records a *filename*, not a Windows shader SHA-256; the Operator subsequently supplied a matching file SHA-256, recorded in the update below.
 
 Git candidate: `shader/FlexAgX_transmigrated_CT009_X4000_candidate.fx`. Preserve the CT-008 baseline, original upstream reference and correction history unchanged.
 
 ## Remaining verification gates
 
-1. On Windows, capture `Get-FileHash -Algorithm SHA256` for the exact compiled CT-009 `.fx` file and compare with the expected Git candidate digest.
+1. **Operator-reported hash match obtained:** validate the Windows file path and compile-session relationship independently if stronger provenance is required.
 2. Verify correct rendering, 0%-strength bypass, neutral/grayscale, saturated gamut limits, scene-cut timing, first-frame and reload across matched CT-008/CT-009 captures.
 3. Do not treat this log as proof of numerical/GPU parity, warnings elsewhere resolved, other backend compatibility, or release authorization.
 
 **Conclusion:** CT-009 X4000/X3571 compiler-warning objective is **confirmed in the supplied native log observations**, while source-hash binding, GPU fidelity and production acceptance remain open.
+
+## Source identity synchronization — November 1, 2026
+
+The Operator supplied Windows SHA-256 `28B213958DAD8F264347B76192E6B685A61829D0B90778D6522A73301995163D` for the CT-009 candidate. SHA-256 recomputed from the staged repository candidate's 56,897 UTF-8 bytes is `28b213958dad8f264347b76192e6b685a61829d0b90778d6522a73301995163d`. **Comparison: exact match.** The repository Git blob SHA-1 (`12580cef4e2d9218cc019f8b78594b33bb03626b`) is a separate Git object identifier, not the source SHA-256.
+
+**Scope:** This resolves the operator-reported Windows-to-repository *file-content* hash comparison. The Windows file path and relationship to the earlier compiler sessions are not independently attested by the logs. The zero-warning compile evidence remains valid as reported; GPU correctness, rendered parity, temporal behavior and production clearance remain **OPEN**. Production gate remains **LOCKED**.
