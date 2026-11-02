@@ -93,4 +93,7 @@ def check_corrections(source,reference):
             errors.append('EXACT_ZERO_BYPASS_MISSING')
     except ValueError:
         errors.append('COMPOSITE_GAMUT_SECTION_MISSING')
+    # CT-008 source warning mitigation. This does not assert native warning-free compilation.
+    if 'pow(max(t, 0.0), _FA_GAMUT_P)' not in source:
+        errors.append('GAMUT_POW_DOMAIN_GUARD_MISSING')
     return errors

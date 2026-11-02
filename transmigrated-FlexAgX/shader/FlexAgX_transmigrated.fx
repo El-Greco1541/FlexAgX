@@ -1281,8 +1281,11 @@ float4 FlexAgX_OutputPS(float4 position : SV_Position, float2 texcoord : TEXCOOR
     float y = x;
     if (x > k)
     {
+        // CT-008: the branch mathematically guarantees t >= 0 for the UI
+        // bounds, but clamp the pow operand explicitly for HLSL analysis.
+        // This retains the exact expression for all legal positive t.
         float t = (x - k) / (1.0 - k);
-        y = k + (1.0 - k) * t / pow(1.0 + pow(t, _FA_GAMUT_P), 1.0 / _FA_GAMUT_P);
+        y = k + (1.0 - k) * t / pow(1.0 + pow(max(t, 0.0), _FA_GAMUT_P), 1.0 / _FA_GAMUT_P);
     }
     float Cp = y * Cmax;
     float3 outLinear = clamp(FA_LinearFromOklab(float3(L, Cp * ch, Cp * sh)), 0.0, 1.0);

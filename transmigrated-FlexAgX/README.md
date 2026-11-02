@@ -1,8 +1,8 @@
 # Transmigrated FlexAgX — correctness-first shader research
 
-**Current shader candidate: v0.6.0 · Native acceptance tooling: v0.7.0 · Production gate: LOCKED**
+**Current shader candidate: v0.8.0 (CT-008 domain guard) · Native acceptance tooling: v0.8.0 · Production gate: LOCKED**
 
-This is an independent, source-traceable research adaptation of [El-Greco1541/FlexAgX](https://github.com/El-Greco1541/FlexAgX), release 1.2, licensed under MIT. It preserves the upstream FX file unchanged in `reference/` and places all experimental edits in `shader/`. The original author has not endorsed this project. **No ReShade runtime, FX compiler or GPU acceptance has been established.**
+This is an independent, source-traceable research adaptation of [El-Greco1541/FlexAgX](https://github.com/El-Greco1541/FlexAgX), release 1.2, licensed under MIT. It preserves the upstream FX file unchanged in `reference/` and places all experimental edits in `shader/`. The original author has not endorsed this project. **Operator reports that v0.7 shader compiled in ReShade in 1.865 seconds with 20 warnings; executable source identity/backend not yet corroborated, v0.8 not yet compiled natively, and GPU rendering acceptance is pending.**
 
 The primary objective is correctness, modularity and explicit testing. Throughput and rendering speed are subordinate to source fidelity and verified behavior. The `correction_api/` service is a bounded mathematical probe, **not** an executable replacement for the shader or a production API server.
 
@@ -11,10 +11,10 @@ The primary objective is correctness, modularity and explicit testing. Throughpu
 | Aspect | Verified staging status |
 | --- | --- |
 | Original shader | Byte-identical to FlexAgX 1.2; SHA-256 `e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d` |
-| Corrected candidate | `shader/FlexAgX_transmigrated.fx`; SHA-256 `6603e5ecb42458ce55845021d56c653ed01806ecaead3a5be21c69b6152808ca` |
+| Corrected candidate | `shader/FlexAgX_transmigrated.fx`; SHA-256 `2700deed3c2ff76b439e2efa70d2c41f7b94cccd5efb4123afbd3623127960ec` |
 | Passes | Nine source passes: P0 histogram preclear plus the original eight in their existing order |
-| Latest evidence | 113/113 pytest tests, 16/16 harness self-tests and 125,545/125,545 cumulative checks across two v0.6.0 campaigns |
-| Execution scope | Source/static analysis, CPU mathematical oracles, simulated frames and local HTTP probes only |
+| Historical v0.6 evidence | 113/113 pytest tests, 16/16 harness self-tests and 125,545 cumulative checks in two earlier CPU/static campaigns; see v0.8 test report for fresh checks |
+| Execution scope | Local static/CPU checks; operator-provided native ReShade compile-with-warnings excerpt for earlier shader, pending source-hash/backend identification |
 | Deployment | None; research branch only, gate locked |
 
 The totals are **counted check executions**, not distinct tests. These results were obtained on the v0.6.0 shader candidate before this documentation-only synchronization; no new GPU evidence is claimed. See [verification](VERIFICATION_REPORT.md) and [evidence summaries](harness/evidence/).
@@ -28,6 +28,7 @@ The totals are **counted check executions**, not distinct tests. These results w
 | v0.4 · CT-004 | F23/F24 | Settle retained velocity within an inclusive deadband | Requires Operator behavioral approval and native visual tests |
 | v0.5 · CT-005 | F29 | Require at least two discrepant observations before scene-cut confirmation | Requires Operator behavioral approval and native frame-time tests |
 | v0.6 · CT-006 | F39 | Post-strength-blend gamut containment through bounded Oklab chroma search | CPU/source-verified; GPU color correctness and rendering unverified |
+| v0.8 · CT-008 | X3571/X4000 | Explicit nonnegative operand in gamut roll-off pow; privacy-safe compiler warning triage | Fresh ReShade compilation of v0.8 required; X4000 remains unresolved |
 | Policy hold | F36/F40 | Existing internal tracking at zero auto-exposure and exact 0%-strength encoded bypass preserved | Explicit Operator decision required before behavioral change |
 
 **Do not call the FX shader GPU-corrected or production-ready.** Earlier individual test totals are recorded in Git history and versioned reports; the v0.6.0 totals above are the current campaign reference. The original 43-finding audit does not imply all findings were addressed.
@@ -97,3 +98,15 @@ transmigrated-FlexAgX/
 Consult [canonical TODO](logs/TODO.md), [roadmap](logs/ROADMAP.md), and [repository synchronization record](docs/REPOSITORY_SYNC.md). The project repository is public: contributor and GitHub commit metadata are not anonymous. Do not commit session images, credentials, local SQLite stores, crash dumps or unredacted logs.
 
 **Production gate: LOCKED.** All work stays staged; no merge, deployment or shader-release approval is inferred.
+
+## CT-008: native warning follow-up (v0.8.0)
+
+The first operator-supplied ReShade log reports successful compilation **with warnings**: X4000 ×19 and X3571 ×1, in 1.865 seconds. Generated code addresses are not original FX source line numbers. The x3571 source candidate was guarded with an explicit `max(t, 0.0)` around its pow operand; legal UI-range outputs remain mathematically identical. **This is a staged mitigation, not yet a verified warning fix.** X4000 warnings concerning generated `F__FA_*` helper names require new compiler logs and generated shader inspection before corrective source edits.
+
+To summarize a new native compiler log without publishing local paths/pointers:
+
+```bash
+python -m native_acceptance.compiler_warnings --input compiler-local.log --output warning-summary.json
+```
+
+See [CT-008 warning triage](docs/CT008_NATIVE_WARNING_TRIAGE.md). Do not publish raw log paths, GPU captures, or driver metadata without review.

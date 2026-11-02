@@ -16,3 +16,6 @@
 | Production release | Requires explicit Operator clearance | **LOCKED** |
 
 Current open decisions are maintained in [PENDING_DECISIONS](../docs/PENDING_DECISIONS.md); actionable tests are tracked in [TODO](TODO.md). Keep historical source-diff patches and test evidence immutable.
+
+## CT-008 native warning triage
+Current research candidate v0.8.0: explicit gamut pow domain guard, hashed identity and warning summary tool. Next required action: matched-backend native recompilation and evidence collection. GPU parity and release remain blocked.

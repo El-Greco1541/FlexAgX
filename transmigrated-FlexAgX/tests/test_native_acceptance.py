@@ -46,7 +46,7 @@ def update_record(p, rec):
 def test_reference_pin():
     pins = core.source_identity()
     assert pins['original_sha256'] == core.UPSTREAM_PIN
-    assert pins['candidate_sha256'] == '6603e5ecb42458ce55845021d56c653ed01806ecaead3a5be21c69b6152808ca'
+    assert pins['candidate_sha256'] == '2700deed3c2ff76b439e2efa70d2c41f7b94cccd5efb4123afbd3623127960ec'
 
 
 def test_fixture_determinism(tmp_path):

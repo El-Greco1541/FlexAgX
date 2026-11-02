@@ -1,0 +1,32 @@
+{
+  "version": "0.8.0",
+  "stage": "STAGED",
+  "date": "2026-11-01",
+  "compiled_earlier_revision": "OPERATOR_REPORTED_WITH_WARNINGS",
+  "reported_native_compile_seconds": 1.865,
+  "warning_count": 20,
+  "warning_codes": {
+    "X4000": 19,
+    "X3571": 1
+  },
+  "shader_candidate_sha256": "2700deed3c2ff76b439e2efa70d2c41f7b94cccd5efb4123afbd3623127960ec",
+  "native_compile_new_revision": "NOT_EXECUTED",
+  "source_to_log_sha256_binding": "MISSING",
+  "native_gpu_certified": false,
+  "production_gate": "LOCKED",
+  "pytest": {
+    "passed": 151,
+    "failed": 0
+  },
+  "harness_selftest": {
+    "passed": 16,
+    "failed": 0
+  },
+  "fresh_cpu_static_harness": {
+    "seed": 20261101,
+    "frames": 350,
+    "passed": 61607,
+    "failed": 0
+  },
+  "note": "Operator excerpt summarized; generated backend line positions not original FX source locations."
+}

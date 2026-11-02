@@ -11,7 +11,7 @@ from .source_audit import check_corrections
 
 ROOT=Path(__file__).resolve().parents[1]
 REFERENCE_SHA='e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d'
-CANDIDATE_SHA='6603e5ecb42458ce55845021d56c653ed01806ecaead3a5be21c69b6152808ca'
+CANDIDATE_SHA='2700deed3c2ff76b439e2efa70d2c41f7b94cccd5efb4123afbd3623127960ec'
 
 def checked(data, phase, detail, cases):
     assert data, f'{phase}: {detail}'

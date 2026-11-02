@@ -24,3 +24,6 @@ v0.5 CT-005: Reproduced one-frame false scene-cut confirmation at 100..250ms in 
 ### CT-006 v0.6.0 — 2026-11-01
 
 CT-006 none in completed CPU harness campaigns; F40 intentional near-zero encoding discontinuity, F39 GPU/backend behavior not yet verified.
+
+## CT-008 native compiler report
+Operator supplied a compile-with-warnings excerpt: 19 X4000 warnings involving generated helper symbols and one X3571 pow warning; source-file positions are not confirmed because diagnostics reference generated shader buffers. The compiler succeeded, but source fingerprint and backend metadata were not captured in the excerpt. Mitigation is unverified pending a rerun.

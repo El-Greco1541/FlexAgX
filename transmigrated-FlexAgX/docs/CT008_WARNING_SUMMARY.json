@@ -1,0 +1,21 @@
+{
+  "source": "Operator-pasted compiler excerpt (reduced manually; no raw paths stored)",
+  "reported_compilation": "SUCCESS_WITH_WARNINGS",
+  "time_seconds": 1.865,
+  "diagnostics": {
+    "X4000": 19,
+    "X3571": 1
+  },
+  "generated_helper_mentions": {
+    "F__FA_Decode": 5,
+    "F__FA_Encode": 2,
+    "F__FA_ComposedCurve": 1,
+    "F__FA_Native": 4,
+    "F__FA_Dn": 5,
+    "F__FA_WhiteBalance": 1,
+    "F__FA_ConstrainGamutAfterMix": 1
+  },
+  "source_hash_anchored": false,
+  "backend_unknown": true,
+  "gpu_acceptance": false
+}

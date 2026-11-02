@@ -1,12 +1,12 @@
 {
   "project": "Transmigrated FlexAgX",
-  "version": "0.7.0",
-  "shader_candidate_version": "0.6.0",
-  "maintenance_revision": "CT-007 native acceptance tooling (shader source unchanged)",
-  "status": "STAGED_NATIVE_ACCEPTANCE_NOT_EXECUTED",
-  "file_count": 87,
+  "version": "0.8.0",
+  "shader_candidate_version": "0.8.0",
+  "maintenance_revision": "CT-008 compiler warning triage; source-stage domain guard",
+  "status": "STAGED / NATIVE_COMPILE_REPORTED_V07_WARNINGS / V08_NATIVE_RECOMPILATION_PENDING",
+  "file_count": 94,
   "original_sha256": "e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d",
-  "corrected_sha256": "6603e5ecb42458ce55845021d56c653ed01806ecaead3a5be21c69b6152808ca",
+  "corrected_sha256": "2700deed3c2ff76b439e2efa70d2c41f7b94cccd5efb4123afbd3623127960ec",
   "files": [
     {
       "path": ".gitignore",
@@ -20,8 +20,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "4b7666803d54be9bfc4fc7aea4347cf446c6bbfdd2baac215d09103a001200c4",
-      "bytes": 8247
+      "sha256": "1d673b51740820c307990b85e5f67e13912afcc3221ad2ec590432330d417f34",
+      "bytes": 9670
     },
     {
       "path": "VERIFICATION_NATIVE_V07.json",
@@ -32,6 +32,16 @@
       "path": "VERIFICATION_NATIVE_V07.md",
       "sha256": "43328f683a7fa7e614454f7dd5aa6ca10da8c90344c39b69c6ecf4d4232e1c58",
       "bytes": 1370
+    },
+    {
+      "path": "VERIFICATION_NATIVE_V08.json",
+      "sha256": "d2f6adaba8101c87de21fe161928fd85c6d94f6687fc446e028e297c06f559ac",
+      "bytes": 857
+    },
+    {
+      "path": "VERIFICATION_NATIVE_V08.md",
+      "sha256": "10c23992cab25828a5517280352e260b2b45d6545baf0ca26f5a9ae25fc970e0",
+      "bytes": 950
     },
     {
       "path": "VERIFICATION_REPORT.json",
@@ -75,8 +85,8 @@
     },
     {
       "path": "docs/CORRECTION_LEDGER.md",
-      "sha256": "b29e906bb977274bf81cf963a276acaced3d54f8e5e0079282c647d1e99af224",
-      "bytes": 6064
+      "sha256": "b30cfd98481a570957318a8e6c2329ccd7134d39b48d304f70c19a83f95d9094",
+      "bytes": 6810
     },
     {
       "path": "docs/CT004_DEADBAND_SETTLING.md",
@@ -112,6 +122,21 @@
       "path": "docs/CT007_NATIVE_ACCEPTANCE_STATUS.md",
       "sha256": "afbd95ddb9d7a67cb859ad0e822a333ed442d4a2e46d59a4f2a7a0bf825dca6d",
       "bytes": 1199
+    },
+    {
+      "path": "docs/CT008_NATIVE_WARNING_TRIAGE.md",
+      "sha256": "10184972789f72a214b1ecde2d955fa3ac2c1a273337b76f4e0afc96311a0a1f",
+      "bytes": 3205
+    },
+    {
+      "path": "docs/CT008_SOURCE_DIFF.patch",
+      "sha256": "003921aaa698804a090b4764bec24a942376f19a8a2f9691af0362b0a6114bee",
+      "bytes": 714
+    },
+    {
+      "path": "docs/CT008_WARNING_SUMMARY.json",
+      "sha256": "15de01f35312a28495191dce4ab1d9c20a6681e9464eeb84325600f71a4f1825",
+      "bytes": 533
     },
     {
       "path": "docs/DIFF_SCOPE.json",
@@ -315,12 +340,12 @@
     },
     {
       "path": "harness/source_audit.py",
-      "sha256": "eb75471e563256aadbcc60ffd876019bb4ae431f979abdc1bbe6a507de7a4357",
-      "bytes": 6294
+      "sha256": "e86e86b05e76f8a8d9ff310c8b207361ee89584c14bc360f1ddf95af0b4b315b",
+      "bytes": 6498
     },
     {
       "path": "harness/suites.py",
-      "sha256": "9b2f2ece06441315d40f8c1716957de4fcefa1234c1e926d9112843e6881f333",
+      "sha256": "29e6764853356c9ef6e027532a2852227d6fa87786290efff70211becf4b8358",
       "bytes": 22704
     },
     {
@@ -340,8 +365,8 @@
     },
     {
       "path": "logs/ERROR_LOG.md",
-      "sha256": "4c08ec39df927a6058071f0fcf78792d5a44a3133f3c16cff69b41e9795bab1a",
-      "bytes": 2096
+      "sha256": "13b402ceee91652a4d9a9803c395e489c747a6ac73b7674ab4789e8f35060c63",
+      "bytes": 2501
     },
     {
       "path": "logs/NOTES.md",
@@ -350,13 +375,13 @@
     },
     {
       "path": "logs/ROADMAP.md",
-      "sha256": "3b6a61548fa6757a0b0edb88158fea556c3406245697e3405cc45182ffcb2957",
-      "bytes": 1637
+      "sha256": "4162dbab531c642f10a2d56aa163700ae54ea1a13571bd7a68309a480364eeaa",
+      "bytes": 1903
     },
     {
       "path": "logs/TODO.md",
-      "sha256": "30184c0ad7c66576226c2e15c98a50a297cd2a13349bae72020962cd84733186",
-      "bytes": 2271
+      "sha256": "a3e4fdb92659e4aa2831c5fc76c9dcc4a812a1c0f96bf99327f0bd83fa77e9e2",
+      "bytes": 2771
     },
     {
       "path": "native_acceptance/__init__.py",
@@ -369,8 +394,13 @@
       "bytes": 1079
     },
     {
+      "path": "native_acceptance/compiler_warnings.py",
+      "sha256": "1968db7899365f79960873363bcec48302878ae2e49261c85d9273c609a65737",
+      "bytes": 2814
+    },
+    {
       "path": "native_acceptance/core.py",
-      "sha256": "53c5ebaa9a47200803546b70b2fa4f223d489ea68b2dd8d5ed8403a2d70fa43e",
+      "sha256": "a4797456e0cdf379c7b43d6440719410312aca3be3d7d6c351ae9150ec27b774",
       "bytes": 11921
     },
     {
@@ -390,8 +420,8 @@
     },
     {
       "path": "shader/FlexAgX_transmigrated.fx",
-      "sha256": "6603e5ecb42458ce55845021d56c653ed01806ecaead3a5be21c69b6152808ca",
-      "bytes": 56247
+      "sha256": "2700deed3c2ff76b439e2efa70d2c41f7b94cccd5efb4123afbd3623127960ec",
+      "bytes": 56477
     },
     {
       "path": "tests/conftest.py",
@@ -430,8 +460,13 @@
     },
     {
       "path": "tests/test_native_acceptance.py",
-      "sha256": "ecab125116b74227357834a0c7be3d84ff0092b0770e15bf707e898bb85ea0fe",
+      "sha256": "5e69d2215bb89c0129387d8fc12e84e658a16d4f5300d445646bcb2aa1a8f2f5",
       "bytes": 7008
+    },
+    {
+      "path": "tests/test_native_warnings.py",
+      "sha256": "94f128f15d9e7a36b51fe1ae84bb341c4427d468e9e3ca5845baa8e3cd0896a6",
+      "bytes": 4182
     },
     {
       "path": "tests/test_scene_cut.py",

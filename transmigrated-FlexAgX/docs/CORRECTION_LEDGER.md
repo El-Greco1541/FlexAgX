@@ -43,3 +43,10 @@ A disabled frame does not refresh the marker, so the next active frame is treate
 - **F40 intentionally not repaired:** exact 0% encoded passthrough remains the governing UI behavior; mismatch between input and output encoding at small positive strength is documented and regression-tested as a known discontinuity requiring Operator policy selection.
 - Candidate shader SHA-256: `6603e5ecb42458ce55845021d56c653ed01806ecaead3a5be21c69b6152808ca`. Original FX SHA-256 unchanged: `e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d`.
 - Evidence and alternative strategies: `docs/CT006_F39_GAMUT_AND_F40_ENCODING.md`; GPU compilation and visual certification remain open. Production gate locked.
+
+## CT-008 / ReShade X4000 and X3571 compiler feedback
+
+- Native ReShade *compiled with warnings* according to an operator-supplied excerpt (1.865 seconds). This does not pin the compiled FX hash, ReShade version, graphics backend or GPU output.
+- X4000 ×19 references generated helper identifiers; no uninitialized-code claim has been proven or dismissed. Avoid ungrounded edits.
+- X3571 ×1: explicit nonnegative `pow(max(t, 0.0), _FA_GAMUT_P)` is staged as a mathematically equivalent positive-domain safeguard for the legal UI branch. A rerun must establish whether this addresses the warning.
+- The nine-pass structure and prior F36/F40 policy holds are unchanged. See `docs/CT008_NATIVE_WARNING_TRIAGE.md`. Production gate remains locked.

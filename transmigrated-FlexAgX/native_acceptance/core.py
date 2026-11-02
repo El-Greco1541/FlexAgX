@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "shader" / "FlexAgX_transmigrated.fx"
 UPSTREAM = ROOT / "reference" / "FlexAgX_1.2.fx"
 UPSTREAM_PIN = "e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d"
-CANDIDATE_PIN = "6603e5ecb42458ce55845021d56c653ed01806ecaead3a5be21c69b6152808ca"
+CANDIDATE_PIN = "2700deed3c2ff76b439e2efa70d2c41f7b94cccd5efb4123afbd3623127960ec"
 MAX_JSON = 256 * 1024
 MAX_IMAGE = 30 * 1024 * 1024
 MAX_LOG = 4 * 1024 * 1024
@@ -53,7 +53,7 @@ def source_identity() -> dict:
     if original_hash != UPSTREAM_PIN or original_hash != manifest["original_sha256"]:
         raise ValueError("Original shader reference identity mismatch")
     if candidate_hash != CANDIDATE_PIN or candidate_hash != manifest["corrected_sha256"]:
-        raise ValueError("Candidate shader does not match the pinned v0.6 source")
+        raise ValueError("Candidate shader does not match the pinned v0.8 source")
     return {"original_sha256": original_hash, "candidate_sha256": candidate_hash}
 
 

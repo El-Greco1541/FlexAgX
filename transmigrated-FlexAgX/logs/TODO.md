@@ -30,3 +30,10 @@ This list is the **current** status for the v0.6.0 FX candidate. Completed work 
 - [ ] Obtain explicit Operator release authorization before any merge or deployment.
 
 **Status: STAGED. Production gate LOCKED.**
+
+## CT-008 native compile feedback
+- [x] Classify X4000/X3571 with source and generated-code provenance boundaries.
+- [x] Stage candidate nonnegative gamut pow operand with CPU equivalence tests.
+- [ ] Recompile the v0.8.0 shader on the same ReShade/backend and record shader SHA-256, version, API, GPU and full warning diagnostics.
+- [ ] Resolve generated `F__...` helper warnings only after locating backend code paths.
+- [ ] Confirm first-frame/reload and color fixtures with native GPU captures.
