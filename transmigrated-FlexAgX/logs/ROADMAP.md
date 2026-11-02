@@ -10,7 +10,8 @@
 | v0.4 adaptation deadband | CT-004 velocity settle to rest | Candidate; Operator policy acceptance open |
 | v0.5 scene-cut confirmation | CT-005 two observations | Candidate; Operator policy acceptance open |
 | v0.6 gamut correction | CT-006 post-blend gamut and F40 policy hold | Candidate; CPU/static tested |
-| Next acceptance phase | ReShade FX compiler, GPU frame/reload and color fixtures | **Not started in this environment** |
+| v0.7 native acceptance kit | Pinned SDR fixtures, toolchain probe, fail-closed log/screenshot evidence verifier | Local preparation tested; no GPU execution |
+| Native target acceptance | Actual ReShade FX compiler, GPU frame/reload and color fixtures | **Blocked pending target runtime and Operator review** |
 | Future expansion | Pass-level ports, API glue, color-space contracts | Deferred pending correctness acceptance |
 | Production release | Requires explicit Operator clearance | **LOCKED** |
 

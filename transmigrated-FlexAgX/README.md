@@ -1,6 +1,6 @@
 # Transmigrated FlexAgX — correctness-first shader research
 
-**Current shader candidate: v0.6.0 · Stage: correction before expansion · Production gate: LOCKED**
+**Current shader candidate: v0.6.0 · Native acceptance tooling: v0.7.0 · Production gate: LOCKED**
 
 This is an independent, source-traceable research adaptation of [El-Greco1541/FlexAgX](https://github.com/El-Greco1541/FlexAgX), release 1.2, licensed under MIT. It preserves the upstream FX file unchanged in `reference/` and places all experimental edits in `shader/`. The original author has not endorsed this project. **No ReShade runtime, FX compiler or GPU acceptance has been established.**
 
@@ -56,6 +56,18 @@ python -m uvicorn correction_api.api:app --host 127.0.0.1 --port 8081
 
 The probe supports `GET /health`, `GET /v1/capabilities`, `POST /v1/correction/hue`, and `POST /v1/correction/histogram`. Its contracts reject malformed wire values with typed results and do not ingest a live ReShade framebuffer. The independent `cpu-server/` directory contains the fuller CPU image API and its separate transaction journal; `code-transmigration/` contains modular orchestration research. Neither is replaced by this shader candidate.
 
+## CT-007: native acceptance preparation (v0.7.0)
+
+The candidate `.fx` source remains **byte-identical to v0.6.0**. The new [Native Acceptance Protocol](docs/NATIVE_ACCEPTANCE.md) provides deterministic SDR test images, a local ReShade/GPU capture plan, compiler-log provenance requirements, a strict evidence validator and adversarial validator tests. Run:
+
+```bash
+python -m native_acceptance probe
+python -m native_acceptance prepare --output ../native-run-local
+python -m native_acceptance verify --bundle ../native-run-local
+```
+
+The first two commands prepare a plan and inspect tool discovery; **the final command must fail on an unfilled template**. A completed, hash-consistent record can be marked **evidence ready for independent review**, never automatically GPU-certified. **No ReShade FX compiler or GPU backend has been executed in this development environment**. Keep real diagnostic logs, captures, hardware metadata and other local test artifacts out of GitHub.
+
 ## Repository map
 
 ```text
@@ -64,6 +76,7 @@ transmigrated-FlexAgX/
 ├── shader/FlexAgX_transmigrated.fx  Staged corrected FX candidate
 ├── correction_api/                  Pure probe modules and API glue
 ├── harness/                         Oracles, bounded runner, archived summaries
+├── native_acceptance/               Native fixtures, probe and evidence validator
 ├── tests/                           Source and API regression tests
 ├── docs/                            Correction contracts, ledger, source diffs and sync status
 ├── logs/                            Current TODO, roadmap and historical notes

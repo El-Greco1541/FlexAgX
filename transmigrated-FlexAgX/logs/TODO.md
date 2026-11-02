@@ -14,6 +14,8 @@ This list is the **current** status for the v0.6.0 FX candidate. Completed work 
 - [x] Execute v0.6.0 regression tests, harness self-tests and two recorded synthetic campaigns.
 - [x] Synchronize current README, roadmap, inventory hashes and repository branch/PR record without changing FX or code.
 
+- [x] Build CT-007 native-acceptance capture plan, source-pinned fixtures, integrity verifier and negative-test suite; no GPU claim.
+
 ## Open: correctness acceptance
 
 - [ ] Obtain explicit Operator acceptance of CT-004, CT-005 and CT-006 behavioral policies.

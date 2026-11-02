@@ -1,16 +1,17 @@
 {
-  "project": "transmigrated-FlexAgX",
-  "version": "0.6.0",
-  "maintenance_revision": "documentation-sync-2026-11-01",
-  "status": "STAGED_NOT_GPU_CERTIFIED",
-  "file_count": 79,
+  "project": "Transmigrated FlexAgX",
+  "version": "0.7.0",
+  "shader_candidate_version": "0.6.0",
+  "maintenance_revision": "CT-007 native acceptance tooling (shader source unchanged)",
+  "status": "STAGED_NATIVE_ACCEPTANCE_NOT_EXECUTED",
+  "file_count": 87,
   "original_sha256": "e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d",
   "corrected_sha256": "6603e5ecb42458ce55845021d56c653ed01806ecaead3a5be21c69b6152808ca",
   "files": [
     {
       "path": ".gitignore",
-      "sha256": "97ce3b544c0b386c14269c3e31df8c1102f3428d85ca7d849af3b9ffca1503e8",
-      "bytes": 285
+      "sha256": "eb776cbad64908b924a2e924b38530108ea98abdbdca93e96b7b5a9bd5048a65",
+      "bytes": 475
     },
     {
       "path": "LICENSE",
@@ -19,8 +20,18 @@
     },
     {
       "path": "README.md",
-      "sha256": "93957e8a1420a45dbe65e680cfaef886b05732251b1eba9c45bc8651d5615940",
-      "bytes": 7178
+      "sha256": "4b7666803d54be9bfc4fc7aea4347cf446c6bbfdd2baac215d09103a001200c4",
+      "bytes": 8247
+    },
+    {
+      "path": "VERIFICATION_NATIVE_V07.json",
+      "sha256": "fcc7d68caf20247ee58f9ea2f0b689c669757b9590b53668d29a4481e4b54afc",
+      "bytes": 3016
+    },
+    {
+      "path": "VERIFICATION_NATIVE_V07.md",
+      "sha256": "43328f683a7fa7e614454f7dd5aa6ca10da8c90344c39b69c6ecf4d4232e1c58",
+      "bytes": 1370
     },
     {
       "path": "VERIFICATION_REPORT.json",
@@ -98,6 +109,11 @@
       "bytes": 3096
     },
     {
+      "path": "docs/CT007_NATIVE_ACCEPTANCE_STATUS.md",
+      "sha256": "afbd95ddb9d7a67cb859ad0e822a333ed442d4a2e46d59a4f2a7a0bf825dca6d",
+      "bytes": 1199
+    },
+    {
       "path": "docs/DIFF_SCOPE.json",
       "sha256": "814547e5f9648309aeeda64a63e7e08395192d514860bb5c16f089440878e2eb",
       "bytes": 1275
@@ -106,6 +122,11 @@
       "path": "docs/EFFECT_HARNESS.md",
       "sha256": "cbb3412c10aad04f78d44bf129c492a850bbd0503ff63103b9c7c0986c18ea6b",
       "bytes": 3410
+    },
+    {
+      "path": "docs/NATIVE_ACCEPTANCE.md",
+      "sha256": "2f5697e38856cdf3ad019b5db2e349e0d938e1e24ad16e60f5e1319f5a6a70dd",
+      "bytes": 7761
     },
     {
       "path": "docs/PENDING_DECISIONS.md",
@@ -329,13 +350,28 @@
     },
     {
       "path": "logs/ROADMAP.md",
-      "sha256": "813065f068ba66426c926f062c0d5d45485d41119ab031f2409f1a33e1da2a26",
-      "bytes": 1447
+      "sha256": "3b6a61548fa6757a0b0edb88158fea556c3406245697e3405cc45182ffcb2957",
+      "bytes": 1637
     },
     {
       "path": "logs/TODO.md",
-      "sha256": "bb9b113fec81686d68e1f806c822b28c1d9e2aea842aa8edc2783dcd7e0d7976",
-      "bytes": 2137
+      "sha256": "30184c0ad7c66576226c2e15c98a50a297cd2a13349bae72020962cd84733186",
+      "bytes": 2271
+    },
+    {
+      "path": "native_acceptance/__init__.py",
+      "sha256": "7abfcd9078dcf599927e18296a7fcb1c9af91e2ff4f4ee8fadc0bd85d2b8e027",
+      "bytes": 79
+    },
+    {
+      "path": "native_acceptance/__main__.py",
+      "sha256": "6119b2979adde71832305ba2137c70e71dc9d9ba688a954403270957a130c39f",
+      "bytes": 1079
+    },
+    {
+      "path": "native_acceptance/core.py",
+      "sha256": "53c5ebaa9a47200803546b70b2fa4f223d489ea68b2dd8d5ed8403a2d70fa43e",
+      "bytes": 11921
     },
     {
       "path": "reference/FlexAgX_1.2.fx",
@@ -344,8 +380,8 @@
     },
     {
       "path": "requirements-dev.txt",
-      "sha256": "5e98f80c0b85b8f3b0f71315e39ccfca99589b3d587a2bb49a2f24e9094cf82b",
-      "bytes": 49
+      "sha256": "530f31559a3386eeb23bbed8804df38939f22f8ea3276bc4acb6d3edc397a489",
+      "bytes": 64
     },
     {
       "path": "requirements.txt",
@@ -391,6 +427,11 @@
       "path": "tests/test_harness.py",
       "sha256": "1b089c427410fe2192f0be4ee8f8eb70a6e79a2d47975d8f78178392f383a7ad",
       "bytes": 942
+    },
+    {
+      "path": "tests/test_native_acceptance.py",
+      "sha256": "ecab125116b74227357834a0c7be3d84ff0092b0770e15bf707e898bb85ea0fe",
+      "bytes": 7008
     },
     {
       "path": "tests/test_scene_cut.py",

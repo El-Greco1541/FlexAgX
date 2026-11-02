@@ -1,0 +1,126 @@
+{
+  "corrected_sha256": "6603e5ecb42458ce55845021d56c653ed01806ecaead3a5be21c69b6152808ca",
+  "cpu_static_campaign": {
+    "checks": 61607,
+    "failed": 0,
+    "frames": 350,
+    "passed": 61607,
+    "phases": [
+      {
+        "checks": 9288,
+        "failed": 0,
+        "phase": "gamut",
+        "status": "PASS"
+      },
+      {
+        "checks": 25715,
+        "failed": 0,
+        "phase": "scene_cut",
+        "status": "PASS"
+      },
+      {
+        "checks": 7602,
+        "failed": 0,
+        "phase": "adaptation",
+        "status": "PASS"
+      },
+      {
+        "checks": 8111,
+        "failed": 0,
+        "phase": "temporal",
+        "status": "PASS"
+      },
+      {
+        "checks": 20,
+        "failed": 0,
+        "phase": "source",
+        "status": "PASS"
+      },
+      {
+        "checks": 3987,
+        "failed": 0,
+        "phase": "hue",
+        "status": "PASS"
+      },
+      {
+        "checks": 2520,
+        "failed": 0,
+        "phase": "histogram",
+        "status": "PASS"
+      },
+      {
+        "checks": 1181,
+        "failed": 0,
+        "phase": "interface",
+        "status": "PASS"
+      },
+      {
+        "checks": 2550,
+        "failed": 0,
+        "phase": "metamorphic",
+        "status": "PASS"
+      },
+      {
+        "checks": 360,
+        "failed": 0,
+        "phase": "torture",
+        "status": "PASS"
+      },
+      {
+        "checks": 273,
+        "failed": 0,
+        "phase": "live_http",
+        "status": "PASS"
+      }
+    ],
+    "scope": "NOT_GPU_OR_FX_COMPILER",
+    "seed": 20261101
+  },
+  "evidence_provenance": "Fresh local test runs in this environment; historical v0.6 125545 checks are unchanged and not counted as new native evidence.",
+  "gpu_render": "NOT_EXECUTED",
+  "harness_selftest": {
+    "failed": 0,
+    "passed": 16,
+    "total": 16
+  },
+  "kit_version": "0.7.0",
+  "native_fx_compile": "NOT_EXECUTED",
+  "native_probe": {
+    "compilers": {
+      "generic_compilers_not_sufficient": true,
+      "reshade_fx_tool_discovered": false
+    },
+    "executables_detected": {
+      "ReShade": false,
+      "dxc": false,
+      "glslangValidator": false,
+      "nvidia-smi": false,
+      "reshadefx": false,
+      "vulkaninfo": false
+    },
+    "fx_compilation": "NOT_EXECUTED",
+    "gpu_device": "UNVERIFIED",
+    "gpu_render": "NOT_EXECUTED",
+    "operator_review": "REQUIRED",
+    "platform": "Linux",
+    "runtime_indicators": {
+      "nvidia_smi": false,
+      "vulkaninfo": false
+    },
+    "status": "NATIVE_VALIDATION_NOT_EXECUTED"
+  },
+  "operator_attestation": "NOT_AVAILABLE",
+  "original_sha256": "e744bdb7c410039f6835485c023f242ea399de14b09b3fd13657c02166d06e4d",
+  "production_gate": "LOCKED",
+  "project": "FlexAgX corrected shader native acceptance",
+  "pytest": {
+    "failed": 0,
+    "new_native_verifier_cases": 22,
+    "passed": 135,
+    "total": 135
+  },
+  "release_clearance": false,
+  "shader_candidate_version": "0.6.0",
+  "shader_modified": false,
+  "status": "PREPARED_AND_LOCALLY_TESTED_NATIVE_GPU_NOT_EXECUTED"
+}

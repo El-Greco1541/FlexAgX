@@ -15,3 +15,12 @@ results_tmp/
 harness/results/
 harness/tmp/
 harness/correction_results/
+
+# Native collection bundles can include private GPU/host metadata
+native-run*/
+native-evidence*/
+/captures/
+capture_record.json
+
+# Local attestation and capture scratch
+native_collection*/
