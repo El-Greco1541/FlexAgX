@@ -7,7 +7,7 @@
   "log_sha256": "af5b4a293c507bb54e220d7c89e4a24994bec5ee2c72cf43e3ed8652ce70e5d8",
   "raw_log_publicly_committed": false,
   "shader_filename": "FlexAgX_transmigrated_CT009_X4000_candidate.fx",
-  "shader_sha256_on_windows": null,
+  "shader_sha256_on_windows": "28b213958dad8f264347b76192e6b685a61829d0b90778d6522a73301995163d",
   "compiler_entries": [
     {
       "timestamp": "20:54:34.416",
@@ -54,12 +54,20 @@
   "previous_log_toolchain": "ReShade 6.7.3.2150, D3D12; sourced to previous session log only",
   "confirmed": "No FlexAgX shader diagnostics in this excerpt, one substantial compilation with INFO-only status",
   "unverified": [
-    "candidate_sha256_on_windows",
     "rendering_visual_parity",
     "first_frame_and_reload",
     "temporal_state_and_sync",
     "other_backends",
-    "production"
+    "production",
+    "independent_compiled_file_path_attestation"
   ],
-  "production_gate": "LOCKED"
+  "production_gate": "LOCKED",
+  "source_identity_check": {
+    "repository_candidate_sha256": "28b213958dad8f264347b76192e6b685a61829d0b90778d6522a73301995163d",
+    "operator_reported_windows_sha256": "28b213958dad8f264347b76192e6b685a61829d0b90778d6522a73301995163d",
+    "comparison": "MATCH",
+    "candidate_file_bytes": 56897,
+    "source": "SHA-256 computed over fetched candidate UTF-8 text and compared with operator-provided Windows hash",
+    "limitation": "Repeat excerpt does not include a Windows path or its digest; linkage is operator-attested only."
+  }
 }
