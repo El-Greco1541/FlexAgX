@@ -21,7 +21,7 @@ The staged experimental candidate is preserved at
 `shader/FlexAgX_transmigrated_CT009_X4000_candidate.fx`, Git blob
 `12580cef4e2d9218cc019f8b78594b33bb03626b` (blob object SHA, **not** a Windows source SHA-256).
 
-The uploaded session log records only the *filename*; it does **not** independently contain the shader's on-machine SHA-256. Therefore the local compiled FX bytes have not been cryptographically bound to the staged Git blob. Record the file's SHA-256 on the Windows host before closing the provenance requirement.
+The log itself records only the *filename*, not the on-machine SHA-256. A subsequent operator-supplied Windows SHA-256 matches the repository candidate byte-for-byte (see source-identity synchronization below). This matching file digest does not independently attest the Windows path or the compile-session-to-file relationship.
 
 ## What has and has not been verified
 
@@ -29,13 +29,19 @@ The uploaded session log records only the *filename*; it does **not** independen
 - **Observed PASS:** D3D12 device creation; ReShade 6.7.3.2150 runtime identification.
 - **Previous source isolation:** exactly seven helper bodies differ from the CT-008 shader; CT-008 pow guard and shader pass structure preserved.
 - **Not certified:** rendered pixel parity, colorimetry, first-frame state, resource synchronization, stability, other graphics APIs, performance, or production.
-- **Not verified by this log:** binary/file identity on the Windows host; independently reproduced GPU tests.
+- **Not verified by this log:** independent Windows file-path/compile-session attestation or GPU tests. The operator-reported Windows file SHA-256 now matches the repository candidate.
 
 ## Next acceptance steps
 
-1. Record SHA-256 of the actual Windows-side CT-009 shader and compare it against the candidate bytes from this branch.
+1. **Completed as operator-reported:** Windows-side SHA-256 matches repository candidate. Independently verify Windows path and compile-to-file association if required.
 2. Capture the same settled scene with CT-008 and CT-009, with matching effect settings, including a neutral gray, saturated gamut stress frame, zero-strength bypass, first-frame/reload sequence, and scene cut.
 3. Keep raw logs and private captures outside the public repository. Store a reviewed, redacted summary only.
 4. Leave the original upstream shader, CT-008 baseline and production branch unchanged until Operator approval.
 
 **Native compiler warning criterion for this one configuration: met. GPU and production acceptance: open.**
+
+## Source identity synchronization — November 1, 2026
+
+The Operator supplied Windows SHA-256 `28B213958DAD8F264347B76192E6B685A61829D0B90778D6522A73301995163D` for the CT-009 candidate. SHA-256 recomputed from the staged repository candidate's 56,897 UTF-8 bytes is `28b213958dad8f264347b76192e6b685a61829d0b90778d6522a73301995163d`. **Comparison: exact match.** The repository Git blob SHA-1 (`12580cef4e2d9218cc019f8b78594b33bb03626b`) is a separate Git object identifier, not the source SHA-256.
+
+**Scope:** This resolves the operator-reported Windows-to-repository *file-content* hash comparison. The Windows file path and relationship to the earlier compiler sessions are not independently attested by the logs. The zero-warning compile evidence remains valid as reported; GPU correctness, rendered parity, temporal behavior and production clearance remain **OPEN**. Production gate remains **LOCKED**.
