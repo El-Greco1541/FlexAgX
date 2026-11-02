@@ -4,8 +4,8 @@
   "stage": "CT-009",
   "candidate": "FlexAgX_transmigrated_CT009_X4000_candidate.fx",
   "staged_git_blob_sha": "12580cef4e2d9218cc019f8b78594b33bb03626b",
-  "windows_shader_sha256": null,
-  "windows_shader_hash_binding": "PENDING",
+  "windows_shader_sha256": "28b213958dad8f264347b76192e6b685a61829d0b90778d6522a73301995163d",
+  "windows_shader_hash_binding": "OPERATOR_REPORTED_SHA256_MATCHES_REPOSITORY_CANDIDATE",
   "reshade_version": "6.7.3.2150",
   "runtime_backend": "D3D12",
   "full_compile_seconds": 1.774,
@@ -27,5 +27,14 @@
   "raw_log_committed": false,
   "native_gpu_rendering_certified": false,
   "production_gate": "LOCKED",
-  "note": "Parsed from operator-supplied log; shader path, addresses and hardware identity omitted from published evidence."
+  "note": "Parsed from operator-supplied log; shader path, addresses and hardware identity omitted from published evidence.",
+  "source_identity_check": {
+    "repository_candidate_sha256": "28b213958dad8f264347b76192e6b685a61829d0b90778d6522a73301995163d",
+    "operator_reported_windows_sha256": "28b213958dad8f264347b76192e6b685a61829d0b90778d6522a73301995163d",
+    "comparison": "MATCH",
+    "candidate_file_bytes": 56897,
+    "staged_git_blob_sha": "12580cef4e2d9218cc019f8b78594b33bb03626b",
+    "source": "SHA-256 computed over fetched candidate UTF-8 text and compared with operator-provided Windows hash",
+    "limitation": "Source digest is reported by operator; exact Windows path and association with compilation sessions are not independently attested."
+  }
 }
