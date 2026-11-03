@@ -72,7 +72,7 @@ FlexAgX fundamentally changes how light and color interact on screen:
 | :--- | :--- |
 | **ReShade Version** | `5.9.0` or higher *(requires storage image reads)* |
 | **Graphics API** | DirectX 11, DirectX 12, Vulkan, or OpenGL 4.3+ |
-| **Bit Depth** | Supports 8-bit, 10-bit, and 16-bit color output |
+| **Bit Depth** | Supports 8-bit and 10-bit color output |
 
 > **Note:** DirectX 9, DirectX 10, and OpenGL versions below 4.3 are **not supported**.
 
@@ -93,16 +93,22 @@ FlexAgX fundamentally changes how light and color interact on screen:
 
 FlexAgX features intuitive parameters organized by functional category:
 
-| Section | Parameter | Default | Description |
-| :--- | :--- | :--- | :--- |
-| **Main** | `Overall Strength` | `100.0%` | Global effect intensity (0% provides bit-exact bypass). |
-| | `Debug View` | `Off` | Toggle between *Off*, *Clipping Warning*, and *Exposure Gain*. |
-| **Brightness** | `Auto Exposure Strength` | `30.0%` | Percentage of automatic brightness adaptation applied. |
-| | `Exposure Offset` | `0.0 EV` | Manual camera exposure compensation dial. |
-| **Highlights/Shadows**| `Shadow Preservation` | `50.0%` | Lifts deep shadows away from flat black. |
-| **Color** | `Hue Restoration` | `100.0%` | Fixes color drift in ultra-bright highlight regions. |
-| | `Color Temperature` | `6500 K` | White balance adjustment (2000 K to 12000 K). |
-| **Detail** | `Local Detail` | `20.0` | Guided micro-contrast recovery to preserve fine surface detail. |
+| Section | Parameter | Description |
+| :--- | :--- | :--- |
+| **Main** | Game Colour Curve | Selects the brightness curve used by the game engine (`sRGB` or `Gamma 2.2`). Most modern games use sRGB. |
+| **Main** | Monitor Colour Curve | Selects the brightness curve expected by your display (`sRGB` or `Gamma 2.2`). Keep on `sRGB` unless using a custom calibrated display. |
+| **Main** | Strength | Controls the overall blend percentage of the FlexAgX effect (0% to 100%). At 0%, the shader is fully bypassed. |
+| **Main** | Dithering | Enables faint triangular-PDF noise injection to prevent colour banding across smooth gradients. Adjusts automatically for 8-bit or 10-bit bit depths. |
+| **Brightness** | Brightness | Sets exposure offset in Exposure Value steps (-2.0 EV to +2.0 EV). Adjusts scene lighting linearly while preserving highlights. |
+| **Brightness** | Auto Brightness | Controls the adaptation strength of dynamic scene exposure (0% to 100%). Automatically scales down when large screen regions reach pure white. |
+| **Brightness** | Hold Brightness | Freezes the dynamic auto-exposure and highlight knee adaptation at their current values while allowing manual brightness adjustments. |
+| **Highlights and Shadows** | Auto Highlights | Enables automatic calculation of the highlight roll-off knee based on real-time scene analysis. |
+| **Highlights and Shadows** | Highlight Start | Sets the manual linear threshold (0.40 to 0.55) where highlights begin rolling off toward white. Only active when *Auto Highlights* is disabled. |
+| **Highlights and Shadows** | Shadow Detail | Adjusts shadow preservation (0% to 100%). Elevates deep darks to prevent crushed shadows while maintaining AgX tone characteristics. |
+| **Colour** | Hue Stability | Controls hue restoration strength (0% to 100%) in Oklab colour space to prevent tone-curve hue shifting across both vivid and pastel tones. |
+| **Colour** | Vivid Colour Softening | Defines the threshold (0.60 to 0.95) where highly saturated colors begin soft-clipping into the display gamut. |
+| **Colour** | Colour Temperature | Sets image white balance in Kelvin (2000 K to 12000 K). Neutral reference is 6500 K; lower values warm the image, higher values cool it. |
+| **Detail** | Detail | Controls guided-filter local contrast restoration (0% to 50%) to recover fine edge definition flattened by tone mapping, featuring an adaptive noise gate. |
 
 ---
 
