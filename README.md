@@ -10,7 +10,7 @@
 
 ## Overview ✨
 
-**FlexAgX** is an advanced image-reconstruction and tone-mapping shader built for ReShade 5.9.0+. Inspired by filmic color science and modern camera pipelines, FlexAgX brings an **HDR-like look** to standard dynamic range (SDR) SDR displays—rescuing blown-out highlights, preserving rich shadow detail, and eliminating harsh color clipping without introducing unnatural haloing or flat contrast.
+**FlexAgX** is an advanced image-reconstruction and tone-mapping shader built for ReShade 5.9.0+. Inspired by filmic color science and modern camera pipelines, FlexAgX brings an **HDR-like look** to standard dynamic range (SDR) displays—rescuing blown-out highlights, preserving rich shadow detail, and eliminating harsh color clipping without introducing unnatural haloing or flat contrast.
 
 Unlike traditional tone mappers that shift tints or clip vivid colors into harsh digital bands, FlexAgX operates in perceptually uniform **Oklab LMS color space**. The result is smooth, organic highlight roll-offs, true-to-life hue retention, and a distinct filmic depth.
 
