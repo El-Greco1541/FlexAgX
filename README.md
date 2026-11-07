@@ -38,7 +38,7 @@
 
 * **Von Kries White Balance**
 
-  Adjust scene white point seamlessly from $2000\,\text{K}$ to $12000\,\text{K}$ using a high-precision cubic fit of the Planckian locus.
+  Adjust scene white point seamlessly from 2000K to 12000K using a high-precision cubic fit of the Planckian locus.
 
 * **Sub-Sampled Dithering**
 
