@@ -13,9 +13,6 @@
 
 [Key Features](#-key-features) • [Visual Experience](#%EF%B8%8F-visual-experience) • [Installation](#-installation) • [Configuration](#%EF%B8%8F-configuration) • [Acknowledgements](#-acknowledgements)
 
-<img width="1774" height="887" alt="Logo" src="https://github.com/user-attachments/assets/a719c7ff-77d1-4443-80b6-8a5c8901c2c1" />
-
-
 </div>
 
 ## 🌟 Overview
