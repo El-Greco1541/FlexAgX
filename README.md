@@ -2,58 +2,58 @@
 
 # FlexAgX
 
-### Adaptive tone mapping and colour restoration for ReShade
+### Adaptive AgX Tone Mapping for ReShade
 
-![ReShade](https://img.shields.io/badge/ReShade-5.9.0%2B-0A84FF?style=flat-square)
-![Version](https://img.shields.io/badge/version-1.7.1-30D158?style=flat-square)
-![License](https://img.shields.io/badge/license-MIT-8E8E93?style=flat-square)
+*Crafted for pure visual clarity. Film-grade AgX color science meets real-time gaming.*
+
+[Key Features](#-key-features) • [Visual Experience](#%EF%B8%8F-visual-experience) • [Installation](#-installation) • [Configuration](#%EF%B8%8F-configuration) • [Acknowledgements](#-acknowledgements)
+
+<img width="1774" height="887" alt="Logo" src="https://github.com/user-attachments/assets/a719c7ff-77d1-4443-80b6-8a5c8901c2c1" />
+
+
 </div>
 
----
+## 🌟 Overview
 
-## ✨ Overview
+**FlexAgX** brings the advanced filmic color science of Troy Sobotka’s **AgX** tone-mapping pipeline to real-time rendering. By intelligently reshaping brightness and color through custom sigmoid curves and inset color spaces, FlexAgX replaces harsh, digital clipping with organic light roll-off. Inspired by professional motion-picture workflows and modern perceptual color spaces, it dynamically adapts to every frame—preventing highlight blowouts, recovering shadow detail, and compressing vivid colors without hue distortion.
 
-FlexAgX gives your games a more natural, filmic response to light. Instead of harsh highlights that clip to flat white, bright areas roll off smoothly into the range your display can show, while shadows keep their detail and colours stay true to their original hue.
+## ✨ Key Features
 
-Every frame, FlexAgX studies the brightness distribution of the scene, tracks a smoothed exposure level over time, and builds a custom tone curve to match. The result adapts naturally as you move between dark caves and bright outdoor scenes, without the sudden jumps that plague simpler post-processing filters.
+* **AgX-Derived Filmic Tone Curve**
 
----
+  Utilizes specialized sigmoid response curves mapped on a log luminance axis to simulate organic film emulsion response, ensuring bright highlights roll off gracefully rather than hard-clipping.
 
-## 🌟 Key Features
+* **Oklab Perceptual Gamut Mapping**
 
-### 🎞️ HDR-like Image
-- Highlights are softly compressed rather than clipped, delivering the depth and dynamic range associated with HDR presentation on standard displays.
+  Leveraging Björn Ottosson’s Oklab color space, vivid and over-saturated colors soft-roll into your monitor's display gamut using analytical Halley & Newton boundary solvers, preventing unnatural hue shifts.
 
-### 🧠 Adaptive Exposure
-- A centre-weighted histogram drives automatic brightness that tracks the scene, with built-in scene-cut detection for sudden changes like cutscenes or loading transitions.
+* **Highlight Shoulder & Shadow Detail**
 
-### 🌑 Shadow Detail Preservation
-- Dark regions retain texture and depth instead of collapsing into black.
+  A dynamic Hermite curve seamlessly blends low-end shadows with high-end highlights, protecting dark areas from crushing to flat black while maintaining pristine contrast.
 
-### 🎨 Hue Stability
-- Colours hold their character through the tone curve, and neutral greys stay neutral.
+* **Von Kries White Balance**
 
-### 🌈 Vivid Colour Softening
-- Intensely saturated colours are gently brought into the displayable gamut, avoiding harsh, cut-off hues.
+  Adjust scene white point seamlessly from $2000\,\text{K}$ to $12000\,\text{K}$ using a high-precision cubic fit of the Planckian locus.
 
-### 🌡️ Colour Temperature Control
-- Warm or cool the image with a white-balance adjustment anchored to a 6500 K neutral point.
+* **Sub-Sampled Dithering**
 
-### 🔲 Dithering
-- Triangular, interleaved-gradient-noise dithering reduces banding in smooth gradients.
+  Supports 8-bit, 10-bit, and FP16 buffer targets using Interleaved Gradient Noise (IGN), tapered dynamically at extreme luminance points to prevent gradient banding.
 
-### 🛡️ Safe on HDR Displays
-- When an HDR colour space is detected, FlexAgX steps aside and passes the image through untouched.
+* **Zero-Fail Architecture**
 
----
+  Every dynamic lookup table (LUT) passes through a multi-point validation suite every frame. If an illegal slope or monotonicity breakdown is detected, FlexAgX gracefully degrades through tiered fallbacks to ensure uncompromised stability.
 
-## 👁️ The Visual Difference
+## 👁️ Visual Experience
 
-Without FlexAgX, bright skies and sunlit surfaces often flatten into pale, featureless patches, while deep shadows sink into murky black. Saturated colours can look electric and oversharpened at their peaks, and a sudden change in brightness can make the image feel jarring.
+Once enabled, FlexAgX instantly transforms your game's presentation, delivering a striking, **HDR-like image** even on standard SDR displays:
 
-With FlexAgX enabled, the same scene breathes. Skies keep their gradients and cloud detail. Sunlit stone retains its texture rather than washing out. Shadowed corners reveal the shapes hiding within them. Vivid reds and blues remain rich but no longer glow beyond what the screen can honestly reproduce. Exposure settles gradually as you move through a scene, so the image feels consistent rather than reactive.
+* **Graceful Highlight Roll-Off:** Blinding light sources, explosions, and sunny skies transition smoothly into white instead of clipping into harsh, flat plateaus.
 
-The overall impression is of a picture that has been carefully graded for the room you are playing in: fuller, calmer, and more cinematic, without looking over-processed.
+* **Preserved Shadow Detail:** Deep, murky shadows open up to reveal environmental textures and subtle details without looking washed out or crushed.
+
+* **Controlled Color Vibrancy:** Highly saturated colors are reined in organically to fit within your display's color gamut, ensuring rich reds, blues, and neon lights remain vibrant and distinct without blowing out into incorrect hues.
+
+* **Cinematic Cohesion:** The interplay of auto-exposure, white balance, and perceptual gamut compression gives games a rich, film-emulated atmosphere of depth and realism.
 
 <table>
   <tr>
@@ -76,76 +76,61 @@ The overall impression is of a picture that has been carefully graded for the ro
   </tr>
 </table>
 
----
-
-## 🖥️ System Requirements
-
-| Component | Requirement |
-|---|---|
-| **ReShade** | 5.9.0 or newer |
-| **Graphics API** | Direct3D 11 (feature level 11.0), Direct3D 12, OpenGL 4.3, or Vulkan |
-| **Shader support** | Compute shaders and storage images |
-| **Display** | SDR displays are fully supported; HDR output is passed through unchanged |
-
----
-
 ## 📦 Installation
 
-1. 📥 Download `FlexAgX.fx` from this repository.
-2. 📂 Copy the file into your ReShade shaders folder, typically `reshade-shaders/Shaders/`.
-3. 🎮 Launch your game and open the ReShade overlay (the default key is **Home**).
-4. 🔍 In the **Home** tab, find **FlexAgX** and enable it.
-5. 🧭 For best results, place FlexAgX late in the effect chain, after other colour-grading effects, so it works on the final image.
+### Requirements
 
----
+* **ReShade:** 5.9.0 or newer
 
-## 🎛️ Configuration
+* **Graphics API:** DirectX 11, DirectX 12, OpenGL 4.3+, or Vulkan
 
-| Setting | Category | Purpose |
-|---|---|---|
-| **Game Colour Curve** | Main | The brightness encoding your game uses |
-| **Monitor Colour Curve** | Main | The brightness encoding your monitor uses |
-| **Strength** | Main | Blends the effect with the original image |
-| **Dithering** | Main | Reduces colour banding in gradients |
-| **Brightness** | Brightness | Makes the whole image brighter or darker |
-| **Auto Brightness** | Brightness | Strength of automatic exposure adjustment |
-| **Hold Brightness** | Brightness | Freezes exposure and highlight position |
-| **Auto Highlights** | Highlights and Shadows | Chooses the highlight roll-off point automatically |
-| **Highlight Start** | Highlights and Shadows | Manual roll-off point, used when Auto Highlights is off |
-| **Shadow Detail** | Highlights and Shadows | Keeps dark areas from turning flat black |
-| **Hue Stability** | Colour | Prevents colours from drifting to other hues |
-| **Vivid Colour Softening** | Colour | Lower values soften very saturated colours more |
-| **Colour Temperature** | Colour | Warms or cools the image |
+### Setup
 
----
+1. Download `FlexAgX_1.7.1.fx` from the [Releases](../../releases) tab.
 
-## 🙏 Acknowledgments
+2. Move the file into your game's ReShade shader folder:
 
-FlexAgX builds on the work of many people and projects. Thank you to:
+   ```
+   <GameDirectory>/reshade-shaders/Shaders/
+   ```
 
-- **Björn Ottosson** for the Oklab perceptual colour space, whose matrices, cube-root non-linearity, and gamut-boundary formulas form the backbone of the colour pipeline.
-- **Troy Sobotka** for the AgX tone-mapping approach, whose inset and outset matrices and sigmoid curve inspired the tone mapping.
-- **Kim et al. (2002)** for the Planckian locus approximation used to derive colour-temperature white points.
-- **Jorge Jimenez** for interleaved gradient noise, used for dithering.
-- **crosire and the ReShade team** for the ReShade FX framework, which makes effects like this possible.
-- **Bruce Lindbloom** for the widely published XYZ-to-sRGB colour matrices.
-- **IEC 61966-2-1**, the standard defining the sRGB transfer functions.
-- The **community**, whose shared techniques for fullscreen triangles and von Kries-style white balancing make this shader possible.
+3. Launch your game, open the ReShade overlay (`Home` key by default), and select `FlexAgX`.
 
----
+## ⚙️ Configuration
 
-## 📄 License
+FlexAgX provides intuitive controls grouped for quick tuning:
 
-FlexAgX is released under the **MIT License**.
+| Section | Parameter | Description |
+| ----- | ----- | ----- |
+| **Main** | `Game Colour Curve` | Input encoding curve used by the game (`sRGB` or `Gamma 2.2`). |
+|  | `Monitor Colour Curve` | Output display gamma target (`sRGB` or `Gamma 2.2`). |
+|  | `Strength` | Master blend slider ($0\%$ to $100\%$). |
+| **Brightness** | `Brightness` | Manual exposure adjustment ($\pm 2.0\,\text{EV}$). |
+|  | `Auto Brightness` | Automated exposure adaptation strength ($0\%$ to $100\%$). |
+|  | `Hold Brightness` | Freeze adaptation at current exposure level. |
+| **Highlights & Shadows** | `Auto Highlights` | Dynamically calculate highlight roll-off point from scene histogram. |
+|  | `Highlight Start` | Manual highlight knee position ($0.40$ to $0.55$). Used when Auto Highlights is off. |
+|  | `Shadow Detail` | Softens shadow crushing via Hermite toe blending ($0\%$ to $100\%$). |
+| **Colour** | `Hue Stability` | Restores original hue angle post-tone curve ($0\%$ to $100\%$). |
+|  | `Vivid Colour Softening` | Threshold where extreme saturation begins compressing ($0.60$ to $0.95$). |
+|  | `Colour Temperature` | White balance temperature adjustment ($2000\,\text{K}$ to $12000\,\text{K}$). |
 
-Copyright © 2026 El-Greco1541
+## 📜 Acknowledgements
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files, to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, subject to the conditions set out in the full license text. See [LICENSE](LICENSE) for details.
+FlexAgX builds upon mathematical formulations and color research established by the following creators and visual engineers:
 
----
+* **Troy Sobotka:** Creator of the AgX tone-mapping approach, from which the non-linear inset/outset matrix transformations and 6th-order sigmoid response curves are derived.
 
-<div align="center">
+* **Björn Ottosson (2020):** Formulated the Oklab perceptual color space, including the RGB-to-LMS/Oklab matrices, cube-root non-linearities, and gamut-boundary coefficients.
 
-Made with care for better-looking games. ✨
+* **Kim et al. (2002):** Provided the Planckian locus cubic approximation fits for chromaticities `x(T)` and `y(T)` used in kelvin white-balance evaluation.
 
-</div>
+* **Jorge Jimenez (2014):** Created Interleaved Gradient Noise (IGN), utilized for high-efficiency sub-sampled gradient dithering.
+
+* **Bruce Lindbloom:** Published the widely adopted D65 XYZ-to-linear-sRGB transformation matrix and standard colorimetry reference tables.
+
+* **crosire:** Developer of the ReShade framework, infrastructure, texture/uniform annotations, and FX macro system.
+
+* **IEC Standard (IEC 61966-2-1):** Standardized sRGB electro-optical and opto-electronic transfer functions.
+
+Released under the [MIT License](../../LICENSE). Designed for high-fidelity real-time rendering.
