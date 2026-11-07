@@ -133,4 +133,4 @@ FlexAgX builds upon mathematical formulations and color research established by 
 
 * **IEC Standard (IEC 61966-2-1):** Standardized sRGB electro-optical and opto-electronic transfer functions.
 
-Released under the [MIT License](../../LICENSE). Designed for high-fidelity real-time rendering.
+Released under the [MIT License](https://github.com/El-Greco1541/FlexAgX/blob/main/LICENSE). Designed for high-fidelity real-time rendering.
