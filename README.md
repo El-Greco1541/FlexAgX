@@ -4,6 +4,11 @@
 
 ### Adaptive AgX Tone Mapping for ReShade
 
+  <img src="https://img.shields.io/badge/ReShade-5.9.0%2B-blue?style=for-the-badge&logo=reshade&logoColor=white" alt="ReShade Version">
+  <img src="https://img.shields.io/badge/Version-1.7.1-emerald?style=for-the-badge" alt="Version 1.7.1">
+  <img src="https://img.shields.io/badge/License-MIT-purple?style=for-the-badge" alt="MIT License">
+  <img src="https://img.shields.io/badge/API-DX11%20%7C%20DX12%20%7C%20Vulkan%20%7C%20OpenGL-orange?style=for-the-badge" alt="Supported APIs">
+
 *Crafted for pure visual clarity. Film-grade AgX color science meets real-time gaming.*
 
 [Key Features](#-key-features) • [Visual Experience](#%EF%B8%8F-visual-experience) • [Installation](#-installation) • [Configuration](#%EF%B8%8F-configuration) • [Acknowledgements](#-acknowledgements)
