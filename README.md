@@ -91,7 +91,7 @@ Once enabled, FlexAgX instantly transforms your game's presentation, delivering 
 
 ### Setup
 
-1. Download `FlexAgX_1.7.1.fx` from the [Releases](../../releases) tab.
+1. Download `FlexAgX.fx` from the [Releases](../../releases) tab.
 
 2. Move the file into your game's ReShade shader folder:
 
