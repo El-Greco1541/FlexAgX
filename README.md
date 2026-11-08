@@ -121,20 +121,22 @@ FlexAgX provides intuitive controls grouped for quick tuning:
 
 ## 📜 Acknowledgements
 
-FlexAgX builds upon mathematical formulations and color research established by the following creators and visual engineers:
+FlexAgX is built on the work of many researchers, engineers, and open projects. We are grateful to everyone listed below.
 
-* **Troy Sobotka:** Creator of the AgX tone-mapping approach, from which the non-linear inset/outset matrix transformations and 6th-order sigmoid response curves are derived.
+- **ReShade**: the post-processing framework FlexAgX runs in. Thanks to the ReShade developers and community.
+- **Björn Ottosson**: the Oklab perceptual colour space. The LMS matrices and cube-root transform used for lightness, chroma, and hue calculations follow this work.
+- **Björn Ottosson**: the Oklab cusp-based gamut boundary approach, used for keeping very vivid colours within the displayable range.
+- **IEC 61966-2-1**: the sRGB transfer function, used for encoding and decoding display colour.
+- **Johannes von Kries**: von Kries chromatic adaptation (1902), used for the diagonal white-balance correction in LMS space.
+- **Troy Sobotka**: AgX, and its Blender implementation. The inset and outset colour matrices and the sigmoid polynomial that shapes the tone curve follow this approach.
+- **Hermite spline**: cubic Hermite splines, used to build the smooth shoulder and toe curves.
+- **Oklab hue correction**: keeps colours from drifting to a different hue when they are brightened, darkened, or muted.
+- **Graham Finlayson and Elisabetta Trezzi**: Shades of Grey (2004), which uses a Minkowski p-norm to estimate the scene illuminant.
+- **Joost van de Weijer, Theo Gevers, and Arjan Gijsenij**: Grey Edge (2007), which estimates the illuminant from edge statistics.
+- **Edwin Land and John McCann**: Max-RGB / White Patch from their Retinex work (1971), used for the highlight-based estimator.
+- **Calvin McCamy**: McCamy's approximation (1992) for converting chromaticity to correlated colour temperature.
+- **Photographic convention**: middle grey, the long-standing practice of mapping average scene brightness to about 18% grey.
+- **Histogram-based metering**: uses luminance percentiles to measure the scene and detect large changes between frames.
+- **Jorge Jimenez**: Interleaved Gradient Noise (2014), used for dithering to prevent colour banding.
 
-* **Björn Ottosson (2020):** Formulated the Oklab perceptual color space, including the RGB-to-LMS/Oklab matrices, cube-root non-linearities, and gamut-boundary coefficients.
-
-* **Kim et al. (2002):** Provided the Planckian locus cubic approximation fits for chromaticities `x(T)` and `y(T)` used in kelvin white-balance evaluation.
-
-* **Jorge Jimenez (2014):** Created Interleaved Gradient Noise (IGN), utilized for high-efficiency sub-sampled gradient dithering.
-
-* **Bruce Lindbloom:** Published the widely adopted D65 XYZ-to-linear-sRGB transformation matrix and standard colorimetry reference tables.
-
-* **crosire:** Developer of the ReShade framework, infrastructure, texture/uniform annotations, and FX macro system.
-
-* **IEC Standard (IEC 61966-2-1):** Standardized sRGB electro-optical and opto-electronic transfer functions.
-
-Released under the [MIT License](LICENSE). Designed for high-fidelity real-time rendering.
+Released under the [MIT License](LICENSE)
