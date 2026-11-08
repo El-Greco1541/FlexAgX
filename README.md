@@ -109,19 +109,22 @@ Once enabled, FlexAgX instantly transforms your game's presentation, delivering 
 FlexAgX provides intuitive controls grouped for quick tuning:
 
 | Section | Parameter | Description |
-| ----- | ----- | ----- |
-| **Main** | `Game Colour Curve` | Input encoding curve used by the game (`sRGB` or `Gamma 2.2`). |
-|  | `Monitor Colour Curve` | Output display gamma target (`sRGB` or `Gamma 2.2`). |
-|  | `Strength` | Master blend slider ($0\%$ to $100\%$). |
-| **Brightness** | `Brightness` | Manual exposure adjustment ($\pm 2.0\,\text{EV}$). |
-|  | `Auto Brightness` | Automated exposure adaptation strength ($0\%$ to $100\%$). |
-|  | `Hold Brightness` | Freeze adaptation at current exposure level. |
-| **Highlights & Shadows** | `Auto Highlights` | Dynamically calculate highlight roll-off point from scene histogram. |
-|  | `Highlight Start` | Manual highlight knee position ($0.40$ to $0.55$). Used when Auto Highlights is off. |
-|  | `Shadow Detail` | Softens shadow crushing via Hermite toe blending ($0\%$ to $100\%$). |
-| **Colour** | `Hue Stability` | Restores original hue angle post-tone curve ($0\%$ to $100\%$). |
-|  | `Vivid Colour Softening` | Threshold where extreme saturation begins compressing ($0.60$ to $0.95$). |
-|  | `Colour Temperature` | White balance temperature adjustment ($2000\,\text{K}$ to $12000\,\text{K}$). |
+|---|---|---|
+| Main | `Game Colour Curve` | Input encoding curve used by the game (`sRGB` or `Gamma 2.2`). |
+| | `Monitor Colour Curve` | Output display gamma target (`sRGB` or `Gamma 2.2`). |
+| | `Strength` | Master blend slider (0 to 100). |
+| | `Dithering` | Adds faint noise to smooth gradients to prevent colour banding (on or off). |
+| Brightness | `Brightness` | Manual exposure adjustment (±2.0, EV). |
+| | `Auto Brightness` | Automated exposure adaptation strength (0 to 100). |
+| | `Hold Brightness` | Freeze adaptation at current exposure level. |
+| Highlights & Shadows | `Auto Highlights` | Dynamically calculate highlight roll-off point from scene histogram. |
+| | `Highlight Start` | Manual highlight knee position (0.40 to 0.55). Used when Auto Highlights is off. |
+| | `Shadow Detail` | Softens shadow crushing via Hermite toe blending (0 to 100). |
+| Colour | `Hue Stability` | Restores original hue angle post-tone curve (0 to 100). |
+| | `Vivid Colour Softening` | Threshold where extreme saturation begins compressing (0.60 to 0.95). |
+| | `Colour Temperature` | White balance temperature adjustment (2000 K to 12000 K). Disabled while Auto White Balance is on. |
+| | `Auto White Balance` | Automatically removes the colour tint from the scene's lighting. Off by default. |
+| | `Auto White Balance Strength` | How strongly the automatic correction is applied (0 to 100). Only works when Auto White Balance is on. |
 
 ## 📜 Acknowledgements
 
