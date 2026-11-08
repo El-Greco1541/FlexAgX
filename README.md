@@ -35,6 +35,10 @@
 
   A dynamic Hermite curve seamlessly blends low-end shadows with high-end highlights, protecting dark areas from crushing to flat black while maintaining pristine contrast.
 
+* **Advanced Auto White Balance**
+
+  Removes colour casts from your scene’s lighting automatically. Three analysers vote on the light colour, and a correction only happens when at least two agree. Changes arrive gradually,  so the image stays natural, and scenes without clear evidence are left alone.
+
 * **Von Kries White Balance**
 
   Adjust scene white point seamlessly from 2000K to 12000K using a high-precision cubic fit of the Planckian locus.
