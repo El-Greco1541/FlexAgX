@@ -6,7 +6,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/ReShade-5.9.0%2B-00E5FF?style=flat&labelColor=111827&logoColor=white" alt="ReShade Version">
-  <img src="https://img.shields.io/badge/Version-1.7.1-34D399?style=flat&logo=semanticrelease&logoColor=white&labelColor=111827" alt="Version 1.7.1">
+  <img src="https://img.shields.io/badge/Version-1.7.1-34D399?style=flat&logo=semanticrelease&logoColor=white&labelColor=111827" alt="Version 1.9">
   <img src="https://img.shields.io/badge/License-MIT-C084FC?style=flat&logo=opensourceinitiative&logoColor=white&labelColor=111827" alt="MIT License">
   <img src="https://img.shields.io/badge/APIs-DX11%20%7C%20DX12%20%7C%20Vulkan%20%7C%20OpenGL-FB923C?style=flat&logo=vulkan&logoColor=white&labelColor=111827" alt="Supported APIs">
 </p>
