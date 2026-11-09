@@ -934,9 +934,9 @@ static const float3x3 FA_RGB_TO_LMS = float3x3(
     0.0883024619, 0.2817188376, 0.6299787005);
 
 static const float3x3 FA_LMS_TO_RGB = float3x3(
-     4.0767416613, -3.3077115904,  0.2309699287,
-    -1.2684380041,  2.6097574007, -0.3413193963,
-    -0.0041960865, -0.7034186145,  1.7076147009);
+     4.0767416621, -3.3077115913,  0.2309699292,
+    -1.2684380046,  2.6097574011, -0.3413193965,
+    -0.0041960863, -0.7034186147,  1.7076147010);
 
 static const float3 FA_WB_REFERENCE_LMS = float3(1.0106792805, 1.0017568775, 1.0211812566);
 
@@ -1964,7 +1964,7 @@ float4 FA_HuePS(float4 position : SV_Position, float2 texcoord : TEXCOORD0) : SV
 
     float3 w = FA_Inset(float3(1.0, 1.0, 1.0));
     float3 x3 = (FA_Inset(src) / w) * ((float)(_FA_LUT_SIZE - 1) / _FA_LUT_DOMAIN);
-    float3 curved = FA_Outset(float3(FA_LUTFetch(x3.r), FA_LUTFetch(x3.g), FA_LUTFetch(x3.b)) * w);
+    float3 curved = clamp(max(FA_Outset(float3(FA_LUTFetch(x3.r), FA_LUTFetch(x3.g), FA_LUTFetch(x3.b)) * w), 0.0), 0.0, 1.0);
 
     float3 inLab = FA_OklabFromLinear(src);
     float3 lab = FA_OklabFromLinear(curved);
