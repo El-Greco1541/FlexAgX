@@ -319,6 +319,7 @@ sampler2D FA_BSampler
     MinFilter = LINEAR; MagFilter = LINEAR; MipFilter = LINEAR;
     AddressU = CLAMP; AddressV = CLAMP;
 };
+storage2D FA_BStorage { Texture = FA_B; };
 
 groupshared uint  FA_HistSh[_FA_HIST_BINS];
 groupshared float FA_PrevSh[_FA_HIST_BINS];
@@ -1955,11 +1956,19 @@ void FA_AwbStateCS(uint3 tid : SV_GroupThreadID)
     }
 }
 
-float4 FA_HuePS(float4 position : SV_Position, float2 texcoord : TEXCOORD0) : SV_Target
+[numthreads(8, 8, 1)]
+void FA_HueCS(uint3 id : SV_DispatchThreadID)
 {
-    if (OverallStrength <= 0.0) return float4(0.0, 0.0, 0.0, 0.0);
+    if (id.x >= BUFFER_WIDTH || id.y >= BUFFER_HEIGHT)
+        return;
 
-    float4 source = tex2D(FA_BackBufferSampler, texcoord);
+    if (OverallStrength <= 0.0)
+    {
+        tex2Dstore(FA_BStorage, int2(id.xy), float4(0.0, 0.0, 0.0, 0.0));
+        return;
+    }
+
+    float4 source = tex2Dfetch(FA_BackBufferSampler, int2(id.xy));
     float3 src = FA_Sanitize(FA_Decode(source.rgb));
 
     float3 w = FA_Inset(float3(1.0, 1.0, 1.0));
@@ -2005,7 +2014,7 @@ float4 FA_HuePS(float4 position : SV_Position, float2 texcoord : TEXCOORD0) : SV
         float3 roll = lerp(rollDown, rollUp, step(restored, balanced));
         balanced = restored + (balanced - restored) * roll;
     }
-    return float4(balanced, source.a);
+    tex2Dstore(FA_BStorage, int2(id.xy), float4(balanced, source.a));
 }
 
 float FA_Fp16QuantStep(float c)
@@ -2096,10 +2105,10 @@ technique FlexAgX
     }
     pass FlexAgX_HuePass
     {
-        VertexShader = FA_FullscreenVS;
-        PixelShader = FA_HuePS;
-        VertexCount = 3;
-        RenderTarget = FA_B;
+        ComputeShader = FA_HueCS;
+        DispatchSizeX = (BUFFER_WIDTH + 7) / 8;
+        DispatchSizeY = (BUFFER_HEIGHT + 7) / 8;
+        DispatchSizeZ = 1;
     }
     pass FlexAgX_OutputPass
     {
