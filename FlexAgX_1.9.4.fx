@@ -242,8 +242,8 @@ static const float ClipGuard = 2.0;
 #define _FA_AWB_MAX_RATE (0.25)
 #define _FA_AWB_CUT_TAU (0.45)
 #define _FA_AWB_CUT_RATE (0.35)
-#define _FA_AWB_UNCERTAIN_HOLD (3.0)
-#define _FA_AWB_RELAX_RATE (0.12)
+#define _FA_AWB_UNCERTAIN_HOLD (1.5)
+#define _FA_AWB_RELAX_RATE (0.35)
 #define _FA_AWB_AGREEMENT_SIGMA (0.15)
 #define _FA_AWB_TARGET_TAU (0.3)
 #define _FA_AWB_STRENGTH_TAU (0.25)
@@ -330,6 +330,7 @@ groupshared float FA_LutNat[_FA_LUT_SIZE];
 groupshared int   FA_StateFail;
 groupshared float FA_StateGain;
 groupshared float FA_StateJoin;
+groupshared float FA_StateDist;
 
 groupshared uint FA_P1Bins[_FA_HIST_BINS];
 groupshared uint FA_P1Valid;
@@ -1013,11 +1014,13 @@ float FA_AwbPlausibility(float3 e)
     denom = (abs(denom) < 1.0e-4) ? ((denom < 0.0) ? -1.0e-4 : 1.0e-4) : denom;
     float n = (x - 0.3320) / denom;
     float cct = 449.0 * n * n * n + 3525.0 * n * n + 6823.3 * n + 5520.33;
-    float cctPlaus = smoothstep(1800.0, 3000.0, cct)
-                   * (1.0 - smoothstep(9000.0, 18000.0, cct));
+    float cctPlaus = (cct > 1000.0 && cct < 25000.0)
+                   ? (0.15 + 0.85 * smoothstep(1500.0, 2600.0, cct)
+                           * (1.0 - smoothstep(11000.0, 20000.0, cct)))
+                   : 0.0;
     float3 logE = log(max(e, 1.0e-6));
     float chroma = length(logE - dot(logE, FA_LUMA));
-    float chromaPlaus = 1.0 - smoothstep(_FA_AWB_PLAUS_CHROMA_LO, _FA_AWB_PLAUS_CHROMA_HI, chroma);
+    float chromaPlaus = 1.0 - 0.90 * smoothstep(_FA_AWB_PLAUS_CHROMA_LO, _FA_AWB_PLAUS_CHROMA_HI, chroma);
     return saturate(cctPlaus * chromaPlaus);
 }
 
@@ -1028,15 +1031,6 @@ float3 FA_AwbCorrectionLog(float3 e)
     float3 l = log(max(corr, 1.0e-6));
     l -= dot(l, FA_LUMA);
     return l;
-}
-
-float3 FA_AwbCurvedGrey(float3 c)
-{
-    float3 w = FA_Inset(float3(1.0, 1.0, 1.0));
-    float lutScale = (float)(_FA_LUT_SIZE - 1) / _FA_LUT_DOMAIN;
-    float3 x3 = (FA_Inset(c) / w) * lutScale;
-    float3 v = float3(FA_LUTFetch(x3.r), FA_LUTFetch(x3.g), FA_LUTFetch(x3.b));
-    return clamp(max(FA_Outset(v * w), 0.0), 0.0, 1.0);
 }
 
 void FA_LutPath(float3 rgbIn, out float3 u, out float3 linearOut, out float3 codeOut)
@@ -1334,6 +1328,7 @@ void FA_StateCS(uint3 id : SV_DispatchThreadID, uint3 tid : SV_GroupThreadID)
         float drawRaw = 0.0;
         if (FA_T > 0u)
             FA_HistDistance(D, drawRaw);
+        FA_StateDist = D;
         if (D > SceneChangeSensitivity) FA_UpdateHistRef = 0;
         if (didResync) FA_UpdateHistRef = 1;
         if (coldStart) FA_UpdateHistRef = 1;
@@ -1509,7 +1504,7 @@ void FA_StateCS(uint3 id : SV_DispatchThreadID, uint3 tid : SV_GroupThreadID)
 
     if (lane == 0)
         tex2Dstore(FA_StateStorage, int2(2, 0),
-                   float4(FreezeExposure ? 1.0 : 0.0, 0.0, 0.0, 0.0));
+                   float4(FreezeExposure ? 1.0 : 0.0, FA_StateDist, 0.0, 0.0));
 }
 
 [numthreads(16, 16, 1)]
@@ -1519,6 +1514,12 @@ void FA_StatsCS(uint3 id : SV_DispatchThreadID, uint3 gid : SV_GroupID, uint3 ti
 
     const uint lane = tid.y * 16 + tid.x;
     const bool doAwb = AutoWhiteBalance;
+
+    float e50Prev = tex2Dfetch(FA_StateStorage, int2(0, 0)).x;
+    if (!FA_Finite1(e50Prev)) e50Prev = 0.0;
+    float sceneLuma = exp2(clamp(e50Prev, _FA_LOG_MIN, _FA_LOG_MAX));
+    float awbBrightMin = clamp(sceneLuma * 4.0, 0.08, _FA_AWB_BRIGHT_MIN);
+    float awbEdgeMin = clamp(sceneLuma * 8.0, 0.002, _FA_AWB_EDGE_MIN);
 
     float2 halfSize = 0.5 * float2((float)BUFFER_WIDTH, (float)BUFFER_HEIGHT);
     float invDiag2 = 1.0 / (halfSize.x * halfSize.x + halfSize.y * halfSize.y);
@@ -1592,9 +1593,11 @@ void FA_StatsCS(uint3 id : SV_DispatchThreadID, uint3 gid : SV_GroupID, uint3 ti
                             float bn = c.b * invSum;
 
                             acc0 += w * float4(1.0, c3r, c3g, c3b);
-                            acc3 += w * float4(0.0, rn, rn * rn, bn);
-                            acc4 += w * float4(bn * bn, Y, Y * Y, 0.0);
-                            if (Y >= _FA_AWB_BRIGHT_MIN)
+                            float rnC = rn - (1.0 / 3.0);
+                            float bnC = bn - (1.0 / 3.0);
+                            acc3 += w * float4(0.0, rn, rnC * rnC, bn);
+                            acc4 += w * float4(bnC * bnC, Y, 0.0, 0.0);
+                            if (Y >= awbBrightMin)
                             {
                                 float cMaxB = max(c.r, max(c.g, c.b));
                                 float nu = min(c.r, min(c.g, c.b)) / max(cMaxB, 1.0e-6);
@@ -1620,7 +1623,7 @@ void FA_StatsCS(uint3 id : SV_DispatchThreadID, uint3 gid : SV_GroupID, uint3 ti
                     if (rowV[ei] && rowV[ei - 1])
                     {
                         float3 d = abs(rowC[ei] - rowC[ei - 1]);
-                        if (max(d.r, max(d.g, d.b)) >= _FA_AWB_EDGE_MIN)
+                        if (max(d.r, max(d.g, d.b)) >= awbEdgeMin)
                         {
                             float ew = 0.5 * (rowW[ei] + rowW[ei - 1]);
                             acc2 += ew * float4(d.r, d.g, d.b, 1.0);
@@ -1637,7 +1640,7 @@ void FA_StatsCS(uint3 id : SV_DispatchThreadID, uint3 gid : SV_GroupID, uint3 ti
                     if (rowV[vi] && prevV[vi])
                     {
                         float3 d = abs(rowC[vi] - prevC[vi]);
-                        if (max(d.r, max(d.g, d.b)) >= _FA_AWB_EDGE_MIN)
+                        if (max(d.r, max(d.g, d.b)) >= awbEdgeMin)
                         {
                             float ew = 0.5 * (rowW[vi] + prevW[vi]);
                             acc2 += ew * float4(d.r, d.g, d.b, 1.0);
@@ -1771,13 +1774,14 @@ void FA_AwbStateCS(uint3 tid : SV_GroupThreadID)
         float Nw = A0.x;
         float sampledWeight = A4.w;
         float validFraction = Nw / max(sampledWeight, 1.0e-6);
-        bool haveScene = (Nw >= 64.0) && (validFraction >= 0.05);
+        bool haveScene = (Nw >= 64.0)
+                      && ((validFraction >= 0.05) || (Nw >= 1024.0 && validFraction >= 0.01));
 
         float meanY = A4.y / max(Nw, 1.0e-6);
         float meanRn = A3.y / max(Nw, 1.0e-6);
         float meanBn = A3.w / max(Nw, 1.0e-6);
-        float varRn = max(A3.z / max(Nw, 1.0e-6) - meanRn * meanRn, 0.0);
-        float varBn = max(A4.x / max(Nw, 1.0e-6) - meanBn * meanBn, 0.0);
+        float varRn = max(A3.z / max(Nw, 1.0e-6) - (meanRn - (1.0 / 3.0)) * (meanRn - (1.0 / 3.0)), 0.0);
+        float varBn = max(A4.x / max(Nw, 1.0e-6) - (meanBn - (1.0 / 3.0)) * (meanBn - (1.0 / 3.0)), 0.0);
         float stdC = sqrt(varRn + varBn);
 
         float meanChroma = length(float2(meanRn - (1.0 / 3.0), meanBn - (1.0 / 3.0)));
@@ -1785,7 +1789,9 @@ void FA_AwbStateCS(uint3 tid : SV_GroupThreadID)
         float dominancePenalty = 1.0 - 0.65 * smoothstep(2.0, 4.0, chromaRatio);
         float bimodalPenalty = lerp(0.35, 1.0, saturate(chromaRatio / 0.6));
 
-        float countTerm = smoothstep(64.0, 256.0, Nw) * smoothstep(0.10, 0.35, validFraction);
+        float countTerm = smoothstep(64.0, 256.0, Nw)
+                        * max(smoothstep(0.10, 0.35, validFraction),
+                              smoothstep(0.005, 0.02, validFraction) * smoothstep(1024.0, 4096.0, Nw));
         float exposureTerm = smoothstep(0.004, 0.02, meanY) * (1.0 - smoothstep(0.55, 0.85, meanY));
         float edgePresence = smoothstep(16.0, 64.0, A2.w);
         float diversityTerm = smoothstep(0.008, 0.045, stdC) * edgePresence;
@@ -1826,6 +1832,7 @@ void FA_AwbStateCS(uint3 tid : SV_GroupThreadID)
 
         float3 fused = float3(0.0, 0.0, 0.0);
         float fusedConf = 0.0;
+        float agreement = 1.0;
         float totalBase = conf1 + conf2 + conf3;
         if (totalBase > 1.0e-4)
         {
@@ -1837,13 +1844,14 @@ void FA_AwbStateCS(uint3 tid : SV_GroupThreadID)
             float spread = (conf1 * dot(c1 - fused, c1 - fused)
                           + conf2 * dot(c2 - fused, c2 - fused)
                           + conf3 * dot(c3 - fused, c3 - fused)) / totalBase;
-            float agreement = exp(-spread / (_FA_AWB_AGREEMENT_SIGMA * _FA_AWB_AGREEMENT_SIGMA));
+            agreement = exp(-spread / (_FA_AWB_AGREEMENT_SIGMA * _FA_AWB_AGREEMENT_SIGMA));
 
             float top2 = max(min(conf1, conf2), max(min(conf1, conf3), min(conf2, conf3)));
+            float leadConf = (top2 > 1.0e-6) ? top2 : (0.5 * max(conf1, max(conf2, conf3)));
 
             float plausFused = FA_AwbPlausibility(FA_AwbNormLuma(exp(-fused)));
-            float flatGate = smoothstep(0.002, 0.012, stdC) * smoothstep(16.0, 64.0, A2.w);
-            fusedConf = saturate(top2 * 2.0) * agreement * plausFused * flatGate;
+            float flatGate = smoothstep(0.002, 0.012, stdC);
+            fusedConf = saturate(leadConf * 2.0) * agreement * plausFused * flatGate;
 
             fused = clamp(fused, -_FA_AWB_GAIN_LIMIT_LOG, _FA_AWB_GAIN_LIMIT_LOG);
         }
@@ -1863,96 +1871,103 @@ void FA_AwbStateCS(uint3 tid : SV_GroupThreadID)
             s3 = float4(0.0, 0.0, 0.0, 0.0);
         }
 
-        float total = clamp(frametime * 0.001, 0.001, 0.5);
+        float totalRaw = frametime * 0.001;
+        bool stalled = totalRaw > 0.5;
+        float total = clamp(totalRaw, 0.001, 0.5);
         int steps = (int)ceil(total / 0.0333);
         float sdt = total / (float)steps;
 
         float meanYPrev = s1.y;
         float meanRnPrev = s1.z;
         float meanBnPrev = s1.w;
-        bool sceneCut = false;
-        if (haveScene && s2.w > 0.5)
-        {
-            float lumaJump = abs(meanY - meanYPrev) / max(max(meanY, meanYPrev), 0.02);
-            float chromaJump = abs(meanRn - meanRnPrev) + abs(meanBn - meanBnPrev);
-            sceneCut = (lumaJump > 0.45) || (chromaJump > _FA_AWB_CUT_CHROMA);
-        }
-
         float3 cur = s0.xyz;
         float smoothedConf = s0.w;
         float uncertain = s1.x;
         float3 tgt = s2.xyz;
-        float recentCut = sceneCut ? 1.0 : s3.x * exp(-total / 0.5);
-        bool wasConfident = s3.y > 0.5;
-
-        smoothedConf = lerp(smoothedConf, fusedConf, 1.0 - exp(-total / 0.4));
-        float confGate = wasConfident ? _FA_AWB_CONF_EXIT : _FA_AWB_CONF_ENTER;
-        bool confident = haveScene && (fusedConf > 0.0) && (smoothedConf >= confGate);
-
-        if (confident)
-        {
-            tgt = lerp(tgt, fused, 1.0 - exp(-total / _FA_AWB_TARGET_TAU));
-            uncertain = 0.0;
-        }
-        else
-        {
-            uncertain += total;
-            if (sceneCut)
-                uncertain = max(uncertain, _FA_AWB_UNCERTAIN_HOLD + 1.0e-3);
-        }
-
-        tgt -= dot(tgt, FA_LUMA);
-        tgt = clamp(tgt, -_FA_AWB_GAIN_LIMIT_LOG, _FA_AWB_GAIN_LIMIT_LOG);
-        tgt -= dot(tgt, FA_LUMA);
-        tgt = clamp(tgt, -_FA_AWB_GAIN_LIMIT_LOG, _FA_AWB_GAIN_LIMIT_LOG);
-
-        float cutBoost = confident ? recentCut : 0.0;
-        float tau = lerp(_FA_AWB_TAU, _FA_AWB_CUT_TAU, cutBoost);
-        float cap = lerp(_FA_AWB_MAX_RATE, _FA_AWB_CUT_RATE, cutBoost);
-        if (s2.w < 0.5) cur = float3(0.0, 0.0, 0.0);
-
-        [loop]
-        for (int st = 0; st < steps; ++st)
-        {
-            if (uncertain > _FA_AWB_UNCERTAIN_HOLD)
-                tgt *= exp(-sdt * _FA_AWB_RELAX_RATE);
-            float3 delta = tgt - cur;
-            float maxStep = cap * sdt;
-            cur += clamp(delta * (sdt / max(tau, sdt)), -maxStep, maxStep);
-            cur -= dot(cur, FA_LUMA);
-        }
-        cur = clamp(cur, -_FA_AWB_GAIN_LIMIT_LOG, _FA_AWB_GAIN_LIMIT_LOG);
-        cur -= dot(cur, FA_LUMA);
-        cur = clamp(cur, -_FA_AWB_GAIN_LIMIT_LOG, _FA_AWB_GAIN_LIMIT_LOG);
-
         float strengthSm = s3.z;
-        float strengthTarget = AutoWhiteBalanceStrength / 100.0;
-        strengthSm += (strengthTarget - strengthSm) * (1.0 - exp(-total / _FA_AWB_STRENGTH_TAU));
+
+        if (!stalled)
+        {
+            bool sceneCut = false;
+            if (haveScene && s2.w > 0.5 && s3.w > 0.5)
+            {
+                float lumaJump = abs(meanY - meanYPrev) / max(max(meanY, meanYPrev), 0.02);
+                float chromaJump = abs(meanRn - meanRnPrev) + abs(meanBn - meanBnPrev);
+                float histD = tex2Dfetch(FA_StateStorage, int2(2, 0)).y;
+                if (!FA_Finite1(histD)) histD = 0.0;
+                sceneCut = (chromaJump > _FA_AWB_CUT_CHROMA)
+                        || (lumaJump > 0.45 && histD > SceneChangeSensitivity);
+            }
+
+            float recentCut = sceneCut ? 1.0 : s3.x * exp(-total / 0.5);
+            bool wasConfident = s3.y > 0.5;
+
+            smoothedConf = lerp(smoothedConf, fusedConf, 1.0 - exp(-total / 0.4));
+            if (sceneCut)
+                smoothedConf = max(smoothedConf, fusedConf);
+            float confGate = wasConfident ? _FA_AWB_CONF_EXIT : _FA_AWB_CONF_ENTER;
+            bool confident = haveScene && (fusedConf > 0.0) && (smoothedConf >= confGate);
+
+            if (confident)
+            {
+                tgt = lerp(tgt, fused, (1.0 - exp(-total / _FA_AWB_TARGET_TAU)) * agreement);
+                uncertain = 0.0;
+            }
+            else
+            {
+                uncertain += total;
+                if (sceneCut)
+                    uncertain = max(uncertain, _FA_AWB_UNCERTAIN_HOLD + 1.0e-3);
+            }
+
+            tgt -= dot(tgt, FA_LUMA);
+            tgt = clamp(tgt, -_FA_AWB_GAIN_LIMIT_LOG, _FA_AWB_GAIN_LIMIT_LOG);
+            tgt -= dot(tgt, FA_LUMA);
+            tgt = clamp(tgt, -_FA_AWB_GAIN_LIMIT_LOG, _FA_AWB_GAIN_LIMIT_LOG);
+
+            float cutBoost = confident ? recentCut : 0.0;
+            float tau = lerp(_FA_AWB_TAU, _FA_AWB_CUT_TAU, cutBoost);
+            float cap = lerp(_FA_AWB_MAX_RATE, _FA_AWB_CUT_RATE, cutBoost);
+            if (s2.w < 0.5) cur = float3(0.0, 0.0, 0.0);
+
+            [loop]
+            for (int st = 0; st < steps; ++st)
+            {
+                if (uncertain > _FA_AWB_UNCERTAIN_HOLD)
+                    tgt *= exp(-sdt * _FA_AWB_RELAX_RATE);
+                float3 delta = tgt - cur;
+                float maxStep = cap * sdt;
+                cur += clamp(delta * (sdt / max(tau, sdt)), -maxStep, maxStep);
+                cur -= dot(cur, FA_LUMA);
+            }
+            cur = clamp(cur, -_FA_AWB_GAIN_LIMIT_LOG, _FA_AWB_GAIN_LIMIT_LOG);
+            cur -= dot(cur, FA_LUMA);
+            cur = clamp(cur, -_FA_AWB_GAIN_LIMIT_LOG, _FA_AWB_GAIN_LIMIT_LOG);
+
+            float strengthTarget = AutoWhiteBalanceStrength / 100.0;
+            strengthSm += (strengthTarget - strengthSm) * (1.0 - exp(-total / _FA_AWB_STRENGTH_TAU));
+
+            tex2Dstore(FA_AwbStateStorage, int2(0, 0), float4(cur, smoothedConf));
+            tex2Dstore(FA_AwbStateStorage, int2(1, 0),
+                       float4(uncertain,
+                              haveScene ? meanY : meanYPrev,
+                              haveScene ? meanRn : meanRnPrev,
+                              haveScene ? meanBn : meanBnPrev));
+            tex2Dstore(FA_AwbStateStorage, int2(2, 0), float4(tgt, 1.0));
+            tex2Dstore(FA_AwbStateStorage, int2(3, 0),
+                       float4(recentCut, confident ? 1.0 : 0.0, strengthSm,
+                              haveScene ? 1.0 : 0.0));
+        }
 
         float3 applied = clamp(cur * strengthSm,
                                -_FA_AWB_GAIN_LIMIT_LOG, _FA_AWB_GAIN_LIMIT_LOG);
         float3 targetWhite = exp(-applied);
-
-        float u0 = clamp((haveScene ? meanY : 0.18), 0.01, 0.95);
-        float3 greyPost = FA_AwbCurvedGrey(targetWhite * u0);
-        float greyPostLuma = dot(greyPost, FA_LUMA);
-        float3 baseWhite = (FA_Finite1(greyPostLuma) && greyPostLuma > 1.0e-7)
-                         ? (greyPost / greyPostLuma)
-                         : targetWhite;
-        float3 lmsEstimate = mul(FA_RGB_TO_LMS, baseWhite);
+        float3 whiteN = targetWhite / max(dot(targetWhite, FA_LUMA), 1.0e-6);
+        float3 lmsEstimate = mul(FA_RGB_TO_LMS, whiteN);
         float3 awbGain = clamp(1.0 / max(lmsEstimate, float3(1.0e-4, 1.0e-4, 1.0e-4)),
                                0.5, 2.0);
 
         tex2Dstore(FA_WBStorage, int2(0, 0), float4(awbGain, 0.0));
-        tex2Dstore(FA_AwbStateStorage, int2(0, 0), float4(cur, smoothedConf));
-        tex2Dstore(FA_AwbStateStorage, int2(1, 0),
-                   float4(uncertain,
-                          haveScene ? meanY : meanYPrev,
-                          haveScene ? meanRn : meanRnPrev,
-                          haveScene ? meanBn : meanBnPrev));
-        tex2Dstore(FA_AwbStateStorage, int2(2, 0), float4(tgt, 1.0));
-        tex2Dstore(FA_AwbStateStorage, int2(3, 0),
-                   float4(recentCut, confident ? 1.0 : 0.0, strengthSm, 0.0));
     }
 }
 
@@ -1971,11 +1986,21 @@ void FA_HueCS(uint3 id : SV_DispatchThreadID)
     float4 source = tex2Dfetch(FA_BackBufferSampler, int2(id.xy));
     float3 src = FA_Sanitize(FA_Decode(source.rgb));
 
+    float3 wbGain = tex2Dfetch(FA_WBSampler, int2(0, 0)).rgb;
+    float3 toneInput = src;
+    if (AutoWhiteBalance)
+    {
+        float3 corrected = FA_WhiteBalance(src, wbGain);
+        float roll = min(1.0 - smoothstep(0.80, 0.97, max(corrected.r, max(corrected.g, corrected.b))),
+                         smoothstep(0.0, 0.02, min(src.r, min(src.g, src.b))));
+        toneInput = max(src + (corrected - src) * roll, 0.0);
+    }
+
     float3 w = FA_Inset(float3(1.0, 1.0, 1.0));
-    float3 x3 = (FA_Inset(src) / w) * ((float)(_FA_LUT_SIZE - 1) / _FA_LUT_DOMAIN);
+    float3 x3 = (FA_Inset(toneInput) / w) * ((float)(_FA_LUT_SIZE - 1) / _FA_LUT_DOMAIN);
     float3 curved = clamp(max(FA_Outset(float3(FA_LUTFetch(x3.r), FA_LUTFetch(x3.g), FA_LUTFetch(x3.b)) * w), 0.0), 0.0, 1.0);
 
-    float3 inLab = FA_OklabFromLinear(src);
+    float3 inLab = FA_OklabFromLinear(toneInput);
     float3 lab = FA_OklabFromLinear(curved);
 
     float inputChroma = length(inLab.yz);
@@ -2005,15 +2030,9 @@ void FA_HueCS(uint3 id : SV_DispatchThreadID)
     float cs = cos(theta), sn = sin(theta);
     float3 restored = FA_LinearFromOklab(float3(lab.x, ab.x * cs - ab.y * sn, ab.x * sn + ab.y * cs));
 
-    float3 wbGain = tex2Dfetch(FA_WBSampler, int2(0, 0)).rgb;
-    float3 balanced = FA_WhiteBalance(restored, wbGain);
-    if (AutoWhiteBalance)
-    {
-        float3 rollUp = 1.0 - smoothstep(0.80, 0.97, balanced);
-        float3 rollDown = smoothstep(0.0, 0.02, restored);
-        float3 roll = lerp(rollDown, rollUp, step(restored, balanced));
-        balanced = restored + (balanced - restored) * roll;
-    }
+    float3 balanced = restored;
+    if (!AutoWhiteBalance)
+        balanced = FA_WhiteBalance(restored, wbGain);
     tex2Dstore(FA_BStorage, int2(id.xy), float4(balanced, source.a));
 }
 
